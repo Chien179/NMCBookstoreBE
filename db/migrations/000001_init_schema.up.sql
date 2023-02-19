@@ -11,11 +11,11 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "address" (
+  "id" BIGSERIAL PRIMARY KEY,
   "address" varchar NOT NULL,
   "users_id" bigserial NOT NULL,
   "district" varchar NOT NULL,
-  "city" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "city" varchar NOT NULL
 );
 
 CREATE TABLE "books" (
@@ -50,18 +50,29 @@ CREATE TABLE "carts" (
 );
 
 CREATE TABLE "books_carts" (
+  "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "carts_id" bigserial NOT NULL
 );
 
 CREATE TABLE "books_genres" (
+  "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "genres_id" bigserial NOT NULL
 );
 
+CREATE TABLE "books_subgenres" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "books_id" bigserial NOT NULL,
+  "subgenres_id" bigserial NOT NULL
+);
+
 CREATE TABLE "reviews" (
   "id" BIGSERIAL PRIMARY KEY,
-  "books_id" bigserial NOT NULL
+  "users_id" bigserial NOT NULL,
+  "books_id" bigserial NOT NULL,
+  "comments" varchar NOT NULL,
+  "rating" int NOT NULL
 );
 
 CREATE TABLE "orders" (
@@ -70,13 +81,20 @@ CREATE TABLE "orders" (
 );
 
 CREATE TABLE "transactions" (
+  "id" BIGSERIAL PRIMARY KEY,
   "orders_id" bigserial NOT NULL,
   "books_id" bigserial NOT NULL
 );
 
 CREATE TABLE "wishlists" (
-  "users_id" bigserial NOT NULL,
-  "books_id" bigserial NOT NULL
+  "id" BIGSERIAL PRIMARY KEY,
+  "users_id" bigserial NOT NULL
+);
+
+CREATE TABLE "books_wishlists" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "books_id" bigserial NOT NULL,
+  "wishlists_id" bigserial NOT NULL
 );
 
 CREATE INDEX ON "address" ("users_id");
@@ -97,7 +115,17 @@ CREATE INDEX ON "books_genres" ("genres_id");
 
 CREATE INDEX ON "books_genres" ("books_id", "genres_id");
 
+CREATE INDEX ON "books_subgenres" ("books_id");
+
+CREATE INDEX ON "books_subgenres" ("subgenres_id");
+
+CREATE INDEX ON "books_subgenres" ("books_id", "subgenres_id");
+
+CREATE INDEX ON "reviews" ("users_id");
+
 CREATE INDEX ON "reviews" ("books_id");
+
+CREATE INDEX ON "reviews" ("users_id", "books_id");
 
 CREATE INDEX ON "orders" ("users_id");
 
@@ -109,9 +137,11 @@ CREATE INDEX ON "transactions" ("books_id", "orders_id");
 
 CREATE INDEX ON "wishlists" ("users_id");
 
-CREATE INDEX ON "wishlists" ("books_id");
+CREATE INDEX ON "books_wishlists" ("books_id");
 
-CREATE INDEX ON "wishlists" ("users_id", "books_id");
+CREATE INDEX ON "books_wishlists" ("wishlists_id");
+
+CREATE INDEX ON "books_wishlists" ("books_id", "wishlists_id");
 
 ALTER TABLE "address" ADD FOREIGN KEY ("users_id") REFERENCES "users" ("id");
 
@@ -127,6 +157,12 @@ ALTER TABLE "books_genres" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id"
 
 ALTER TABLE "books_genres" ADD FOREIGN KEY ("genres_id") REFERENCES "genres" ("id");
 
+ALTER TABLE "books_subgenres" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
+
+ALTER TABLE "books_subgenres" ADD FOREIGN KEY ("subgenres_id") REFERENCES "subgenres" ("id");
+
+ALTER TABLE "reviews" ADD FOREIGN KEY ("users_id") REFERENCES "users" ("id");
+
 ALTER TABLE "reviews" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("users_id") REFERENCES "users" ("id");
@@ -137,4 +173,6 @@ ALTER TABLE "transactions" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id"
 
 ALTER TABLE "wishlists" ADD FOREIGN KEY ("users_id") REFERENCES "users" ("id");
 
-ALTER TABLE "wishlists" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
+ALTER TABLE "books_wishlists" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
+
+ALTER TABLE "books_wishlists" ADD FOREIGN KEY ("wishlists_id") REFERENCES "wishlists" ("id");

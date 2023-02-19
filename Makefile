@@ -14,7 +14,7 @@ migratedown:
 	migrate -path db/migrations -database "postgresql://root:123456@localhost:5432/nmc_bookstore?sslmode=disable" -verbose down
 
 sqlc:
-	docker run --rm -v "C:\Users\chien\Projects\NMCBookstoreBE:/src" -w /src kjconroy/sqlc generate
+	docker run --rm -v "C:\Users\chien\Projects\NMCBookstoreBE:/src" -w /src kjconroy/sqlc:1.16.0 generate
 
 test:
 	go test -v -cover ./...
