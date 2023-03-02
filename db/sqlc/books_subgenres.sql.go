@@ -16,7 +16,7 @@ INSERT INTO books_subgenres (
 ) VALUES (
   $1, $2
 )
-RETURNING id, books_id, subgenres_id
+RETURNING id, books_id, subgenres_id, created_at
 `
 
 type CreateBookSubgenreParams struct {
@@ -27,7 +27,12 @@ type CreateBookSubgenreParams struct {
 func (q *Queries) CreateBookSubgenre(ctx context.Context, arg CreateBookSubgenreParams) (BooksSubgenre, error) {
 	row := q.db.QueryRowContext(ctx, createBookSubgenre, arg.BooksID, arg.SubgenresID)
 	var i BooksSubgenre
-	err := row.Scan(&i.ID, &i.BooksID, &i.SubgenresID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.SubgenresID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -42,19 +47,24 @@ func (q *Queries) DeleteBookSubgenre(ctx context.Context, id int64) error {
 }
 
 const getBookSubgenre = `-- name: GetBookSubgenre :one
-SELECT id, books_id, subgenres_id FROM books_subgenres
+SELECT id, books_id, subgenres_id, created_at FROM books_subgenres
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre, error) {
 	row := q.db.QueryRowContext(ctx, getBookSubgenre, id)
 	var i BooksSubgenre
-	err := row.Scan(&i.ID, &i.BooksID, &i.SubgenresID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.SubgenresID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const listBooksSubgenres = `-- name: ListBooksSubgenres :many
-SELECT id, books_id, subgenres_id FROM books_subgenres
+SELECT id, books_id, subgenres_id, created_at FROM books_subgenres
 WHERE subgenres_id = $1
 ORDER BY id
 `
@@ -68,7 +78,12 @@ func (q *Queries) ListBooksSubgenres(ctx context.Context, subgenresID int64) ([]
 	items := []BooksSubgenre{}
 	for rows.Next() {
 		var i BooksSubgenre
-		if err := rows.Scan(&i.ID, &i.BooksID, &i.SubgenresID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.BooksID,
+			&i.SubgenresID,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

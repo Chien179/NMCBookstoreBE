@@ -1,7 +1,13 @@
+-- name: GetReview :one
+SELECT * FROM reviews
+WHERE id = $1 LIMIT 1;
+
 -- name: GetReviewsByBookID :many
 SELECT * FROM reviews
 WHERE books_id = $1
-ORDER BY id;
+ORDER BY id
+LIMIT $2
+OFFSET $3;
 
 -- name: CreateReview :one
 INSERT INTO reviews (

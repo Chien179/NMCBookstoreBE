@@ -9,7 +9,7 @@ import (
 )
 
 type Querier interface {
-	CreateAddres(ctx context.Context, arg CreateAddresParams) (Address, error)
+	CreateAddress(ctx context.Context, arg CreateAddressParams) (Address, error)
 	CreateBook(ctx context.Context, arg CreateBookParams) (Book, error)
 	CreateBookCart(ctx context.Context, arg CreateBookCartParams) (BooksCart, error)
 	CreateBookGenre(ctx context.Context, arg CreateBookGenreParams) (BooksGenre, error)
@@ -23,7 +23,7 @@ type Querier interface {
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateWishlist(ctx context.Context, usersID int64) (Wishlist, error)
-	DeleteAddres(ctx context.Context, id int64) error
+	DeleteAddress(ctx context.Context, id int64) error
 	DeleteBook(ctx context.Context, id int64) error
 	DeleteBookCart(ctx context.Context, id int64) error
 	DeleteBookGenre(ctx context.Context, id int64) error
@@ -34,7 +34,7 @@ type Querier interface {
 	DeleteSubgenre(ctx context.Context, id int64) error
 	DeleteTransaction(ctx context.Context, id int64) error
 	DeleteUser(ctx context.Context, id int64) error
-	GetAddres(ctx context.Context, id int64) (Address, error)
+	GetAddress(ctx context.Context, id int64) (Address, error)
 	GetBook(ctx context.Context, id int64) (Book, error)
 	GetBookCart(ctx context.Context, id int64) (BooksCart, error)
 	GetBookGenre(ctx context.Context, id int64) (BooksGenre, error)
@@ -43,12 +43,13 @@ type Querier interface {
 	GetCart(ctx context.Context, id int64) (Cart, error)
 	GetGenre(ctx context.Context, id int64) (Genre, error)
 	GetOrder(ctx context.Context, id int64) (Order, error)
-	GetReviewsByBookID(ctx context.Context, booksID int64) ([]Review, error)
+	GetReview(ctx context.Context, id int64) (Review, error)
+	GetReviewsByBookID(ctx context.Context, arg GetReviewsByBookIDParams) ([]Review, error)
 	GetSubgenre(ctx context.Context, id int64) (Subgenre, error)
 	GetTransaction(ctx context.Context, id int64) (Transaction, error)
 	GetUser(ctx context.Context, id int64) (User, error)
 	GetWishlist(ctx context.Context, id int64) (Wishlist, error)
-	ListAddress(ctx context.Context) ([]Address, error)
+	ListAddresses(ctx context.Context, arg ListAddressesParams) ([]Address, error)
 	ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, error)
 	ListBooksCarts(ctx context.Context, cartsID int64) ([]BooksCart, error)
 	ListBooksGenres(ctx context.Context, genresID int64) ([]BooksGenre, error)
@@ -58,7 +59,7 @@ type Querier interface {
 	ListSubgenres(ctx context.Context) ([]Subgenre, error)
 	ListTransactions(ctx context.Context, ordersID int64) ([]Transaction, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
-	UpdateAddres(ctx context.Context, arg UpdateAddresParams) (Address, error)
+	UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error)
 	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
 	UpdateGenre(ctx context.Context, arg UpdateGenreParams) (Genre, error)
 	UpdateSubgenre(ctx context.Context, arg UpdateSubgenreParams) (Subgenre, error)

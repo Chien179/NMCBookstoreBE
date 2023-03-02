@@ -16,7 +16,7 @@ INSERT INTO books_wishlists (
 ) VALUES (
   $1, $2
 )
-RETURNING id, books_id, wishlists_id
+RETURNING id, books_id, wishlists_id, created_at
 `
 
 type CreateBookWishlistParams struct {
@@ -27,7 +27,12 @@ type CreateBookWishlistParams struct {
 func (q *Queries) CreateBookWishlist(ctx context.Context, arg CreateBookWishlistParams) (BooksWishlist, error) {
 	row := q.db.QueryRowContext(ctx, createBookWishlist, arg.BooksID, arg.WishlistsID)
 	var i BooksWishlist
-	err := row.Scan(&i.ID, &i.BooksID, &i.WishlistsID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.WishlistsID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -42,19 +47,24 @@ func (q *Queries) DeleteBookWishlist(ctx context.Context, id int64) error {
 }
 
 const getBookWishlist = `-- name: GetBookWishlist :one
-SELECT id, books_id, wishlists_id FROM books_wishlists
+SELECT id, books_id, wishlists_id, created_at FROM books_wishlists
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetBookWishlist(ctx context.Context, id int64) (BooksWishlist, error) {
 	row := q.db.QueryRowContext(ctx, getBookWishlist, id)
 	var i BooksWishlist
-	err := row.Scan(&i.ID, &i.BooksID, &i.WishlistsID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.WishlistsID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const listBooksWishlists = `-- name: ListBooksWishlists :many
-SELECT id, books_id, wishlists_id FROM books_wishlists
+SELECT id, books_id, wishlists_id, created_at FROM books_wishlists
 WHERE wishlists_id = $1
 ORDER BY id
 `
@@ -68,7 +78,12 @@ func (q *Queries) ListBooksWishlists(ctx context.Context, wishlistsID int64) ([]
 	items := []BooksWishlist{}
 	for rows.Next() {
 		var i BooksWishlist
-		if err := rows.Scan(&i.ID, &i.BooksID, &i.WishlistsID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.BooksID,
+			&i.WishlistsID,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

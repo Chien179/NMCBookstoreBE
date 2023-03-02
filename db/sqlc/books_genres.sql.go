@@ -16,7 +16,7 @@ INSERT INTO books_genres (
 ) VALUES (
   $1, $2
 )
-RETURNING id, books_id, genres_id
+RETURNING id, books_id, genres_id, created_at
 `
 
 type CreateBookGenreParams struct {
@@ -27,7 +27,12 @@ type CreateBookGenreParams struct {
 func (q *Queries) CreateBookGenre(ctx context.Context, arg CreateBookGenreParams) (BooksGenre, error) {
 	row := q.db.QueryRowContext(ctx, createBookGenre, arg.BooksID, arg.GenresID)
 	var i BooksGenre
-	err := row.Scan(&i.ID, &i.BooksID, &i.GenresID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.GenresID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -42,19 +47,24 @@ func (q *Queries) DeleteBookGenre(ctx context.Context, id int64) error {
 }
 
 const getBookGenre = `-- name: GetBookGenre :one
-SELECT id, books_id, genres_id FROM books_genres
+SELECT id, books_id, genres_id, created_at FROM books_genres
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetBookGenre(ctx context.Context, id int64) (BooksGenre, error) {
 	row := q.db.QueryRowContext(ctx, getBookGenre, id)
 	var i BooksGenre
-	err := row.Scan(&i.ID, &i.BooksID, &i.GenresID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.GenresID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const listBooksGenres = `-- name: ListBooksGenres :many
-SELECT id, books_id, genres_id FROM books_genres
+SELECT id, books_id, genres_id, created_at FROM books_genres
 WHERE genres_id = $1
 ORDER BY id
 `
@@ -68,7 +78,12 @@ func (q *Queries) ListBooksGenres(ctx context.Context, genresID int64) ([]BooksG
 	items := []BooksGenre{}
 	for rows.Next() {
 		var i BooksGenre
-		if err := rows.Scan(&i.ID, &i.BooksID, &i.GenresID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.BooksID,
+			&i.GenresID,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

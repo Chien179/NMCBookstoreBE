@@ -9,11 +9,12 @@ import (
 )
 
 type Address struct {
-	ID       int64  `json:"id"`
-	Address  string `json:"address"`
-	UsersID  int64  `json:"users_id"`
-	District string `json:"district"`
-	City     string `json:"city"`
+	ID        int64     `json:"id"`
+	Address   string    `json:"address"`
+	UsersID   int64     `json:"users_id"`
+	District  string    `json:"district"`
+	City      string    `json:"city"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Book struct {
@@ -29,27 +30,31 @@ type Book struct {
 }
 
 type BooksCart struct {
-	ID      int64 `json:"id"`
-	BooksID int64 `json:"books_id"`
-	CartsID int64 `json:"carts_id"`
+	ID        int64     `json:"id"`
+	BooksID   int64     `json:"books_id"`
+	CartsID   int64     `json:"carts_id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type BooksGenre struct {
-	ID       int64 `json:"id"`
-	BooksID  int64 `json:"books_id"`
-	GenresID int64 `json:"genres_id"`
+	ID        int64     `json:"id"`
+	BooksID   int64     `json:"books_id"`
+	GenresID  int64     `json:"genres_id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type BooksSubgenre struct {
-	ID          int64 `json:"id"`
-	BooksID     int64 `json:"books_id"`
-	SubgenresID int64 `json:"subgenres_id"`
+	ID          int64     `json:"id"`
+	BooksID     int64     `json:"books_id"`
+	SubgenresID int64     `json:"subgenres_id"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type BooksWishlist struct {
-	ID          int64 `json:"id"`
-	BooksID     int64 `json:"books_id"`
-	WishlistsID int64 `json:"wishlists_id"`
+	ID          int64     `json:"id"`
+	BooksID     int64     `json:"books_id"`
+	WishlistsID int64     `json:"wishlists_id"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Cart struct {
@@ -65,16 +70,18 @@ type Genre struct {
 }
 
 type Order struct {
-	ID      int64 `json:"id"`
-	UsersID int64 `json:"users_id"`
+	ID        int64     `json:"id"`
+	UsersID   int64     `json:"users_id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Review struct {
-	ID       int64  `json:"id"`
-	UsersID  int64  `json:"users_id"`
-	BooksID  int64  `json:"books_id"`
-	Comments string `json:"comments"`
-	Rating   int32  `json:"rating"`
+	ID        int64     `json:"id"`
+	UsersID   int64     `json:"users_id"`
+	BooksID   int64     `json:"books_id"`
+	Comments  string    `json:"comments"`
+	Rating    int32     `json:"rating"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Subgenre struct {
@@ -85,9 +92,10 @@ type Subgenre struct {
 }
 
 type Transaction struct {
-	ID       int64 `json:"id"`
-	OrdersID int64 `json:"orders_id"`
-	BooksID  int64 `json:"books_id"`
+	ID        int64     `json:"id"`
+	OrdersID  int64     `json:"orders_id"`
+	BooksID   int64     `json:"books_id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type User struct {
@@ -103,6 +111,7 @@ type User struct {
 }
 
 type Wishlist struct {
-	ID      int64 `json:"id"`
-	UsersID int64 `json:"users_id"`
+	ID        int64     `json:"id"`
+	UsersID   int64     `json:"users_id"`
+	CreatedAt time.Time `json:"created_at"`
 }

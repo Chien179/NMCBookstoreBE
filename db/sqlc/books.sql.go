@@ -138,18 +138,20 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 
 const updateBook = `-- name: UpdateBook :one
 UPDATE books
-SET price = $2,
-  image = $3,
-  description = $4,
-  author = $5,
-  publisher = $6,
-  quantity = $7
+SET name = $2,
+  price = $3,
+  image = $4,
+  description = $5,
+  author = $6,
+  publisher = $7,
+  quantity = $8
 WHERE id = $1
 RETURNING id, name, price, image, description, author, publisher, quantity, created_at
 `
 
 type UpdateBookParams struct {
 	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
 	Price       float64 `json:"price"`
 	Image       string  `json:"image"`
 	Description string  `json:"description"`
@@ -161,6 +163,7 @@ type UpdateBookParams struct {
 func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error) {
 	row := q.db.QueryRowContext(ctx, updateBook,
 		arg.ID,
+		arg.Name,
 		arg.Price,
 		arg.Image,
 		arg.Description,

@@ -28,11 +28,12 @@ WHERE id = $1;
 
 -- name: UpdateBook :one
 UPDATE books
-SET price = $2,
-  image = $3,
-  description = $4,
-  author = $5,
-  publisher = $6,
-  quantity = $7
+SET name = $2,
+  price = $3,
+  image = $4,
+  description = $5,
+  author = $6,
+  publisher = $7,
+  quantity = $8
 WHERE id = $1
 RETURNING *;

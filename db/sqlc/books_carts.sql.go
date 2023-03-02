@@ -16,7 +16,7 @@ INSERT INTO books_carts (
 ) VALUES (
   $1, $2
 )
-RETURNING id, books_id, carts_id
+RETURNING id, books_id, carts_id, created_at
 `
 
 type CreateBookCartParams struct {
@@ -27,7 +27,12 @@ type CreateBookCartParams struct {
 func (q *Queries) CreateBookCart(ctx context.Context, arg CreateBookCartParams) (BooksCart, error) {
 	row := q.db.QueryRowContext(ctx, createBookCart, arg.BooksID, arg.CartsID)
 	var i BooksCart
-	err := row.Scan(&i.ID, &i.BooksID, &i.CartsID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.CartsID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -42,19 +47,24 @@ func (q *Queries) DeleteBookCart(ctx context.Context, id int64) error {
 }
 
 const getBookCart = `-- name: GetBookCart :one
-SELECT id, books_id, carts_id FROM books_carts
+SELECT id, books_id, carts_id, created_at FROM books_carts
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetBookCart(ctx context.Context, id int64) (BooksCart, error) {
 	row := q.db.QueryRowContext(ctx, getBookCart, id)
 	var i BooksCart
-	err := row.Scan(&i.ID, &i.BooksID, &i.CartsID)
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.CartsID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const listBooksCarts = `-- name: ListBooksCarts :many
-SELECT id, books_id, carts_id FROM books_carts
+SELECT id, books_id, carts_id, created_at FROM books_carts
 WHERE carts_id = $1
 ORDER BY id
 `
@@ -68,7 +78,12 @@ func (q *Queries) ListBooksCarts(ctx context.Context, cartsID int64) ([]BooksCar
 	items := []BooksCart{}
 	for rows.Next() {
 		var i BooksCart
-		if err := rows.Scan(&i.ID, &i.BooksID, &i.CartsID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.BooksID,
+			&i.CartsID,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

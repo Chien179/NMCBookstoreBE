@@ -15,7 +15,8 @@ CREATE TABLE "address" (
   "address" varchar NOT NULL,
   "users_id" bigserial NOT NULL,
   "district" varchar NOT NULL,
-  "city" varchar NOT NULL
+  "city" varchar NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "books" (
@@ -52,19 +53,22 @@ CREATE TABLE "carts" (
 CREATE TABLE "books_carts" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
-  "carts_id" bigserial NOT NULL
+  "carts_id" bigserial NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "books_genres" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
-  "genres_id" bigserial NOT NULL
+  "genres_id" bigserial NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "books_subgenres" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
-  "subgenres_id" bigserial NOT NULL
+  "subgenres_id" bigserial NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "reviews" (
@@ -72,29 +76,34 @@ CREATE TABLE "reviews" (
   "users_id" bigserial NOT NULL,
   "books_id" bigserial NOT NULL,
   "comments" varchar NOT NULL,
-  "rating" int NOT NULL
+  "rating" int NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "orders" (
   "id" BIGSERIAL PRIMARY KEY,
-  "users_id" bigserial NOT NULL
+  "users_id" bigserial NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "transactions" (
   "id" BIGSERIAL PRIMARY KEY,
   "orders_id" bigserial NOT NULL,
-  "books_id" bigserial NOT NULL
+  "books_id" bigserial NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "wishlists" (
   "id" BIGSERIAL PRIMARY KEY,
-  "users_id" bigserial NOT NULL
+  "users_id" bigserial NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "books_wishlists" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
-  "wishlists_id" bigserial NOT NULL
+  "wishlists_id" bigserial NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE INDEX ON "address" ("users_id");

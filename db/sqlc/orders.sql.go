@@ -15,13 +15,13 @@ INSERT INTO orders (
 ) VALUES (
   $1
 )
-RETURNING id, users_id
+RETURNING id, users_id, created_at
 `
 
 func (q *Queries) CreateOrder(ctx context.Context, usersID int64) (Order, error) {
 	row := q.db.QueryRowContext(ctx, createOrder, usersID)
 	var i Order
-	err := row.Scan(&i.ID, &i.UsersID)
+	err := row.Scan(&i.ID, &i.UsersID, &i.CreatedAt)
 	return i, err
 }
 
@@ -36,13 +36,13 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, users_id FROM orders
+SELECT id, users_id, created_at FROM orders
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 	row := q.db.QueryRowContext(ctx, getOrder, id)
 	var i Order
-	err := row.Scan(&i.ID, &i.UsersID)
+	err := row.Scan(&i.ID, &i.UsersID, &i.CreatedAt)
 	return i, err
 }

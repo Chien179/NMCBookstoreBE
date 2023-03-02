@@ -9,7 +9,7 @@ import (
 	"context"
 )
 
-const createAddres = `-- name: CreateAddres :one
+const createAddress = `-- name: CreateAddress :one
 INSERT INTO address (
   users_id,
   address,
@@ -18,18 +18,18 @@ INSERT INTO address (
 ) VALUES (
   $1, $2, $3, $4
 )
-RETURNING id, address, users_id, district, city
+RETURNING id, address, users_id, district, city, created_at
 `
 
-type CreateAddresParams struct {
+type CreateAddressParams struct {
 	UsersID  int64  `json:"users_id"`
 	Address  string `json:"address"`
 	District string `json:"district"`
 	City     string `json:"city"`
 }
 
-func (q *Queries) CreateAddres(ctx context.Context, arg CreateAddresParams) (Address, error) {
-	row := q.db.QueryRowContext(ctx, createAddres,
+func (q *Queries) CreateAddress(ctx context.Context, arg CreateAddressParams) (Address, error) {
+	row := q.db.QueryRowContext(ctx, createAddress,
 		arg.UsersID,
 		arg.Address,
 		arg.District,
@@ -42,27 +42,28 @@ func (q *Queries) CreateAddres(ctx context.Context, arg CreateAddresParams) (Add
 		&i.UsersID,
 		&i.District,
 		&i.City,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
-const deleteAddres = `-- name: DeleteAddres :exec
+const deleteAddress = `-- name: DeleteAddress :exec
 DELETE FROM address
 WHERE id = $1
 `
 
-func (q *Queries) DeleteAddres(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteAddres, id)
+func (q *Queries) DeleteAddress(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteAddress, id)
 	return err
 }
 
-const getAddres = `-- name: GetAddres :one
-SELECT id, address, users_id, district, city FROM address
+const getAddress = `-- name: GetAddress :one
+SELECT id, address, users_id, district, city, created_at FROM address
 WHERE id = $1 LIMIT 1
 `
 
-func (q *Queries) GetAddres(ctx context.Context, id int64) (Address, error) {
-	row := q.db.QueryRowContext(ctx, getAddres, id)
+func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
+	row := q.db.QueryRowContext(ctx, getAddress, id)
 	var i Address
 	err := row.Scan(
 		&i.ID,
@@ -70,17 +71,25 @@ func (q *Queries) GetAddres(ctx context.Context, id int64) (Address, error) {
 		&i.UsersID,
 		&i.District,
 		&i.City,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
-const listAddress = `-- name: ListAddress :many
-SELECT id, address, users_id, district, city FROM address
+const listAddresses = `-- name: ListAddresses :many
+SELECT id, address, users_id, district, city, created_at FROM address
 ORDER BY id
+LIMIT $1
+OFFSET $2
 `
 
-func (q *Queries) ListAddress(ctx context.Context) ([]Address, error) {
-	rows, err := q.db.QueryContext(ctx, listAddress)
+type ListAddressesParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) ([]Address, error) {
+	rows, err := q.db.QueryContext(ctx, listAddresses, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +103,7 @@ func (q *Queries) ListAddress(ctx context.Context) ([]Address, error) {
 			&i.UsersID,
 			&i.District,
 			&i.City,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -108,24 +118,24 @@ func (q *Queries) ListAddress(ctx context.Context) ([]Address, error) {
 	return items, nil
 }
 
-const updateAddres = `-- name: UpdateAddres :one
+const updateAddress = `-- name: UpdateAddress :one
 UPDATE address
 SET  address = $2,
   district = $3,
   city = $4
 WHERE id = $1
-RETURNING id, address, users_id, district, city
+RETURNING id, address, users_id, district, city, created_at
 `
 
-type UpdateAddresParams struct {
+type UpdateAddressParams struct {
 	ID       int64  `json:"id"`
 	Address  string `json:"address"`
 	District string `json:"district"`
 	City     string `json:"city"`
 }
 
-func (q *Queries) UpdateAddres(ctx context.Context, arg UpdateAddresParams) (Address, error) {
-	row := q.db.QueryRowContext(ctx, updateAddres,
+func (q *Queries) UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error) {
+	row := q.db.QueryRowContext(ctx, updateAddress,
 		arg.ID,
 		arg.Address,
 		arg.District,
@@ -138,6 +148,7 @@ func (q *Queries) UpdateAddres(ctx context.Context, arg UpdateAddresParams) (Add
 		&i.UsersID,
 		&i.District,
 		&i.City,
+		&i.CreatedAt,
 	)
 	return i, err
 }

@@ -18,7 +18,7 @@ INSERT INTO reviews (
 ) VALUES (
   $1, $2, $3, $4
 )
-RETURNING id, users_id, books_id, comments, rating
+RETURNING id, users_id, books_id, comments, rating, created_at
 `
 
 type CreateReviewParams struct {
@@ -42,18 +42,46 @@ func (q *Queries) CreateReview(ctx context.Context, arg CreateReviewParams) (Rev
 		&i.BooksID,
 		&i.Comments,
 		&i.Rating,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const getReview = `-- name: GetReview :one
+SELECT id, users_id, books_id, comments, rating, created_at FROM reviews
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
+	row := q.db.QueryRowContext(ctx, getReview, id)
+	var i Review
+	err := row.Scan(
+		&i.ID,
+		&i.UsersID,
+		&i.BooksID,
+		&i.Comments,
+		&i.Rating,
+		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getReviewsByBookID = `-- name: GetReviewsByBookID :many
-SELECT id, users_id, books_id, comments, rating FROM reviews
+SELECT id, users_id, books_id, comments, rating, created_at FROM reviews
 WHERE books_id = $1
 ORDER BY id
+LIMIT $2
+OFFSET $3
 `
 
-func (q *Queries) GetReviewsByBookID(ctx context.Context, booksID int64) ([]Review, error) {
-	rows, err := q.db.QueryContext(ctx, getReviewsByBookID, booksID)
+type GetReviewsByBookIDParams struct {
+	BooksID int64 `json:"books_id"`
+	Limit   int32 `json:"limit"`
+	Offset  int32 `json:"offset"`
+}
+
+func (q *Queries) GetReviewsByBookID(ctx context.Context, arg GetReviewsByBookIDParams) ([]Review, error) {
+	rows, err := q.db.QueryContext(ctx, getReviewsByBookID, arg.BooksID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -67,6 +95,7 @@ func (q *Queries) GetReviewsByBookID(ctx context.Context, booksID int64) ([]Revi
 			&i.BooksID,
 			&i.Comments,
 			&i.Rating,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}

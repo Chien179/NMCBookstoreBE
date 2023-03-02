@@ -15,24 +15,24 @@ INSERT INTO wishlists (
 ) VALUES (
   $1
 )
-RETURNING id, users_id
+RETURNING id, users_id, created_at
 `
 
 func (q *Queries) CreateWishlist(ctx context.Context, usersID int64) (Wishlist, error) {
 	row := q.db.QueryRowContext(ctx, createWishlist, usersID)
 	var i Wishlist
-	err := row.Scan(&i.ID, &i.UsersID)
+	err := row.Scan(&i.ID, &i.UsersID, &i.CreatedAt)
 	return i, err
 }
 
 const getWishlist = `-- name: GetWishlist :one
-SELECT id, users_id FROM wishlists
+SELECT id, users_id, created_at FROM wishlists
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetWishlist(ctx context.Context, id int64) (Wishlist, error) {
 	row := q.db.QueryRowContext(ctx, getWishlist, id)
 	var i Wishlist
-	err := row.Scan(&i.ID, &i.UsersID)
+	err := row.Scan(&i.ID, &i.UsersID, &i.CreatedAt)
 	return i, err
 }

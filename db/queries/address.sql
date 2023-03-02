@@ -1,12 +1,14 @@
--- name: GetAddres :one
+-- name: GetAddress :one
 SELECT * FROM address
 WHERE id = $1 LIMIT 1;
 
--- name: ListAddress :many
+-- name: ListAddresses :many
 SELECT * FROM address
-ORDER BY id;
+ORDER BY id
+LIMIT $1
+OFFSET $2;
 
--- name: CreateAddres :one
+-- name: CreateAddress :one
 INSERT INTO address (
   users_id,
   address,
@@ -17,11 +19,11 @@ INSERT INTO address (
 )
 RETURNING *;
 
--- name: DeleteAddres :exec
+-- name: DeleteAddress :exec
 DELETE FROM address
 WHERE id = $1;
 
--- name: UpdateAddres :one
+-- name: UpdateAddress :one
 UPDATE address
 SET  address = $2,
   district = $3,

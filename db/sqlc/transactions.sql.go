@@ -16,7 +16,7 @@ INSERT INTO transactions (
 ) VALUES (
   $1, $2
 )
-RETURNING id, orders_id, books_id
+RETURNING id, orders_id, books_id, created_at
 `
 
 type CreateTransactionParams struct {
@@ -27,7 +27,12 @@ type CreateTransactionParams struct {
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
 	row := q.db.QueryRowContext(ctx, createTransaction, arg.OrdersID, arg.BooksID)
 	var i Transaction
-	err := row.Scan(&i.ID, &i.OrdersID, &i.BooksID)
+	err := row.Scan(
+		&i.ID,
+		&i.OrdersID,
+		&i.BooksID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
@@ -42,19 +47,24 @@ func (q *Queries) DeleteTransaction(ctx context.Context, id int64) error {
 }
 
 const getTransaction = `-- name: GetTransaction :one
-SELECT id, orders_id, books_id FROM transactions
+SELECT id, orders_id, books_id, created_at FROM transactions
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetTransaction(ctx context.Context, id int64) (Transaction, error) {
 	row := q.db.QueryRowContext(ctx, getTransaction, id)
 	var i Transaction
-	err := row.Scan(&i.ID, &i.OrdersID, &i.BooksID)
+	err := row.Scan(
+		&i.ID,
+		&i.OrdersID,
+		&i.BooksID,
+		&i.CreatedAt,
+	)
 	return i, err
 }
 
 const listTransactions = `-- name: ListTransactions :many
-SELECT id, orders_id, books_id FROM transactions
+SELECT id, orders_id, books_id, created_at FROM transactions
 WHERE orders_id = $1
 ORDER BY id
 `
@@ -68,7 +78,12 @@ func (q *Queries) ListTransactions(ctx context.Context, ordersID int64) ([]Trans
 	items := []Transaction{}
 	for rows.Next() {
 		var i Transaction
-		if err := rows.Scan(&i.ID, &i.OrdersID, &i.BooksID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrdersID,
+			&i.BooksID,
+			&i.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
