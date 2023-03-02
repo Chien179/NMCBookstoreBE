@@ -56,20 +56,20 @@ func TestGetReview(t *testing.T) {
 	require.WithinDuration(t, review1.CreatedAt, review2.CreatedAt, time.Second)
 }
 
-func TestGetReviewByBookId(t *testing.T) {
+func TestListReviewByBookID(t *testing.T) {
 	book := createRandomBook(t)
 	for i := 0; i < 10; i++ {
 		user := createRandomUser(t)
 		createRandomReview(t, user, book)
 	}
 
-	arg := GetReviewsByBookIDParams{
+	arg := ListReviewsByBookIDParams{
 		BooksID: book.ID,
 		Limit:   5,
 		Offset:  0,
 	}
 
-	reviews, err := testQueries.GetReviewsByBookID(context.Background(), arg)
+	reviews, err := testQueries.ListReviewsByBookID(context.Background(), arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, reviews)

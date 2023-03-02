@@ -2,9 +2,14 @@
 SELECT * FROM books_subgenres
 WHERE id = $1 LIMIT 1;
 
--- name: ListBooksSubgenres :many
+-- name: ListBooksSubgenresBySubgenreID :many
 SELECT * FROM books_subgenres
 WHERE subgenres_id = $1
+ORDER BY id;
+
+-- name: ListBooksSubgenresByBookID :many
+SELECT * FROM books_subgenres
+WHERE books_id = $1
 ORDER BY id;
 
 -- name: CreateBookSubgenre :one

@@ -2,9 +2,14 @@
 SELECT * FROM books_genres
 WHERE id = $1 LIMIT 1;
 
--- name: ListBooksGenres :many
+-- name: ListBooksGenresByGenreID :many
 SELECT * FROM books_genres
 WHERE genres_id = $1
+ORDER BY id;
+
+-- name: ListBooksGenresByBookID :many
+SELECT * FROM books_genres
+WHERE books_id = $1
 ORDER BY id;
 
 -- name: CreateBookGenre :one

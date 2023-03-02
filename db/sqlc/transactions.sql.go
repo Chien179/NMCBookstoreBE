@@ -63,14 +63,14 @@ func (q *Queries) GetTransaction(ctx context.Context, id int64) (Transaction, er
 	return i, err
 }
 
-const listTransactions = `-- name: ListTransactions :many
+const listTransactionsByOrderID = `-- name: ListTransactionsByOrderID :many
 SELECT id, orders_id, books_id, created_at FROM transactions
 WHERE orders_id = $1
 ORDER BY id
 `
 
-func (q *Queries) ListTransactions(ctx context.Context, ordersID int64) ([]Transaction, error) {
-	rows, err := q.db.QueryContext(ctx, listTransactions, ordersID)
+func (q *Queries) ListTransactionsByOrderID(ctx context.Context, ordersID int64) ([]Transaction, error) {
+	rows, err := q.db.QueryContext(ctx, listTransactionsByOrderID, ordersID)
 	if err != nil {
 		return nil, err
 	}

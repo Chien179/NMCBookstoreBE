@@ -98,18 +98,21 @@ func (q *Queries) ListSubgenres(ctx context.Context) ([]Subgenre, error) {
 
 const updateSubgenre = `-- name: UpdateSubgenre :one
 UPDATE subgenres
-SET name = $2
+SET 
+  genres_id = $2,
+  name = $3
 WHERE id = $1
 RETURNING id, genres_id, name, created_at
 `
 
 type UpdateSubgenreParams struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+	ID       int64  `json:"id"`
+	GenresID int64  `json:"genres_id"`
+	Name     string `json:"name"`
 }
 
 func (q *Queries) UpdateSubgenre(ctx context.Context, arg UpdateSubgenreParams) (Subgenre, error) {
-	row := q.db.QueryRowContext(ctx, updateSubgenre, arg.ID, arg.Name)
+	row := q.db.QueryRowContext(ctx, updateSubgenre, arg.ID, arg.GenresID, arg.Name)
 	var i Subgenre
 	err := row.Scan(
 		&i.ID,

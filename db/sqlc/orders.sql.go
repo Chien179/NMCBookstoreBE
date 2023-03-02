@@ -46,3 +46,40 @@ func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 	err := row.Scan(&i.ID, &i.UsersID, &i.CreatedAt)
 	return i, err
 }
+
+const listOdersByUserID = `-- name: ListOdersByUserID :many
+SELECT id, users_id, created_at FROM orders
+WHERE users_id = $1
+ORDER BY id
+LIMIT $2
+OFFSET $3
+`
+
+type ListOdersByUserIDParams struct {
+	UsersID int64 `json:"users_id"`
+	Limit   int32 `json:"limit"`
+	Offset  int32 `json:"offset"`
+}
+
+func (q *Queries) ListOdersByUserID(ctx context.Context, arg ListOdersByUserIDParams) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, listOdersByUserID, arg.UsersID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Order{}
+	for rows.Next() {
+		var i Order
+		if err := rows.Scan(&i.ID, &i.UsersID, &i.CreatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

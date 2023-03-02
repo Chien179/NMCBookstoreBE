@@ -2,7 +2,7 @@
 SELECT * FROM reviews
 WHERE id = $1 LIMIT 1;
 
--- name: GetReviewsByBookID :many
+-- name: ListReviewsByBookID :many
 SELECT * FROM reviews
 WHERE books_id = $1
 ORDER BY id

@@ -63,14 +63,48 @@ func (q *Queries) GetBookCart(ctx context.Context, id int64) (BooksCart, error) 
 	return i, err
 }
 
-const listBooksCarts = `-- name: ListBooksCarts :many
+const listBooksCartsByBookID = `-- name: ListBooksCartsByBookID :many
+SELECT id, books_id, carts_id, created_at FROM books_carts
+WHERE books_id = $1
+ORDER BY id
+`
+
+func (q *Queries) ListBooksCartsByBookID(ctx context.Context, booksID int64) ([]BooksCart, error) {
+	rows, err := q.db.QueryContext(ctx, listBooksCartsByBookID, booksID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BooksCart{}
+	for rows.Next() {
+		var i BooksCart
+		if err := rows.Scan(
+			&i.ID,
+			&i.BooksID,
+			&i.CartsID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBooksCartsByCartID = `-- name: ListBooksCartsByCartID :many
 SELECT id, books_id, carts_id, created_at FROM books_carts
 WHERE carts_id = $1
 ORDER BY id
 `
 
-func (q *Queries) ListBooksCarts(ctx context.Context, cartsID int64) ([]BooksCart, error) {
-	rows, err := q.db.QueryContext(ctx, listBooksCarts, cartsID)
+func (q *Queries) ListBooksCartsByCartID(ctx context.Context, cartsID int64) ([]BooksCart, error) {
+	rows, err := q.db.QueryContext(ctx, listBooksCartsByCartID, cartsID)
 	if err != nil {
 		return nil, err
 	}

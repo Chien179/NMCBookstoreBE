@@ -2,7 +2,7 @@
 SELECT * FROM transactions
 WHERE id = $1 LIMIT 1;
 
--- name: ListTransactions :many
+-- name: ListTransactionsByOrderID :many
 SELECT * FROM transactions
 WHERE orders_id = $1
 ORDER BY id;

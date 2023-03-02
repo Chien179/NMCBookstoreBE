@@ -2,9 +2,14 @@
 SELECT * FROM books_carts
 WHERE id = $1 LIMIT 1;
 
--- name: ListBooksCarts :many
+-- name: ListBooksCartsByCartID :many
 SELECT * FROM books_carts
 WHERE carts_id = $1
+ORDER BY id;
+
+-- name: ListBooksCartsByBookID :many
+SELECT * FROM books_carts
+WHERE books_id = $1
 ORDER BY id;
 
 -- name: CreateBookCart :one

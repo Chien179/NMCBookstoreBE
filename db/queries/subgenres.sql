@@ -21,6 +21,8 @@ WHERE id = $1;
 
 -- name: UpdateSubgenre :one
 UPDATE subgenres
-SET name = $2
+SET 
+  genres_id = $2,
+  name = $3
 WHERE id = $1
 RETURNING *;

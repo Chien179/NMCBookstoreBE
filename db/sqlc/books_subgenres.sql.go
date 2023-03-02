@@ -63,14 +63,48 @@ func (q *Queries) GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre,
 	return i, err
 }
 
-const listBooksSubgenres = `-- name: ListBooksSubgenres :many
+const listBooksSubgenresByBookID = `-- name: ListBooksSubgenresByBookID :many
+SELECT id, books_id, subgenres_id, created_at FROM books_subgenres
+WHERE books_id = $1
+ORDER BY id
+`
+
+func (q *Queries) ListBooksSubgenresByBookID(ctx context.Context, booksID int64) ([]BooksSubgenre, error) {
+	rows, err := q.db.QueryContext(ctx, listBooksSubgenresByBookID, booksID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []BooksSubgenre{}
+	for rows.Next() {
+		var i BooksSubgenre
+		if err := rows.Scan(
+			&i.ID,
+			&i.BooksID,
+			&i.SubgenresID,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBooksSubgenresBySubgenreID = `-- name: ListBooksSubgenresBySubgenreID :many
 SELECT id, books_id, subgenres_id, created_at FROM books_subgenres
 WHERE subgenres_id = $1
 ORDER BY id
 `
 
-func (q *Queries) ListBooksSubgenres(ctx context.Context, subgenresID int64) ([]BooksSubgenre, error) {
-	rows, err := q.db.QueryContext(ctx, listBooksSubgenres, subgenresID)
+func (q *Queries) ListBooksSubgenresBySubgenreID(ctx context.Context, subgenresID int64) ([]BooksSubgenre, error) {
+	rows, err := q.db.QueryContext(ctx, listBooksSubgenresBySubgenreID, subgenresID)
 	if err != nil {
 		return nil, err
 	}

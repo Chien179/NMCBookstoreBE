@@ -13,3 +13,10 @@ RETURNING *;
 -- name: DeleteOrder :exec
 DELETE FROM orders
 WHERE id = $1;
+
+-- name: ListOdersByUserID :many
+SELECT * FROM orders
+WHERE users_id = $1
+ORDER BY id
+LIMIT $2
+OFFSET $3;

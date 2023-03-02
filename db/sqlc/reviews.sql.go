@@ -66,7 +66,7 @@ func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
 	return i, err
 }
 
-const getReviewsByBookID = `-- name: GetReviewsByBookID :many
+const listReviewsByBookID = `-- name: ListReviewsByBookID :many
 SELECT id, users_id, books_id, comments, rating, created_at FROM reviews
 WHERE books_id = $1
 ORDER BY id
@@ -74,14 +74,14 @@ LIMIT $2
 OFFSET $3
 `
 
-type GetReviewsByBookIDParams struct {
+type ListReviewsByBookIDParams struct {
 	BooksID int64 `json:"books_id"`
 	Limit   int32 `json:"limit"`
 	Offset  int32 `json:"offset"`
 }
 
-func (q *Queries) GetReviewsByBookID(ctx context.Context, arg GetReviewsByBookIDParams) ([]Review, error) {
-	rows, err := q.db.QueryContext(ctx, getReviewsByBookID, arg.BooksID, arg.Limit, arg.Offset)
+func (q *Queries) ListReviewsByBookID(ctx context.Context, arg ListReviewsByBookIDParams) ([]Review, error) {
+	rows, err := q.db.QueryContext(ctx, listReviewsByBookID, arg.BooksID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
