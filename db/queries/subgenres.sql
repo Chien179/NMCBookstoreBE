@@ -4,6 +4,7 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListSubgenres :many
 SELECT * FROM subgenres
+WHERE genres_id = $1
 ORDER BY id;
 
 -- name: CreateSubgenre :one

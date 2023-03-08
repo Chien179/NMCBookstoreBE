@@ -1,7 +1,5 @@
-DROP TABLE IF EXISTS books_carts;
 DROP TABLE IF EXISTS books_genres;
 DROP TABLE IF EXISTS books_subgenres;
-DROP TABLE IF EXISTS books_wishlists;
 DROP TABLE IF EXISTS transactions;
 DROP TABLE IF EXISTS wishlists;
 DROP TABLE IF EXISTS reviews;

@@ -11,18 +11,18 @@ import (
 
 const createReview = `-- name: CreateReview :one
 INSERT INTO reviews (
-    users_id,
+    username,
     books_id,
     comments,
     rating
 ) VALUES (
   $1, $2, $3, $4
 )
-RETURNING id, users_id, books_id, comments, rating, created_at
+RETURNING id, username, books_id, comments, rating, created_at
 `
 
 type CreateReviewParams struct {
-	UsersID  int64  `json:"users_id"`
+	Username string `json:"username"`
 	BooksID  int64  `json:"books_id"`
 	Comments string `json:"comments"`
 	Rating   int32  `json:"rating"`
@@ -30,7 +30,7 @@ type CreateReviewParams struct {
 
 func (q *Queries) CreateReview(ctx context.Context, arg CreateReviewParams) (Review, error) {
 	row := q.db.QueryRowContext(ctx, createReview,
-		arg.UsersID,
+		arg.Username,
 		arg.BooksID,
 		arg.Comments,
 		arg.Rating,
@@ -38,7 +38,7 @@ func (q *Queries) CreateReview(ctx context.Context, arg CreateReviewParams) (Rev
 	var i Review
 	err := row.Scan(
 		&i.ID,
-		&i.UsersID,
+		&i.Username,
 		&i.BooksID,
 		&i.Comments,
 		&i.Rating,
@@ -47,8 +47,18 @@ func (q *Queries) CreateReview(ctx context.Context, arg CreateReviewParams) (Rev
 	return i, err
 }
 
+const deleteReview = `-- name: DeleteReview :exec
+DELETE FROM reviews
+WHERE id = $1
+`
+
+func (q *Queries) DeleteReview(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteReview, id)
+	return err
+}
+
 const getReview = `-- name: GetReview :one
-SELECT id, users_id, books_id, comments, rating, created_at FROM reviews
+SELECT id, username, books_id, comments, rating, created_at FROM reviews
 WHERE id = $1 LIMIT 1
 `
 
@@ -57,7 +67,7 @@ func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
 	var i Review
 	err := row.Scan(
 		&i.ID,
-		&i.UsersID,
+		&i.Username,
 		&i.BooksID,
 		&i.Comments,
 		&i.Rating,
@@ -67,7 +77,7 @@ func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
 }
 
 const listReviewsByBookID = `-- name: ListReviewsByBookID :many
-SELECT id, users_id, books_id, comments, rating, created_at FROM reviews
+SELECT id, username, books_id, comments, rating, created_at FROM reviews
 WHERE books_id = $1
 ORDER BY id
 LIMIT $2
@@ -91,7 +101,7 @@ func (q *Queries) ListReviewsByBookID(ctx context.Context, arg ListReviewsByBook
 		var i Review
 		if err := rows.Scan(
 			&i.ID,
-			&i.UsersID,
+			&i.Username,
 			&i.BooksID,
 			&i.Comments,
 			&i.Rating,
