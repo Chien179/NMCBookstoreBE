@@ -2,40 +2,64 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomWishlist(t *testing.T, user User) Wishlist {
-	wishlists, err := testQueries.CreateWishlist(context.Background(), user.ID)
+func createRandomWishlist(t *testing.T, book Book, user User) Wishlist {
+	arg := CreateWishlistParams{
+		BooksID:  book.ID,
+		Username: user.Username,
+	}
+
+	Wishlist, err := testQueries.CreateWishlist(context.Background(), arg)
 	require.NoError(t, err)
-	require.NotEmpty(t, wishlists)
+	require.NotEmpty(t, Wishlist)
 
-	require.Equal(t, user.ID, wishlists.UsersID)
+	require.Equal(t, arg.BooksID, Wishlist.BooksID)
+	require.Equal(t, arg.Username, Wishlist.Username)
 
-	require.NotZero(t, wishlists.ID)
-	require.NotZero(t, wishlists.CreatedAt)
+	require.NotZero(t, Wishlist.ID)
+	require.NotZero(t, Wishlist.CreatedAt)
 
-	return wishlists
+	return Wishlist
 }
 
-func TestCreateWishlist(t *testing.T) {
+func TestCreateBookWishlist(t *testing.T) {
 	user := createRandomUser(t)
-	createRandomWishlist(t, user)
+	book := createRandomBook(t)
+	createRandomWishlist(t, book, user)
 }
 
-func TestGetWishlist(t *testing.T) {
+func TestDeleteBookWishlist(t *testing.T) {
 	user := createRandomUser(t)
-	wishlist1 := createRandomWishlist(t, user)
-	wishlist2, err := testQueries.GetWishlist(context.Background(), wishlist1.ID)
+	book := createRandomBook(t)
+	Wishlist1 := createRandomWishlist(t, book, user)
+
+	err := testQueries.DeleteWishlist(context.Background(), Wishlist1.ID)
+	require.NoError(t, err)
+
+	Wishlist2, err := testQueries.GetWishlist(context.Background(), Wishlist1.ID)
+	require.Error(t, err)
+	require.EqualError(t, err, sql.ErrNoRows.Error())
+	require.Empty(t, Wishlist2)
+}
+
+func TestListBookWishlistsByUsername(t *testing.T) {
+	user := createRandomUser(t)
+	for i := 0; i < 10; i++ {
+		book := createRandomBook(t)
+		createRandomWishlist(t, book, user)
+	}
+
+	books, err := testQueries.ListWishlistsByUsername(context.Background(), user.Username)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, wishlist2)
+	require.NotEmpty(t, books)
 
-	require.Equal(t, wishlist1.ID, wishlist1.ID)
-	require.Equal(t, wishlist1.UsersID, wishlist2.UsersID)
-
-	require.WithinDuration(t, wishlist1.CreatedAt, wishlist2.CreatedAt, time.Second)
+	for _, book := range books {
+		require.NotEmpty(t, book)
+	}
 }

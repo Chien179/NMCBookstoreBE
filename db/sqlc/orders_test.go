@@ -10,11 +10,11 @@ import (
 )
 
 func createRandomOrder(t *testing.T, user User) Order {
-	order, err := testQueries.CreateOrder(context.Background(), user.ID)
+	order, err := testQueries.CreateOrder(context.Background(), user.Username)
 	require.NoError(t, err)
 	require.NotEmpty(t, order)
 
-	require.Equal(t, user.ID, order.UsersID)
+	require.Equal(t, user.Username, order.Username)
 
 	require.NotZero(t, order.ID)
 	require.NotZero(t, order.CreatedAt)
@@ -36,7 +36,7 @@ func TestGetOrder(t *testing.T) {
 	require.NotEmpty(t, order2)
 
 	require.Equal(t, order1.ID, order2.ID)
-	require.Equal(t, order1.UsersID, order2.UsersID)
+	require.Equal(t, order1.Username, order2.Username)
 
 	require.WithinDuration(t, order1.CreatedAt, order2.CreatedAt, time.Second)
 }
@@ -60,13 +60,13 @@ func TestListOrdersByUserID(t *testing.T) {
 		createRandomOrder(t, user)
 	}
 
-	arg := ListOdersByUserIDParams{
-		UsersID: user.ID,
-		Limit:   5,
-		Offset:  0,
+	arg := ListOdersByUserNameParams{
+		Username: user.Username,
+		Limit:    5,
+		Offset:   0,
 	}
 
-	orders, err := testQueries.ListOdersByUserID(context.Background(), arg)
+	orders, err := testQueries.ListOdersByUserName(context.Background(), arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, orders)

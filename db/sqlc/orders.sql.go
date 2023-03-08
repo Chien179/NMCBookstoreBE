@@ -11,17 +11,17 @@ import (
 
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO orders (
-    users_id
+    username
 ) VALUES (
   $1
 )
-RETURNING id, users_id, created_at
+RETURNING id, username, created_at
 `
 
-func (q *Queries) CreateOrder(ctx context.Context, usersID int64) (Order, error) {
-	row := q.db.QueryRowContext(ctx, createOrder, usersID)
+func (q *Queries) CreateOrder(ctx context.Context, username string) (Order, error) {
+	row := q.db.QueryRowContext(ctx, createOrder, username)
 	var i Order
-	err := row.Scan(&i.ID, &i.UsersID, &i.CreatedAt)
+	err := row.Scan(&i.ID, &i.Username, &i.CreatedAt)
 	return i, err
 }
 
@@ -36,33 +36,33 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, users_id, created_at FROM orders
+SELECT id, username, created_at FROM orders
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 	row := q.db.QueryRowContext(ctx, getOrder, id)
 	var i Order
-	err := row.Scan(&i.ID, &i.UsersID, &i.CreatedAt)
+	err := row.Scan(&i.ID, &i.Username, &i.CreatedAt)
 	return i, err
 }
 
-const listOdersByUserID = `-- name: ListOdersByUserID :many
-SELECT id, users_id, created_at FROM orders
-WHERE users_id = $1
+const listOdersByUserName = `-- name: ListOdersByUserName :many
+SELECT id, username, created_at FROM orders
+WHERE username = $1
 ORDER BY id
 LIMIT $2
 OFFSET $3
 `
 
-type ListOdersByUserIDParams struct {
-	UsersID int64 `json:"users_id"`
-	Limit   int32 `json:"limit"`
-	Offset  int32 `json:"offset"`
+type ListOdersByUserNameParams struct {
+	Username string `json:"username"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
 }
 
-func (q *Queries) ListOdersByUserID(ctx context.Context, arg ListOdersByUserIDParams) ([]Order, error) {
-	rows, err := q.db.QueryContext(ctx, listOdersByUserID, arg.UsersID, arg.Limit, arg.Offset)
+func (q *Queries) ListOdersByUserName(ctx context.Context, arg ListOdersByUserNameParams) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, listOdersByUserName, arg.Username, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (q *Queries) ListOdersByUserID(ctx context.Context, arg ListOdersByUserIDPa
 	items := []Order{}
 	for rows.Next() {
 		var i Order
-		if err := rows.Scan(&i.ID, &i.UsersID, &i.CreatedAt); err != nil {
+		if err := rows.Scan(&i.ID, &i.Username, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

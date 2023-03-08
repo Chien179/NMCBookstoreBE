@@ -11,7 +11,7 @@ import (
 type Address struct {
 	ID        int64     `json:"id"`
 	Address   string    `json:"address"`
-	UsersID   int64     `json:"users_id"`
+	Username  string    `json:"username"`
 	District  string    `json:"district"`
 	City      string    `json:"city"`
 	CreatedAt time.Time `json:"created_at"`
@@ -29,13 +29,6 @@ type Book struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-type BooksCart struct {
-	ID        int64     `json:"id"`
-	BooksID   int64     `json:"books_id"`
-	CartsID   int64     `json:"carts_id"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
 type BooksGenre struct {
 	ID        int64     `json:"id"`
 	BooksID   int64     `json:"books_id"`
@@ -50,16 +43,10 @@ type BooksSubgenre struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
-type BooksWishlist struct {
-	ID          int64     `json:"id"`
-	BooksID     int64     `json:"books_id"`
-	WishlistsID int64     `json:"wishlists_id"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
 type Cart struct {
 	ID        int64     `json:"id"`
-	UsersID   int64     `json:"users_id"`
+	BooksID   int64     `json:"books_id"`
+	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -71,13 +58,13 @@ type Genre struct {
 
 type Order struct {
 	ID        int64     `json:"id"`
-	UsersID   int64     `json:"users_id"`
+	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 type Review struct {
 	ID        int64     `json:"id"`
-	UsersID   int64     `json:"users_id"`
+	Username  string    `json:"username"`
 	BooksID   int64     `json:"books_id"`
 	Comments  string    `json:"comments"`
 	Rating    int32     `json:"rating"`
@@ -99,19 +86,19 @@ type Transaction struct {
 }
 
 type User struct {
-	ID          int64     `json:"id"`
 	Username    string    `json:"username"`
 	FullName    string    `json:"full_name"`
 	Email       string    `json:"email"`
 	Password    string    `json:"password"`
 	Image       string    `json:"image"`
 	PhoneNumber string    `json:"phone_number"`
-	Role        bool      `json:"role"`
+	Role        string    `json:"role"`
 	CreatedAt   time.Time `json:"created_at"`
 }
 
 type Wishlist struct {
 	ID        int64     `json:"id"`
-	UsersID   int64     `json:"users_id"`
+	BooksID   int64     `json:"books_id"`
+	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 }

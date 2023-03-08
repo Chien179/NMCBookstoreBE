@@ -2,40 +2,64 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomCart(t *testing.T, user User) Cart {
-	carts, err := testQueries.CreateCart(context.Background(), user.ID)
+func createRandomCart(t *testing.T, book Book, user User) Cart {
+	arg := CreateCartParams{
+		BooksID:  book.ID,
+		Username: user.Username,
+	}
+
+	Cart, err := testQueries.CreateCart(context.Background(), arg)
 	require.NoError(t, err)
-	require.NotEmpty(t, carts)
+	require.NotEmpty(t, Cart)
 
-	require.Equal(t, user.ID, carts.UsersID)
+	require.Equal(t, arg.BooksID, Cart.BooksID)
+	require.Equal(t, arg.Username, Cart.Username)
 
-	require.NotZero(t, carts.ID)
-	require.NotZero(t, carts.CreatedAt)
+	require.NotZero(t, Cart.ID)
+	require.NotZero(t, Cart.CreatedAt)
 
-	return carts
+	return Cart
 }
 
 func TestCreateCart(t *testing.T) {
 	user := createRandomUser(t)
-	createRandomCart(t, user)
+	book := createRandomBook(t)
+	createRandomCart(t, book, user)
 }
 
-func TestGetCart(t *testing.T) {
+func TestDeleteCart(t *testing.T) {
 	user := createRandomUser(t)
-	cart1 := createRandomCart(t, user)
-	cart2, err := testQueries.GetCart(context.Background(), cart1.ID)
+	book := createRandomBook(t)
+	Cart1 := createRandomCart(t, book, user)
+
+	err := testQueries.DeleteCart(context.Background(), Cart1.ID)
+	require.NoError(t, err)
+
+	Cart2, err := testQueries.GetCart(context.Background(), Cart1.ID)
+	require.Error(t, err)
+	require.EqualError(t, err, sql.ErrNoRows.Error())
+	require.Empty(t, Cart2)
+}
+
+func TestListBookCartsByUsername(t *testing.T) {
+	user := createRandomUser(t)
+	for i := 0; i < 10; i++ {
+		book := createRandomBook(t)
+		createRandomCart(t, book, user)
+	}
+
+	books, err := testQueries.ListCartsByUsername(context.Background(), user.Username)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, cart2)
+	require.NotEmpty(t, books)
 
-	require.Equal(t, cart1.ID, cart1.ID)
-	require.Equal(t, cart1.UsersID, cart2.UsersID)
-
-	require.WithinDuration(t, cart1.CreatedAt, cart2.CreatedAt, time.Second)
+	for _, book := range books {
+		require.NotEmpty(t, book)
+	}
 }

@@ -21,7 +21,7 @@ func createRandomUser(t *testing.T) User {
 		Password:    hashedPassword,
 		Image:       util.RandomString(10),
 		PhoneNumber: util.RandomString(10),
-		Role:        false,
+		Role:        "user",
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -36,7 +36,6 @@ func createRandomUser(t *testing.T) User {
 	require.Equal(t, arg.PhoneNumber, user.PhoneNumber)
 	require.Equal(t, arg.Role, user.Role)
 
-	require.NotZero(t, user.ID)
 	require.NotZero(t, user.CreatedAt)
 
 	return user
@@ -48,12 +47,11 @@ func TestCreateUser(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	user1 := createRandomUser(t)
-	user2, err := testQueries.GetUser(context.Background(), user1.ID)
+	user2, err := testQueries.GetUser(context.Background(), user1.Username)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
 
-	require.Equal(t, user1.ID, user2.ID)
 	require.Equal(t, user1.Username, user2.Username)
 	require.Equal(t, user1.FullName, user2.FullName)
 	require.Equal(t, user1.Email, user2.Email)
@@ -68,10 +66,10 @@ func TestGetUser(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	user1 := createRandomUser(t)
 
-	err := testQueries.DeleteUser(context.Background(), user1.ID)
+	err := testQueries.DeleteUser(context.Background(), user1.Username)
 	require.NoError(t, err)
 
-	user2, err := testQueries.GetUser(context.Background(), user1.ID)
+	user2, err := testQueries.GetUser(context.Background(), user1.Username)
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
 	require.Empty(t, user2)
@@ -81,10 +79,9 @@ func TestUpdateUser(t *testing.T) {
 	user1 := createRandomUser(t)
 
 	arg := UpdateUserParams{
-		ID:          user1.ID,
+		Username:    user1.Username,
 		FullName:    user1.FullName,
 		Email:       user1.Email,
-		Password:    user1.Password,
 		Image:       user1.Image,
 		PhoneNumber: user1.PhoneNumber,
 	}
@@ -94,12 +91,36 @@ func TestUpdateUser(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, user2)
 
-	require.Equal(t, user1.ID, user2.ID)
 	require.Equal(t, user1.Username, user2.Username)
 	require.Equal(t, user1.Email, user2.Email)
 	require.Equal(t, user1.Password, user2.Password)
 	require.Equal(t, user1.Image, user2.Image)
 	require.Equal(t, user1.PhoneNumber, user2.PhoneNumber)
+	require.Equal(t, user1.Role, user2.Role)
+
+	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
+}
+
+func TestUpdatePassword(t *testing.T) {
+	user1 := createRandomUser(t)
+
+	arg := UpdatePasswordParams{
+		Username: user1.Username,
+		Password: user1.Password,
+	}
+
+	user2, err := testQueries.UpdatePassword(context.Background(), arg)
+
+	require.NoError(t, err)
+	require.NotEmpty(t, user2)
+
+	require.Equal(t, user1.Username, user2.Username)
+	require.Equal(t, user1.Email, user2.Email)
+	require.Equal(t, user1.Password, user2.Password)
+	require.Equal(t, user1.Image, user2.Image)
+	require.Equal(t, user1.PhoneNumber, user2.PhoneNumber)
+	require.Equal(t, user1.Role, user2.Role)
+
 	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
 }
 

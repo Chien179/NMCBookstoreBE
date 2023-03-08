@@ -90,7 +90,7 @@ func TestListSubgenres(t *testing.T) {
 		createRandomSubgenre(t, genre)
 	}
 
-	subgenres, err := testQueries.ListSubgenres(context.Background())
+	subgenres, err := testQueries.ListSubgenres(context.Background(), genre.ID)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, subgenres)

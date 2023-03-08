@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 	"time"
 
@@ -11,7 +12,7 @@ import (
 
 func createRandomReview(t *testing.T, user User, book Book) Review {
 	arg := CreateReviewParams{
-		UsersID:  user.ID,
+		Username: user.Username,
 		BooksID:  book.ID,
 		Comments: util.RandomString(100),
 		Rating:   util.RandomInt(0, 100),
@@ -21,7 +22,7 @@ func createRandomReview(t *testing.T, user User, book Book) Review {
 	require.NoError(t, err)
 	require.NotEmpty(t, review)
 
-	require.Equal(t, arg.UsersID, review.UsersID)
+	require.Equal(t, arg.Username, review.Username)
 	require.Equal(t, arg.BooksID, review.BooksID)
 	require.Equal(t, arg.Comments, review.Comments)
 	require.Equal(t, arg.Rating, review.Rating)
@@ -48,12 +49,25 @@ func TestGetReview(t *testing.T) {
 	require.NotEmpty(t, review2)
 
 	require.Equal(t, review1.ID, review1.ID)
-	require.Equal(t, review1.UsersID, review2.UsersID)
+	require.Equal(t, review1.Username, review2.Username)
 	require.Equal(t, review1.BooksID, review2.BooksID)
 	require.Equal(t, review1.Comments, review2.Comments)
 	require.Equal(t, review1.Comments, review2.Comments)
 
 	require.WithinDuration(t, review1.CreatedAt, review2.CreatedAt, time.Second)
+}
+
+func TestDeleteReview(t *testing.T) {
+	user := createRandomUser(t)
+	review1 := createRandomOrder(t, user)
+
+	err := testQueries.DeleteOrder(context.Background(), review1.ID)
+	require.NoError(t, err)
+
+	review2, err := testQueries.GetOrder(context.Background(), review1.ID)
+	require.Error(t, err)
+	require.EqualError(t, err, sql.ErrNoRows.Error())
+	require.Empty(t, review2)
 }
 
 func TestListReviewByBookID(t *testing.T) {

@@ -11,61 +11,58 @@ import (
 type Querier interface {
 	CreateAddress(ctx context.Context, arg CreateAddressParams) (Address, error)
 	CreateBook(ctx context.Context, arg CreateBookParams) (Book, error)
-	CreateBookCart(ctx context.Context, arg CreateBookCartParams) (BooksCart, error)
 	CreateBookGenre(ctx context.Context, arg CreateBookGenreParams) (BooksGenre, error)
 	CreateBookSubgenre(ctx context.Context, arg CreateBookSubgenreParams) (BooksSubgenre, error)
-	CreateBookWishlist(ctx context.Context, arg CreateBookWishlistParams) (BooksWishlist, error)
-	CreateCart(ctx context.Context, usersID int64) (Cart, error)
+	CreateCart(ctx context.Context, arg CreateCartParams) (Cart, error)
 	CreateGenre(ctx context.Context, name string) (Genre, error)
-	CreateOrder(ctx context.Context, usersID int64) (Order, error)
+	CreateOrder(ctx context.Context, username string) (Order, error)
 	CreateReview(ctx context.Context, arg CreateReviewParams) (Review, error)
 	CreateSubgenre(ctx context.Context, arg CreateSubgenreParams) (Subgenre, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	CreateWishlist(ctx context.Context, usersID int64) (Wishlist, error)
+	CreateWishlist(ctx context.Context, arg CreateWishlistParams) (Wishlist, error)
 	DeleteAddress(ctx context.Context, id int64) error
 	DeleteBook(ctx context.Context, id int64) error
-	DeleteBookCart(ctx context.Context, id int64) error
 	DeleteBookGenre(ctx context.Context, id int64) error
 	DeleteBookSubgenre(ctx context.Context, id int64) error
-	DeleteBookWishlist(ctx context.Context, id int64) error
+	DeleteCart(ctx context.Context, id int64) error
 	DeleteGenre(ctx context.Context, id int64) error
 	DeleteOrder(ctx context.Context, id int64) error
+	DeleteReview(ctx context.Context, id int64) error
 	DeleteSubgenre(ctx context.Context, id int64) error
 	DeleteTransaction(ctx context.Context, id int64) error
-	DeleteUser(ctx context.Context, id int64) error
+	DeleteUser(ctx context.Context, username string) error
+	DeleteWishlist(ctx context.Context, id int64) error
 	GetAddress(ctx context.Context, id int64) (Address, error)
 	GetBook(ctx context.Context, id int64) (Book, error)
-	GetBookCart(ctx context.Context, id int64) (BooksCart, error)
 	GetBookGenre(ctx context.Context, id int64) (BooksGenre, error)
 	GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre, error)
-	GetBookWishlist(ctx context.Context, id int64) (BooksWishlist, error)
 	GetCart(ctx context.Context, id int64) (Cart, error)
 	GetGenre(ctx context.Context, id int64) (Genre, error)
 	GetOrder(ctx context.Context, id int64) (Order, error)
 	GetReview(ctx context.Context, id int64) (Review, error)
 	GetSubgenre(ctx context.Context, id int64) (Subgenre, error)
 	GetTransaction(ctx context.Context, id int64) (Transaction, error)
-	GetUser(ctx context.Context, id int64) (User, error)
+	GetUser(ctx context.Context, username string) (User, error)
 	GetWishlist(ctx context.Context, id int64) (Wishlist, error)
 	ListAddresses(ctx context.Context, arg ListAddressesParams) ([]Address, error)
 	ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, error)
-	ListBooksCartsByBookID(ctx context.Context, booksID int64) ([]BooksCart, error)
-	ListBooksCartsByCartID(ctx context.Context, cartsID int64) ([]BooksCart, error)
 	ListBooksGenresByBookID(ctx context.Context, booksID int64) ([]BooksGenre, error)
 	ListBooksGenresByGenreID(ctx context.Context, genresID int64) ([]BooksGenre, error)
 	ListBooksSubgenresByBookID(ctx context.Context, booksID int64) ([]BooksSubgenre, error)
 	ListBooksSubgenresBySubgenreID(ctx context.Context, subgenresID int64) ([]BooksSubgenre, error)
-	ListBooksWishlists(ctx context.Context, wishlistsID int64) ([]BooksWishlist, error)
+	ListCartsByUsername(ctx context.Context, username string) ([]Cart, error)
 	ListGenres(ctx context.Context) ([]Genre, error)
-	ListOdersByUserID(ctx context.Context, arg ListOdersByUserIDParams) ([]Order, error)
+	ListOdersByUserName(ctx context.Context, arg ListOdersByUserNameParams) ([]Order, error)
 	ListReviewsByBookID(ctx context.Context, arg ListReviewsByBookIDParams) ([]Review, error)
-	ListSubgenres(ctx context.Context) ([]Subgenre, error)
+	ListSubgenres(ctx context.Context, genresID int64) ([]Subgenre, error)
 	ListTransactionsByOrderID(ctx context.Context, ordersID int64) ([]Transaction, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	ListWishlistsByUsername(ctx context.Context, username string) ([]Wishlist, error)
 	UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error)
 	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
 	UpdateGenre(ctx context.Context, arg UpdateGenreParams) (Genre, error)
+	UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (User, error)
 	UpdateSubgenre(ctx context.Context, arg UpdateSubgenreParams) (Subgenre, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }

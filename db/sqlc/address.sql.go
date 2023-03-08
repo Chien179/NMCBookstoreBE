@@ -11,18 +11,18 @@ import (
 
 const createAddress = `-- name: CreateAddress :one
 INSERT INTO address (
-  users_id,
+  username,
   address,
   district,
   city
 ) VALUES (
   $1, $2, $3, $4
 )
-RETURNING id, address, users_id, district, city, created_at
+RETURNING id, address, username, district, city, created_at
 `
 
 type CreateAddressParams struct {
-	UsersID  int64  `json:"users_id"`
+	Username string `json:"username"`
 	Address  string `json:"address"`
 	District string `json:"district"`
 	City     string `json:"city"`
@@ -30,7 +30,7 @@ type CreateAddressParams struct {
 
 func (q *Queries) CreateAddress(ctx context.Context, arg CreateAddressParams) (Address, error) {
 	row := q.db.QueryRowContext(ctx, createAddress,
-		arg.UsersID,
+		arg.Username,
 		arg.Address,
 		arg.District,
 		arg.City,
@@ -39,7 +39,7 @@ func (q *Queries) CreateAddress(ctx context.Context, arg CreateAddressParams) (A
 	err := row.Scan(
 		&i.ID,
 		&i.Address,
-		&i.UsersID,
+		&i.Username,
 		&i.District,
 		&i.City,
 		&i.CreatedAt,
@@ -58,7 +58,7 @@ func (q *Queries) DeleteAddress(ctx context.Context, id int64) error {
 }
 
 const getAddress = `-- name: GetAddress :one
-SELECT id, address, users_id, district, city, created_at FROM address
+SELECT id, address, username, district, city, created_at FROM address
 WHERE id = $1 LIMIT 1
 `
 
@@ -68,7 +68,7 @@ func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Address,
-		&i.UsersID,
+		&i.Username,
 		&i.District,
 		&i.City,
 		&i.CreatedAt,
@@ -77,19 +77,21 @@ func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
 }
 
 const listAddresses = `-- name: ListAddresses :many
-SELECT id, address, users_id, district, city, created_at FROM address
+SELECT id, address, username, district, city, created_at FROM address
+WHERE username = $1
 ORDER BY id
-LIMIT $1
-OFFSET $2
+LIMIT $2
+OFFSET $3
 `
 
 type ListAddressesParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	Username string `json:"username"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
 }
 
 func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) ([]Address, error) {
-	rows, err := q.db.QueryContext(ctx, listAddresses, arg.Limit, arg.Offset)
+	rows, err := q.db.QueryContext(ctx, listAddresses, arg.Username, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +102,7 @@ func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) ([
 		if err := rows.Scan(
 			&i.ID,
 			&i.Address,
-			&i.UsersID,
+			&i.Username,
 			&i.District,
 			&i.City,
 			&i.CreatedAt,
@@ -124,7 +126,7 @@ SET  address = $2,
   district = $3,
   city = $4
 WHERE id = $1
-RETURNING id, address, users_id, district, city, created_at
+RETURNING id, address, username, district, city, created_at
 `
 
 type UpdateAddressParams struct {
@@ -145,7 +147,7 @@ func (q *Queries) UpdateAddress(ctx context.Context, arg UpdateAddressParams) (A
 	err := row.Scan(
 		&i.ID,
 		&i.Address,
-		&i.UsersID,
+		&i.Username,
 		&i.District,
 		&i.City,
 		&i.CreatedAt,

@@ -4,13 +4,14 @@ WHERE id = $1 LIMIT 1;
 
 -- name: ListAddresses :many
 SELECT * FROM address
+WHERE username = $1
 ORDER BY id
-LIMIT $1
-OFFSET $2;
+LIMIT $2
+OFFSET $3;
 
 -- name: CreateAddress :one
 INSERT INTO address (
-  users_id,
+  username,
   address,
   district,
   city

@@ -4,7 +4,7 @@ WHERE id = $1 LIMIT 1;
 
 -- name: CreateOrder :one
 INSERT INTO orders (
-    users_id
+    username
 ) VALUES (
   $1
 )
@@ -14,9 +14,9 @@ RETURNING *;
 DELETE FROM orders
 WHERE id = $1;
 
--- name: ListOdersByUserID :many
+-- name: ListOdersByUserName :many
 SELECT * FROM orders
-WHERE users_id = $1
+WHERE username = $1
 ORDER BY id
 LIMIT $2
 OFFSET $3;

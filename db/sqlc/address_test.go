@@ -12,7 +12,7 @@ import (
 
 func createRandomAddress(t *testing.T, user User) Address {
 	arg := CreateAddressParams{
-		UsersID:  user.ID,
+		Username: user.Username,
 		Address:  util.RandomString(15),
 		District: util.RandomString(6),
 		City:     util.RandomString(6),
@@ -22,7 +22,7 @@ func createRandomAddress(t *testing.T, user User) Address {
 	require.NoError(t, err)
 	require.NotEmpty(t, address)
 
-	require.Equal(t, arg.UsersID, address.UsersID)
+	require.Equal(t, arg.Username, address.Username)
 	require.Equal(t, arg.Address, address.Address)
 	require.Equal(t, arg.District, address.District)
 	require.Equal(t, arg.City, address.City)
@@ -47,7 +47,7 @@ func TestGetAddress(t *testing.T) {
 	require.NotEmpty(t, address2)
 
 	require.Equal(t, address1.ID, address2.ID)
-	require.Equal(t, address1.UsersID, address2.UsersID)
+	require.Equal(t, address1.Username, address2.Username)
 	require.Equal(t, address1.Address, address2.Address)
 	require.Equal(t, address1.District, address2.District)
 	require.Equal(t, address1.City, address2.City)
@@ -85,7 +85,7 @@ func TestUpdateAddress(t *testing.T) {
 	require.NotEmpty(t, address2)
 
 	require.Equal(t, address1.ID, address2.ID)
-	require.Equal(t, address1.UsersID, address2.UsersID)
+	require.Equal(t, address1.Username, address2.Username)
 	require.Equal(t, address1.Address, address2.Address)
 	require.Equal(t, address1.District, address2.District)
 	require.Equal(t, address1.City, address2.City)
@@ -100,8 +100,9 @@ func TestListAddresses(t *testing.T) {
 	}
 
 	arg := ListAddressesParams{
-		Limit:  5,
-		Offset: 0,
+		Username: user.Username,
+		Limit:    5,
+		Offset:   0,
 	}
 
 	addresss, err := testQueries.ListAddresses(context.Background(), arg)

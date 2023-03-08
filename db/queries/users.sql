@@ -1,10 +1,10 @@
 -- name: GetUser :one
 SELECT * FROM users
-WHERE id = $1 LIMIT 1;
+WHERE username = $1 LIMIT 1;
 
 -- name: ListUsers :many
 SELECT * FROM users
-ORDER BY id
+ORDER BY username
 LIMIT $1
 OFFSET $2;
 
@@ -24,14 +24,19 @@ RETURNING *;
 
 -- name: DeleteUser :exec
 DELETE FROM users
-WHERE id = $1;
+WHERE username = $1;
 
 -- name: UpdateUser :one
 UPDATE users
 SET full_name = $2,
     email = $3,
-    password = $4,
-    image = $5,
-    phone_number = $6
-WHERE id = $1
+    image = $4,
+    phone_number = $5
+WHERE username = $1
+RETURNING *;
+
+-- name: UpdatePassword :one
+UPDATE users
+SET password = $2
+WHERE username = $1
 RETURNING *;

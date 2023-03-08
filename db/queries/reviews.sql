@@ -11,7 +11,7 @@ OFFSET $3;
 
 -- name: CreateReview :one
 INSERT INTO reviews (
-    users_id,
+    username,
     books_id,
     comments,
     rating
@@ -19,3 +19,7 @@ INSERT INTO reviews (
   $1, $2, $3, $4
 )
 RETURNING *;
+
+-- name: DeleteReview :exec
+DELETE FROM reviews
+WHERE id = $1;

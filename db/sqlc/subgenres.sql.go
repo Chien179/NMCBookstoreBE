@@ -65,11 +65,12 @@ func (q *Queries) GetSubgenre(ctx context.Context, id int64) (Subgenre, error) {
 
 const listSubgenres = `-- name: ListSubgenres :many
 SELECT id, genres_id, name, created_at FROM subgenres
+WHERE genres_id = $1
 ORDER BY id
 `
 
-func (q *Queries) ListSubgenres(ctx context.Context) ([]Subgenre, error) {
-	rows, err := q.db.QueryContext(ctx, listSubgenres)
+func (q *Queries) ListSubgenres(ctx context.Context, genresID int64) ([]Subgenre, error) {
+	rows, err := q.db.QueryContext(ctx, listSubgenres, genresID)
 	if err != nil {
 		return nil, err
 	}
