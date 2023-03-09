@@ -313,6 +313,20 @@ func (mr *MockStoreMockRecorder) DeleteOrder(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteOrder", reflect.TypeOf((*MockStore)(nil).DeleteOrder), arg0, arg1)
 }
 
+// DeleteReview mocks base method.
+func (m *MockStore) DeleteReview(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteReview", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteReview indicates an expected call of DeleteReview.
+func (mr *MockStoreMockRecorder) DeleteReview(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteReview", reflect.TypeOf((*MockStore)(nil).DeleteReview), arg0, arg1)
+}
+
 // DeleteSubgenre mocks base method.
 func (m *MockStore) DeleteSubgenre(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
@@ -325,20 +339,6 @@ func (m *MockStore) DeleteSubgenre(arg0 context.Context, arg1 int64) error {
 func (mr *MockStoreMockRecorder) DeleteSubgenre(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteSubgenre", reflect.TypeOf((*MockStore)(nil).DeleteSubgenre), arg0, arg1)
-}
-
-// DeleteTransaction mocks base method.
-func (m *MockStore) DeleteTransaction(arg0 context.Context, arg1 int64) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteTransaction", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteTransaction indicates an expected call of DeleteTransaction.
-func (mr *MockStoreMockRecorder) DeleteTransaction(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTransaction", reflect.TypeOf((*MockStore)(nil).DeleteTransaction), arg0, arg1)
 }
 
 // DeleteUser mocks base method.
@@ -700,18 +700,18 @@ func (mr *MockStoreMockRecorder) ListReviewsByBookID(arg0, arg1 interface{}) *go
 }
 
 // ListSubgenres mocks base method.
-func (m *MockStore) ListSubgenres(arg0 context.Context) ([]db.Subgenre, error) {
+func (m *MockStore) ListSubgenres(arg0 context.Context, arg1 int64) ([]db.Subgenre, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListSubgenres", arg0)
+	ret := m.ctrl.Call(m, "ListSubgenres", arg0, arg1)
 	ret0, _ := ret[0].([]db.Subgenre)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ListSubgenres indicates an expected call of ListSubgenres.
-func (mr *MockStoreMockRecorder) ListSubgenres(arg0 interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) ListSubgenres(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSubgenres", reflect.TypeOf((*MockStore)(nil).ListSubgenres), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSubgenres", reflect.TypeOf((*MockStore)(nil).ListSubgenres), arg0, arg1)
 }
 
 // ListTransactionsByOrderID mocks base method.

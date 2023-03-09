@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
@@ -50,21 +49,6 @@ func TestGetTransaction(t *testing.T) {
 	require.Equal(t, transaction1.BooksID, transaction2.BooksID)
 
 	require.WithinDuration(t, transaction1.CreatedAt, transaction2.CreatedAt, time.Second)
-}
-
-func TestDeleteTransaction(t *testing.T) {
-	user := createRandomUser(t)
-	order := createRandomOrder(t, user)
-	book := createRandomBook(t)
-	transaction1 := createRandomTransaction(t, order, book)
-
-	err := testQueries.DeleteTransaction(context.Background(), transaction1.ID)
-	require.NoError(t, err)
-
-	transaction2, err := testQueries.GetTransaction(context.Background(), transaction1.ID)
-	require.Error(t, err)
-	require.EqualError(t, err, sql.ErrNoRows.Error())
-	require.Empty(t, transaction2)
 }
 
 func TestListTransactionsByOrderID(t *testing.T) {
