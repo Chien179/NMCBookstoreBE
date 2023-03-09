@@ -15,7 +15,3 @@ INSERT INTO transactions (
   $1, $2
 )
 RETURNING *;
-
--- name: DeleteTransaction :exec
-DELETE FROM transactions
-WHERE id = $1;

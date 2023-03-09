@@ -30,7 +30,6 @@ type Querier interface {
 	DeleteOrder(ctx context.Context, id int64) error
 	DeleteReview(ctx context.Context, id int64) error
 	DeleteSubgenre(ctx context.Context, id int64) error
-	DeleteTransaction(ctx context.Context, id int64) error
 	DeleteUser(ctx context.Context, username string) error
 	DeleteWishlist(ctx context.Context, id int64) error
 	GetAddress(ctx context.Context, id int64) (Address, error)

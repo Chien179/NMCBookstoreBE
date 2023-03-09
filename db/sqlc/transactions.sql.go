@@ -36,16 +36,6 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	return i, err
 }
 
-const deleteTransaction = `-- name: DeleteTransaction :exec
-DELETE FROM transactions
-WHERE id = $1
-`
-
-func (q *Queries) DeleteTransaction(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteTransaction, id)
-	return err
-}
-
 const getTransaction = `-- name: GetTransaction :one
 SELECT id, orders_id, books_id, created_at FROM transactions
 WHERE id = $1 LIMIT 1
