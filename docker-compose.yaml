@@ -6,6 +6,8 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=123456
       - POSTGRES_DB=nmc_bookstore
+    ports:
+      - "5432:5432"
   api:
     build:
       context: .
@@ -14,5 +16,6 @@ services:
       - "8080:8080"
     environment:
       - DB_SOURCE=postgresql://root:123456@postgres:5432/nmc_bookstore?sslmode=disable
+      - DB_HOST=postgres_host
     entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
     command: ["/app/main"]
