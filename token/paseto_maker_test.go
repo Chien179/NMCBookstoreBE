@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Chien179/SimpleBank/util"
+	"github.com/Chien179/NMCBookstoreBE/util"
 	"github.com/stretchr/testify/require"
 )
 
@@ -12,7 +12,7 @@ func TestPasetoMaker(t *testing.T) {
 	maker, err := NewPasetoMaker(util.RandomString(32))
 	require.NoError(t, err)
 
-	usename := util.RandomOwner()
+	usename := util.RandomUser()
 	role := "user"
 	duration := time.Minute
 
@@ -37,7 +37,7 @@ func TestExpiredPasetoToken(t *testing.T) {
 	maker, err := NewPasetoMaker(util.RandomString(32))
 	require.NoError(t, err)
 
-	token, err := maker.CreateToken(util.RandomOwner(), "user", -time.Minute)
+	token, err := maker.CreateToken(util.RandomUser(), "user", -time.Minute)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 

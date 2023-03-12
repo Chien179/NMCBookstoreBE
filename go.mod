@@ -3,7 +3,6 @@ module github.com/Chien179/NMCBookstoreBE
 go 1.19
 
 require (
-	github.com/Chien179/SimpleBank v0.0.0-20230216093511-44d843229ec6
 	github.com/gin-gonic/gin v1.9.0
 	github.com/golang/mock v1.4.4
 	github.com/google/uuid v1.3.0
