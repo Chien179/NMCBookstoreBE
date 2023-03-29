@@ -26,8 +26,8 @@ WHERE id = $1;
 
 -- name: UpdateAddress :one
 UPDATE address
-SET  address = $2,
-  district = $3,
-  city = $4
-WHERE id = $1
+SET  address = COALESCE(sqlc.narg(address), address),
+  district = COALESCE(sqlc.narg(district), district),
+  city = COALESCE(sqlc.narg(city), city)
+WHERE id = sqlc.arg(id)
 RETURNING *;

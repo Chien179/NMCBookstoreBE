@@ -76,52 +76,53 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	user1 := createRandomUser(t)
+	oldUser := createRandomUser(t)
+
+	newFullName := util.RandomUser()
+	newEmail := util.RandomEmail()
+	newPassword := util.RandomString(6)
+	newImages := util.RandomString(10)
+	newPhoneNumber := util.RandomString(10)
+	newHashedPassword, err := util.HashPassword(newPassword)
+	require.NoError(t, err)
 
 	arg := UpdateUserParams{
-		Username:    user1.Username,
-		FullName:    user1.FullName,
-		Email:       user1.Email,
-		Image:       user1.Image,
-		PhoneNumber: user1.PhoneNumber,
+		Username: oldUser.Username,
+		FullName: sql.NullString{
+			String: newFullName,
+			Valid:  true,
+		},
+		Email: sql.NullString{
+			String: newEmail,
+			Valid:  true,
+		},
+		Image: sql.NullString{
+			String: newImages,
+			Valid:  true,
+		},
+		PhoneNumber: sql.NullString{
+			String: newPhoneNumber,
+			Valid:  true,
+		},
+		Password: sql.NullString{
+			String: newHashedPassword,
+			Valid:  true,
+		},
 	}
 
-	user2, err := testQueries.UpdateUser(context.Background(), arg)
+	updateUser, err := testQueries.UpdateUser(context.Background(), arg)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, user2)
+	require.NotEmpty(t, updateUser)
 
-	require.Equal(t, user1.Username, user2.Username)
-	require.Equal(t, user1.Email, user2.Email)
-	require.Equal(t, user1.Password, user2.Password)
-	require.Equal(t, user1.Image, user2.Image)
-	require.Equal(t, user1.PhoneNumber, user2.PhoneNumber)
-	require.Equal(t, user1.Role, user2.Role)
-
-	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
-}
-
-func TestUpdatePassword(t *testing.T) {
-	user1 := createRandomUser(t)
-
-	arg := UpdatePasswordParams{
-		Username: user1.Username,
-		Password: user1.Password,
-	}
-
-	user2, err := testQueries.UpdatePassword(context.Background(), arg)
-
-	require.NoError(t, err)
-	require.NotEmpty(t, user2)
-
-	require.Equal(t, user1.Username, user2.Username)
-	require.Equal(t, user1.Email, user2.Email)
-	require.Equal(t, user1.Password, user2.Password)
-	require.Equal(t, user1.Image, user2.Image)
-	require.Equal(t, user1.PhoneNumber, user2.PhoneNumber)
-	require.Equal(t, user1.Role, user2.Role)
-
-	require.WithinDuration(t, user1.CreatedAt, user2.CreatedAt, time.Second)
+	require.Equal(t, newEmail, updateUser.Email)
+	require.NotEqual(t, oldUser.Email, updateUser.Email)
+	require.Equal(t, newHashedPassword, updateUser.Password)
+	require.NotEqual(t, oldUser.Password, updateUser.Password)
+	require.Equal(t, newImages, updateUser.Image)
+	require.NotEqual(t, oldUser.Image, updateUser.Image)
+	require.Equal(t, newPhoneNumber, updateUser.PhoneNumber)
+	require.NotEqual(t, oldUser.PhoneNumber, updateUser.PhoneNumber)
 }
 
 func TestListUsers(t *testing.T) {

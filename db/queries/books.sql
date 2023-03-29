@@ -28,12 +28,12 @@ WHERE id = $1;
 
 -- name: UpdateBook :one
 UPDATE books
-SET name = $2,
-  price = $3,
-  image = $4,
-  description = $5,
-  author = $6,
-  publisher = $7,
-  quantity = $8
-WHERE id = $1
+SET name = COALESCE(sqlc.narg(name), name),
+  price = COALESCE(sqlc.narg(price), price),
+  image = COALESCE(sqlc.narg(image), image),
+  description = COALESCE(sqlc.narg(description), description),
+  author = COALESCE(sqlc.narg(author), author),
+  publisher = COALESCE(sqlc.narg(publisher), publisher),
+  quantity = COALESCE(sqlc.narg(quantity), quantity)
+WHERE id = sqlc.arg(id)
 RETURNING *;

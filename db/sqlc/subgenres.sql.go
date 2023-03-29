@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createSubgenre = `-- name: CreateSubgenre :one
@@ -100,20 +101,20 @@ func (q *Queries) ListSubgenres(ctx context.Context, genresID int64) ([]Subgenre
 const updateSubgenre = `-- name: UpdateSubgenre :one
 UPDATE subgenres
 SET 
-  genres_id = $2,
-  name = $3
-WHERE id = $1
+  genres_id = COALESCE($1, genres_id),
+  name = COALESCE($2, name)
+WHERE id = $3
 RETURNING id, genres_id, name, created_at
 `
 
 type UpdateSubgenreParams struct {
-	ID       int64  `json:"id"`
-	GenresID int64  `json:"genres_id"`
-	Name     string `json:"name"`
+	GenresID sql.NullInt64  `json:"genres_id"`
+	Name     sql.NullString `json:"name"`
+	ID       int64          `json:"id"`
 }
 
 func (q *Queries) UpdateSubgenre(ctx context.Context, arg UpdateSubgenreParams) (Subgenre, error) {
-	row := q.db.QueryRowContext(ctx, updateSubgenre, arg.ID, arg.GenresID, arg.Name)
+	row := q.db.QueryRowContext(ctx, updateSubgenre, arg.GenresID, arg.Name, arg.ID)
 	var i Subgenre
 	err := row.Scan(
 		&i.ID,

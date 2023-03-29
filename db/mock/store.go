@@ -804,21 +804,6 @@ func (mr *MockStoreMockRecorder) UpdateGenre(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGenre", reflect.TypeOf((*MockStore)(nil).UpdateGenre), arg0, arg1)
 }
 
-// UpdatePassword mocks base method.
-func (m *MockStore) UpdatePassword(arg0 context.Context, arg1 db.UpdatePasswordParams) (db.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdatePassword", arg0, arg1)
-	ret0, _ := ret[0].(db.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// UpdatePassword indicates an expected call of UpdatePassword.
-func (mr *MockStoreMockRecorder) UpdatePassword(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockStore)(nil).UpdatePassword), arg0, arg1)
-}
-
 // UpdateSubgenre mocks base method.
 func (m *MockStore) UpdateSubgenre(arg0 context.Context, arg1 db.UpdateSubgenreParams) (db.Subgenre, error) {
 	m.ctrl.T.Helper()

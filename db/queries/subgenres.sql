@@ -23,7 +23,7 @@ WHERE id = $1;
 -- name: UpdateSubgenre :one
 UPDATE subgenres
 SET 
-  genres_id = $2,
-  name = $3
-WHERE id = $1
+  genres_id = COALESCE(sqlc.narg(genres_id), genres_id),
+  name = COALESCE(sqlc.narg(name), name)
+WHERE id = sqlc.arg(id)
 RETURNING *;

@@ -70,27 +70,40 @@ func TestDeleteAddress(t *testing.T) {
 
 func TestUpdateAddress(t *testing.T) {
 	user := createRandomUser(t)
-	address1 := createRandomAddress(t, user)
+	oldAddress := createRandomAddress(t, user)
+
+	newAddress := util.RandomString(6)
+	newDistrict := util.RandomString(6)
+	newCity := util.RandomString(6)
 
 	arg := UpdateAddressParams{
-		ID:       address1.ID,
-		Address:  address1.Address,
-		District: address1.District,
-		City:     address1.City,
+		ID: oldAddress.ID,
+		Address: sql.NullString{
+			String: newAddress,
+			Valid:  true,
+		},
+		District: sql.NullString{
+			String: newDistrict,
+			Valid:  true,
+		},
+		City: sql.NullString{
+			String: newCity,
+			Valid:  true,
+		},
 	}
 
-	address2, err := testQueries.UpdateAddress(context.Background(), arg)
+	updateAddress, err := testQueries.UpdateAddress(context.Background(), arg)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, address2)
+	require.NotEmpty(t, updateAddress)
 
-	require.Equal(t, address1.ID, address2.ID)
-	require.Equal(t, address1.Username, address2.Username)
-	require.Equal(t, address1.Address, address2.Address)
-	require.Equal(t, address1.District, address2.District)
-	require.Equal(t, address1.City, address2.City)
-
-	require.WithinDuration(t, address1.CreatedAt, address2.CreatedAt, time.Second)
+	require.Equal(t, oldAddress.Username, updateAddress.Username)
+	require.Equal(t, newAddress, updateAddress.Address)
+	require.NotEqual(t, oldAddress.Address, updateAddress.Address)
+	require.Equal(t, newDistrict, updateAddress.District)
+	require.NotEqual(t, oldAddress.District, updateAddress.District)
+	require.Equal(t, newCity, updateAddress.City)
+	require.NotEqual(t, oldAddress.City, updateAddress.City)
 }
 
 func TestListAddresses(t *testing.T) {

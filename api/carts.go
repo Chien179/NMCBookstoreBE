@@ -13,6 +13,17 @@ type addToCartRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Add to cart
+// @Description  Use this API to add to cart
+// @Tags         Carts
+// @Accept       json
+// @Produce      json
+// @Param        id path int  true  "Add to cart"
+// @Success      200 {object} db.Cart
+// @failure	 	 400
+// @failure	 	 404
+// @failure		 500
+// @Router       /users/add_to_cart/{id} [post]
 func (server *Server) addToCart(ctx *gin.Context) {
 	var req addToCartRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -49,6 +60,17 @@ type deleteBookInCartRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Delete book in cart
+// @Description  Use this API to delete book in cart
+// @Tags         Carts
+// @Accept       json
+// @Produce      json
+// @Param        id path int  true  "Delete book in cart"
+// @Success      200
+// @failure	 	 400
+// @failure	 	 404
+// @failure		 500
+// @Router       /users/delete_book_in_cart/{id} [delete]
 func (server *Server) deleteBookInCart(ctx *gin.Context) {
 	var req deleteBookInCartRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -56,7 +78,13 @@ func (server *Server) deleteBookInCart(ctx *gin.Context) {
 		return
 	}
 
-	err := server.store.DeleteCart(ctx, req.ID)
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	arg := db.DeleteCartParams{
+		ID:       req.ID,
+		Username: authPayLoad.Username,
+	}
+
+	err := server.store.DeleteCart(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))

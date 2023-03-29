@@ -17,6 +17,17 @@ type createAddressRequest struct {
 	City     string `json:"city" binding:"required"`
 }
 
+// @Summary      Create address
+// @Description  Use this API to create address
+// @Tags         Addresses
+// @Accept       json
+// @Produce      json
+// @Param        Request body createAddressRequest  true  "Create address"
+// @Success      200  {object}  db.Address
+// @failure	 	 400
+// @failure		 403
+// @failure		 500
+// @Router       /users/addresses [post]
 func (server *Server) createAddress(ctx *gin.Context) {
 	var req createAddressRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -52,6 +63,19 @@ type getAddressRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Get address
+// @Description  Use this API to get address
+// @Tags         Addresses
+// @Accept       json
+// @Produce      json
+// @Param        ID path int  true  "Get address"
+// @Success      200  {object}  db.Address
+// @failure	 	 400
+// @failure		 401
+// @failure		 403
+// @failure		 404
+// @failure		 500
+// @Router       /users/addresses/{id} [get]
 func (server *Server) getAddress(ctx *gin.Context) {
 	var req getAddressRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -79,23 +103,39 @@ func (server *Server) getAddress(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, address)
 }
 
-type updateAddressRequest struct {
-	ID   int64 `uri:"id" binding:"required,min=1"`
-	data struct {
-		Address  string `json:"address" binding:"required"`
-		District string `json:"district" binding:"required"`
-		City     string `json:"city" binding:"required"`
-	}
+type updateAddressData struct {
+	Address  string `json:"address"`
+	District string `json:"district"`
+	City     string `json:"city"`
 }
 
+type updateAddressRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+	updateAddressData
+}
+
+// @Summary      Update address
+// @Description  Use this API to update address
+// @Tags         Addresses
+// @Accept       json
+// @Produce      json
+// @Param        ID path int  true  "Update address id"
+// @Param        Request body updateAddressData  false  "Update address data"
+// @Success      200  {object}  db.Address
+// @failure	 	 400
+// @failure		 401
+// @failure		 403
+// @failure		 404
+// @failure		 500
+// @Router       /users/addresses/update/{id} [put]
 func (server *Server) updateAddress(ctx *gin.Context) {
 	var req updateAddressRequest
-	if err := ctx.ShouldBindJSON(&req.data); err != nil {
+	if err := ctx.ShouldBindJSON(&req.updateAddressData); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if err := ctx.ShouldBindUri(&req.ID); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -117,10 +157,19 @@ func (server *Server) updateAddress(ctx *gin.Context) {
 		return
 	}
 	arg := db.UpdateAddressParams{
-		ID:       req.ID,
-		Address:  req.data.Address,
-		District: req.data.District,
-		City:     req.data.City,
+		ID: req.ID,
+		Address: sql.NullString{
+			String: req.updateAddressData.Address,
+			Valid:  true,
+		},
+		District: sql.NullString{
+			String: req.updateAddressData.District,
+			Valid:  true,
+		},
+		City: sql.NullString{
+			String: req.updateAddressData.City,
+			Valid:  true,
+		},
 	}
 
 	address, err = server.store.UpdateAddress(ctx, arg)
@@ -140,6 +189,18 @@ type deleteAddressRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Delete address
+// @Description  Use this API to delete address
+// @Tags         Addresses
+// @Accept       json
+// @Produce      json
+// @Param        ID path int  true  "Delete address"
+// @Success      200
+// @failure	 	 400
+// @failure		 401
+// @failure		 404
+// @failure		 500
+// @Router       /users/addresses/delete/{id} [delete]
 func (server *Server) deleteAddress(ctx *gin.Context) {
 	var req deleteAddressRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -182,6 +243,18 @@ type listAddressRequest struct {
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
+// @Summary      List address
+// @Description  Use this API to list address
+// @Tags         Addresses
+// @Accept       json
+// @Produce      json
+// @Param        Query query listAddressRequest  true  "List address"
+// @Success      200 {object}  []db.Address
+// @failure	 	 400
+// @failure		 401
+// @failure		 404
+// @failure		 500
+// @Router       /users/addresses [get]
 func (server *Server) listAddress(ctx *gin.Context) {
 	var req listAddressRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {

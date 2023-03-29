@@ -15,7 +15,7 @@ func createRandomReview(t *testing.T, user User, book Book) Review {
 		Username: user.Username,
 		BooksID:  book.ID,
 		Comments: util.RandomString(100),
-		Rating:   util.RandomInt(0, 100),
+		Rating:   util.RandomInt32(0, 100),
 	}
 
 	review, err := testQueries.CreateReview(context.Background(), arg)

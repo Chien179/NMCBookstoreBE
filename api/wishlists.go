@@ -13,6 +13,17 @@ type addToWishlistRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Add to wislist
+// @Description  Use this API to add to wishlist
+// @Tags         Carts
+// @Accept       json
+// @Produce      json
+// @Param        id path int  true  "Add to wishlist"
+// @Success      200 {object} db.Wishlist
+// @failure	 	 400
+// @failure	 	 404
+// @failure		 500
+// @Router       /users/add_to_wishlist/{id} [post]
 func (server *Server) addToWishlist(ctx *gin.Context) {
 	var req addToWishlistRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -49,6 +60,17 @@ type deleteBookInWishlistRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Delete book in wishlist
+// @Description  Use this API to delete book in wishlist
+// @Tags         Carts
+// @Accept       json
+// @Produce      json
+// @Param        id path int  true  "Delete book in wishlist"
+// @Success      200
+// @failure	 	 400
+// @failure	 	 404
+// @failure		 500
+// @Router       /users/add_to_wishlist/{id} [delete]
 func (server *Server) deleteBookInWishlist(ctx *gin.Context) {
 	var req deleteBookInWishlistRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {

@@ -28,15 +28,11 @@ WHERE username = $1;
 
 -- name: UpdateUser :one
 UPDATE users
-SET full_name = $2,
-    email = $3,
-    image = $4,
-    phone_number = $5
-WHERE username = $1
-RETURNING *;
-
--- name: UpdatePassword :one
-UPDATE users
-SET password = $2
-WHERE username = $1
+SET full_name = COALESCE(sqlc.narg(full_name), full_name),
+    email = COALESCE(sqlc.narg(email), email),
+    image = COALESCE(sqlc.narg(image), image),
+    phone_number = COALESCE(sqlc.narg(phone_number), phone_number),
+    password = COALESCE(sqlc.narg(password), password)
+WHERE 
+  username = sqlc.arg(username)
 RETURNING *;
