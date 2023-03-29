@@ -38,7 +38,12 @@ func TestDeleteCart(t *testing.T) {
 	book := createRandomBook(t)
 	Cart1 := createRandomCart(t, book, user)
 
-	err := testQueries.DeleteCart(context.Background(), Cart1.ID)
+	arg := DeleteCartParams{
+		ID:       Cart1.ID,
+		Username: user.Username,
+	}
+
+	err := testQueries.DeleteCart(context.Background(), arg)
 	require.NoError(t, err)
 
 	Cart2, err := testQueries.GetCart(context.Background(), Cart1.ID)

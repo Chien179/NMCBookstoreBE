@@ -1,15 +1,22 @@
 package api
 
 import (
+	docs "github.com/Chien179/NMCBookstoreBE/docs"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"     // swagger embed files
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
+	docs.SwaggerInfo.BasePath = "/"
+
 	server.publicRouter(router)
 	server.userAuth(router)
 	server.adminAuth(router)
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	server.router = router
 }

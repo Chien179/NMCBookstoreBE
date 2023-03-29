@@ -14,6 +14,16 @@ type createOrderRequest struct {
 	Username string `json:"username" binding:"required"`
 }
 
+// @Summary      Create order
+// @Description  Use this API to create order
+// @Tags         Orders
+// @Accept       json
+// @Produce      json
+// @Param        Request body createOrderRequest  true  "Create order"
+// @Success      200 {object} db.Order
+// @failure	 	 400
+// @failure		 500
+// @Router       /users/orders [post]
 func (server *Server) createOrder(ctx *gin.Context) {
 	var req createOrderRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -35,6 +45,18 @@ type deleteOrderRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Delete order
+// @Description  Use this API to delete order
+// @Tags         Orders
+// @Accept       json
+// @Produce      json
+// @Param        ID path int  true  "Delete order"
+// @Success      200
+// @failure	 	 400
+// @failure	 	 401
+// @failure	 	 404
+// @failure		 500
+// @Router       /users/orders/delete/{id} [delete]
 func (server *Server) deleteOrder(ctx *gin.Context) {
 	var req deleteOrderRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -61,10 +83,6 @@ func (server *Server) deleteOrder(ctx *gin.Context) {
 
 	err = server.store.DeleteOrder(ctx, req.ID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -77,6 +95,17 @@ type listOrderRequest struct {
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
+// @Summary      List order
+// @Description  Use this API to list order
+// @Tags         Orders
+// @Accept       json
+// @Produce      json
+// @Param        Query query listOrderRequest  true  "List order"
+// @Success      200 {object} []db.Order
+// @failure	 	 400
+// @failure	 	 404
+// @failure		 500
+// @Router       /users/orders [get]
 func (server *Server) listOrder(ctx *gin.Context) {
 	var req listOrderRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {

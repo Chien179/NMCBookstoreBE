@@ -21,7 +21,7 @@ type Book struct {
 	ID          int64     `json:"id"`
 	Name        string    `json:"name"`
 	Price       float64   `json:"price"`
-	Image       string    `json:"image"`
+	Image       []string  `json:"image"`
 	Description string    `json:"description"`
 	Author      string    `json:"author"`
 	Publisher   string    `json:"publisher"`

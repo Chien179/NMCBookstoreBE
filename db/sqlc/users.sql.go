@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -133,59 +134,35 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 	return items, nil
 }
 
-const updatePassword = `-- name: UpdatePassword :one
-UPDATE users
-SET password = $2
-WHERE username = $1
-RETURNING username, full_name, email, password, image, phone_number, role, created_at
-`
-
-type UpdatePasswordParams struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updatePassword, arg.Username, arg.Password)
-	var i User
-	err := row.Scan(
-		&i.Username,
-		&i.FullName,
-		&i.Email,
-		&i.Password,
-		&i.Image,
-		&i.PhoneNumber,
-		&i.Role,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
-SET full_name = $2,
-    email = $3,
-    image = $4,
-    phone_number = $5
-WHERE username = $1
+SET full_name = COALESCE($1, full_name),
+    email = COALESCE($2, email),
+    image = COALESCE($3, image),
+    phone_number = COALESCE($4, phone_number),
+    password = COALESCE($5, password)
+WHERE 
+  username = $6
 RETURNING username, full_name, email, password, image, phone_number, role, created_at
 `
 
 type UpdateUserParams struct {
-	Username    string `json:"username"`
-	FullName    string `json:"full_name"`
-	Email       string `json:"email"`
-	Image       string `json:"image"`
-	PhoneNumber string `json:"phone_number"`
+	FullName    sql.NullString `json:"full_name"`
+	Email       sql.NullString `json:"email"`
+	Image       sql.NullString `json:"image"`
+	PhoneNumber sql.NullString `json:"phone_number"`
+	Password    sql.NullString `json:"password"`
+	Username    string         `json:"username"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
 	row := q.db.QueryRowContext(ctx, updateUser,
-		arg.Username,
 		arg.FullName,
 		arg.Email,
 		arg.Image,
 		arg.PhoneNumber,
+		arg.Password,
+		arg.Username,
 	)
 	var i User
 	err := row.Scan(

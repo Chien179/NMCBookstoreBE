@@ -22,7 +22,7 @@ CREATE TABLE "books" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar NOT NULL,
   "price" float NOT NULL,
-  "image" varchar NOT NULL,
+  "image" varchar[] NOT NULL,
   "description" varchar NOT NULL,
   "author" varchar NOT NULL,
   "publisher" varchar NOT NULL,

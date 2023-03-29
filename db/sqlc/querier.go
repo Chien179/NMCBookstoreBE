@@ -25,7 +25,7 @@ type Querier interface {
 	DeleteBook(ctx context.Context, id int64) error
 	DeleteBookGenre(ctx context.Context, id int64) error
 	DeleteBookSubgenre(ctx context.Context, id int64) error
-	DeleteCart(ctx context.Context, id int64) error
+	DeleteCart(ctx context.Context, arg DeleteCartParams) error
 	DeleteGenre(ctx context.Context, id int64) error
 	DeleteOrder(ctx context.Context, id int64) error
 	DeleteReview(ctx context.Context, id int64) error
@@ -61,7 +61,6 @@ type Querier interface {
 	UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error)
 	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
 	UpdateGenre(ctx context.Context, arg UpdateGenreParams) (Genre, error)
-	UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (User, error)
 	UpdateSubgenre(ctx context.Context, arg UpdateSubgenreParams) (Subgenre, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }

@@ -10,22 +10,35 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type createReviewRequest struct {
-	BookID int64 `uri:"book_id" binding:"required,min=1"`
-	data   struct {
-		Comments string `json:"comments" binding:"required"`
-		Ratings  int32  `json:"rating" binding:"required"`
-	}
+type createReviewData struct {
+	Comments string `json:"comments" binding:"required"`
+	Ratings  int32  `json:"rating" binding:"required"`
 }
 
+type createReviewRequest struct {
+	BookID int64 `uri:"book_id" binding:"required,min=1"`
+	createReviewData
+}
+
+// @Summary      Create review
+// @Description  Use this API to create review
+// @Tags         Reviews
+// @Accept       json
+// @Produce      json
+// @Param        book_id path int  true  "Create review id"
+// @Param        request body createReviewData  true  "Create review data"
+// @Success      200 {object} db.Review
+// @failure	 	 400
+// @failure		 500
+// @Router       /usersreviews/{book_id} [post]
 func (server *Server) createReview(ctx *gin.Context) {
 	var req createReviewRequest
-	if err := ctx.ShouldBindJSON(&req.data); err != nil {
+	if err := ctx.ShouldBindJSON(&req.createReviewData); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if err := ctx.ShouldBindUri(&req.BookID); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -34,8 +47,8 @@ func (server *Server) createReview(ctx *gin.Context) {
 	arg := db.CreateReviewParams{
 		Username: authPayLoad.Username,
 		BooksID:  req.BookID,
-		Comments: req.data.Comments,
-		Rating:   req.data.Ratings,
+		Comments: req.createReviewData.Comments,
+		Rating:   req.createReviewData.Ratings,
 	}
 
 	review, err := server.store.CreateReview(ctx, arg)
@@ -51,6 +64,18 @@ type deleteReviewRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+// @Summary      Delete review
+// @Description  Use this API to delete review
+// @Tags         Reviews
+// @Accept       json
+// @Produce      json
+// @Param        id path int  true  "Delete review"
+// @Success      200
+// @failure	 	 400
+// @failure	 	 401
+// @failure	 	 404
+// @failure		 500
+// @Router       /users/reviews/delete/{id} [delete]
 func (server *Server) deleteReview(ctx *gin.Context) {
 	var req deleteReviewRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -70,7 +95,7 @@ func (server *Server) deleteReview(ctx *gin.Context) {
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	if review.Username != authPayLoad.Username {
-		err := errors.New("account doesn't belong to the authenticated user")
+		err := errors.New("review doesn't belong to the authenticated user")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
@@ -88,38 +113,47 @@ func (server *Server) deleteReview(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Review deleted successfully")
 }
 
-type listReviewRequest struct {
-	BookID   int64 `uri:"book_id" binding:"required,min=1"`
-	formData struct {
-		PageID   int32 `form:"page_id" binding:"required,min=1"`
-		PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
-	}
+type listReviewFormdata struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
+type listReviewRequest struct {
+	BookID int64 `uri:"book_id" binding:"required,min=1"`
+	listReviewFormdata
+}
+
+// @Summary      List review
+// @Description  Use this API to list review
+// @Tags         Reviews
+// @Accept       json
+// @Produce      json
+// @Param        book_id path int  true  "List review id"
+// @Param        request query listReviewFormdata  true  "List review formdata"
+// @Success      200 {object} []db.Review
+// @failure	 	 400
+// @failure		 500
+// @Router       /usersreviews/{book_id} [get]
 func (server *Server) listReview(ctx *gin.Context) {
 	var req listReviewRequest
-	if err := ctx.ShouldBindQuery(&req.formData); err != nil {
+	if err := ctx.ShouldBindQuery(&req.listReviewFormdata); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if err := ctx.ShouldBindUri(&req.BookID); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	arg := db.ListReviewsByBookIDParams{
 		BooksID: req.BookID,
-		Limit:   req.formData.PageSize,
-		Offset:  (req.formData.PageID - 1) * req.formData.PageSize,
+		Limit:   req.listReviewFormdata.PageSize,
+		Offset:  (req.listReviewFormdata.PageID - 1) * req.listReviewFormdata.PageSize,
 	}
 
 	books, err := server.store.ListReviewsByBookID(ctx, arg)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

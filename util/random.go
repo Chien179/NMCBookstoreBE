@@ -13,9 +13,14 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-// RandomInt generates a random interger between min and max
-func RandomInt(min, max int32) int32 {
+// RandomInt32 generates a random interger between min and max
+func RandomInt32(min, max int32) int32 {
 	return min + rand.Int31n(max-min+1)
+}
+
+// RandomInt64 generates a random interger between min and max
+func RandomInt64(min, max int64) int64 {
+	return min + rand.Int63n(max-min+1)
 }
 
 // RandomFloat generates a random interger between min and max

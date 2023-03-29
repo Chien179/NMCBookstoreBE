@@ -1,0 +1,150 @@
+Project nmc_bookstore {
+  database_type: 'PostgreSQL'
+  Note: '''
+    # NMC Bookstore Database
+  '''
+}
+
+
+Table users as U {
+  username varchar [not null, pk]
+  full_name varchar [not null]
+  email varchar [not null, unique]
+  password varchar [not null]
+  image varchar [not null]
+  phone_number varchar [not null]
+  role varchar [not null]
+  created_at timestamptz [not null, default:"now()"]
+}
+
+Table address as A{
+  id bigserial [pk, increment]
+  address varchar [not null]
+  username varchar [ref: > U.username, not null]
+  district varchar [not null]
+  city varchar [not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes{
+    username
+  }
+}
+
+Table books as B {
+  id bigserial [pk, increment]
+  name varchar [not null]
+  price float [not null]
+  image varchar[] [not null]
+  description varchar [not null]
+  author varchar [not null]
+  publisher varchar [not null]
+  quantity int [not null]
+  created_at timestamptz [not null, default:"now()"]
+}
+
+Table genres as G{
+  id bigserial [pk, increment]
+  name varchar [not null]
+  created_at timestamptz [not null, default:"now()"]
+}
+
+Table subgenres as SG{
+  id bigserial [pk, increment]
+  genres_id bigserial [ref: > G.id, not null]
+  name varchar [not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes {
+     genres_id
+  }
+}
+
+Table carts as BC{
+  id bigserial [pk, increment]
+  books_id bigserial [ref: > B.id, not null]
+  username varchar [ref: > U.username, not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes{
+    books_id
+    username
+    (books_id, username)
+  }
+}
+
+Table books_genres as BG {
+  id bigserial [pk, increment]
+  books_id bigserial [ref: > B.id, not null]
+  genres_id bigserial [ref: > G.id, not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes {
+    books_id
+    genres_id
+    (books_id, genres_id)
+  }
+}
+
+Table books_subgenres as BS {
+  id bigserial [pk, increment]
+  books_id bigserial [ref: > B.id, not null]
+  subgenres_id bigserial [ref: > SG.id, not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes {
+    books_id
+    subgenres_id
+    (books_id, subgenres_id)
+  }
+}
+
+Table reviews as R {
+  id bigserial [pk, increment]
+  username varchar [ref: > U.username, not null]
+  books_id bigserial [ref: > B.id, not null]
+  comments varchar [not null]
+  rating int [not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes{
+    username
+    books_id
+    (username, books_id)
+  }
+}
+
+Table orders as O {
+  id bigserial [pk, increment]
+  username varchar [ref: > U.username, not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes{
+    username
+  }
+}
+
+Table transactions as T {
+  id bigserial [pk, increment]
+  orders_id bigserial [ref: > O.id, not null]
+  books_id bigserial [ref: > B.id, not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes{
+    books_id
+    orders_id
+    (books_id, orders_id)
+  }
+}
+
+Table wishlists as BW{
+  id bigserial [pk, increment]
+  books_id bigserial [ref: > B.id, not null]
+  username varchar [ref: > U.username, not null]
+  created_at timestamptz [not null, default:"now()"]
+  
+  indexes{
+    books_id
+    username
+    (books_id, username)
+  }
+}

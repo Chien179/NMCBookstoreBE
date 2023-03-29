@@ -18,4 +18,5 @@ ORDER BY id;
 
 -- name: DeleteCart :exec
 DELETE FROM carts
-WHERE id = $1;
+WHERE id = $1
+AND username = $2;

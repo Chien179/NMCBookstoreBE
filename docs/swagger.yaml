@@ -1,0 +1,1295 @@
+basePath: /
+definitions:
+  api.UserResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      image:
+        type: string
+      phone_number:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  api.createAddressRequest:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      district:
+        type: string
+    required:
+    - address
+    - city
+    - district
+    type: object
+  api.createBookRequest:
+    properties:
+      author:
+        type: string
+      description:
+        type: string
+      image:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+      publisher:
+        type: string
+      quanlity:
+        type: integer
+    required:
+    - author
+    - description
+    - image
+    - name
+    - price
+    - publisher
+    - quanlity
+    type: object
+  api.createGenreRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  api.createOrderRequest:
+    properties:
+      username:
+        type: string
+    required:
+    - username
+    type: object
+  api.createReviewData:
+    properties:
+      comments:
+        type: string
+      rating:
+        type: integer
+    required:
+    - comments
+    - rating
+    type: object
+  api.createSubgenreRequest:
+    properties:
+      genre_id:
+        minimum: 1
+        type: integer
+      name:
+        type: string
+    required:
+    - genre_id
+    - name
+    type: object
+  api.createUserRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      image:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone_number:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - full_name
+    - image
+    - password
+    - phone_number
+    - username
+    type: object
+  api.loginUserRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  api.loginUserResponse:
+    properties:
+      access_token:
+        type: string
+      user:
+        $ref: '#/definitions/api.UserResponse'
+    type: object
+  api.updateAddressData:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      district:
+        type: string
+    type: object
+  api.updateBookData:
+    properties:
+      author:
+        type: string
+      description:
+        type: string
+      image:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+      publisher:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  api.updateGenreData:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  api.updateSubgenreData:
+    properties:
+      genre_id:
+        type: integer
+      name:
+        type: string
+    type: object
+  api.updateUserRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      image:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    required:
+    - email
+    - full_name
+    - image
+    - password
+    - phone_number
+    type: object
+  db.Address:
+    properties:
+      address:
+        type: string
+      city:
+        type: string
+      created_at:
+        type: string
+      district:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  db.Book:
+    properties:
+      author:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      image:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+      publisher:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  db.Cart:
+    properties:
+      books_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  db.Genre:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  db.Order:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  db.Review:
+    properties:
+      books_id:
+        type: integer
+      comments:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      rating:
+        type: integer
+      username:
+        type: string
+    type: object
+  db.Subgenre:
+    properties:
+      created_at:
+        type: string
+      genres_id:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  db.Wishlist:
+    properties:
+      books_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+host: localhost:8080
+info:
+  contact:
+    email: chiennm456@gmail.com
+    name: Nguyen Minh Chien
+    url: https://github.com/Chien179
+  description: API document for NMC bookstore e-commerce website
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: NMC Bookstore
+  version: "1.0"
+paths:
+  /admin/books:
+    post:
+      consumes:
+      - application/json
+      description: Use this API to create book
+      parameters:
+      - description: Create book
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createBookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create book
+      tags:
+      - Admin
+  /admin/books/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to Delete book
+      parameters:
+      - description: Delete book
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete book
+      tags:
+      - Admin
+  /admin/books/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Use this API to update book
+      parameters:
+      - description: Update book id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update book request
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/api.updateBookData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update book
+      tags:
+      - Admin
+  /admin/genres:
+    post:
+      consumes:
+      - application/json
+      description: Use this API to create genre
+      parameters:
+      - description: Create genre
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createGenreRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Genre'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create genre
+      tags:
+      - Genres
+  /admin/genres/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete genre
+      parameters:
+      - description: Delete genre
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete genre
+      tags:
+      - Genres
+  /admin/genres/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Use this API to update genre
+      parameters:
+      - description: Update genre id
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Update genre data
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateGenreData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Genre'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update genre
+      tags:
+      - Genres
+  /admin/subgenres:
+    post:
+      consumes:
+      - application/json
+      description: Use this API to create subgenre
+      parameters:
+      - description: Create subgenre
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createSubgenreRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Subgenre'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create subgenre
+      tags:
+      - Subgenres
+  /admin/subgenres/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete subgenre
+      parameters:
+      - description: delete subgenre
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Delete subgenre
+      tags:
+      - Subgenres
+  /admin/subgenres/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Use this API to update subgenre
+      parameters:
+      - description: Update subgenre id
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Update subgenre data
+        in: body
+        name: Request
+        schema:
+          $ref: '#/definitions/api.updateSubgenreData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Subgenre'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Update subgenre
+      tags:
+      - Subgenres
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to List book
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 100
+        minimum: 24
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Book'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List book
+      tags:
+      - Books
+  /books/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to get book
+      parameters:
+      - description: get book
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Book'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get book
+      tags:
+      - Books
+  /genres:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to list genre
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Genre'
+            type: array
+        "500":
+          description: Internal Server Error
+      summary: List genre
+      tags:
+      - Genres
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Use this API to login user and get access token & refresh token
+      parameters:
+      - description: Login user
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.loginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.loginUserResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Login user
+      tags:
+      - Auth
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Use this API to create a new user
+      parameters:
+      - description: Create user
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserResponse'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server Error
+      summary: Create new user
+      tags:
+      - Auth
+  /subgenres/{genre_id}:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to list subgenre
+      parameters:
+      - description: list subgenre
+        in: path
+        name: genre_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Subgenre'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List subgenre
+      tags:
+      - Subgenres
+  /users/add_to_cart/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Use this API to add to cart
+      parameters:
+      - description: Add to cart
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Cart'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Add to cart
+      tags:
+      - Carts
+  /users/add_to_wishlist/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete book in wishlist
+      parameters:
+      - description: Delete book in wishlist
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete book in wishlist
+      tags:
+      - Carts
+    post:
+      consumes:
+      - application/json
+      description: Use this API to add to wishlist
+      parameters:
+      - description: Add to wishlist
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Wishlist'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Add to wislist
+      tags:
+      - Carts
+  /users/addresses:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to list address
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 10
+        minimum: 5
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Address'
+            type: array
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List address
+      tags:
+      - Addresses
+    post:
+      consumes:
+      - application/json
+      description: Use this API to create address
+      parameters:
+      - description: Create address
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Address'
+        "400":
+          description: Bad Request
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal Server Error
+      summary: Create address
+      tags:
+      - Addresses
+  /users/addresses/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to get address
+      parameters:
+      - description: Get address
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Address'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get address
+      tags:
+      - Addresses
+  /users/addresses/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete address
+      parameters:
+      - description: Delete address
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete address
+      tags:
+      - Addresses
+  /users/addresses/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Use this API to update address
+      parameters:
+      - description: Update address id
+        in: path
+        name: ID
+        required: true
+        type: integer
+      - description: Update address data
+        in: body
+        name: Request
+        schema:
+          $ref: '#/definitions/api.updateAddressData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Address'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update address
+      tags:
+      - Addresses
+  /users/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete user
+      tags:
+      - Users
+  /users/delete_book_in_cart/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete book in cart
+      parameters:
+      - description: Delete book in cart
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete book in cart
+      tags:
+      - Carts
+  /users/list_book_in_cart:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to get book in cart
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Book'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get book in cart
+      tags:
+      - Books
+  /users/list_book_in_wishlist:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to get book in wishlis
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Book'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get book in wishlist
+      tags:
+      - Books
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to get user with token access
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get user
+      tags:
+      - Users
+  /users/orders:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to list order
+      parameters:
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 10
+        minimum: 5
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Order'
+            type: array
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List order
+      tags:
+      - Orders
+    post:
+      consumes:
+      - application/json
+      description: Use this API to create order
+      parameters:
+      - description: Create order
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Order'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create order
+      tags:
+      - Orders
+  /users/orders/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete order
+      parameters:
+      - description: Delete order
+        in: path
+        name: ID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete order
+      tags:
+      - Orders
+  /users/reviews/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Use this API to delete review
+      parameters:
+      - description: Delete review
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Delete review
+      tags:
+      - Reviews
+  /users/update:
+    put:
+      consumes:
+      - application/json
+      description: Use this API to update user
+      parameters:
+      - description: Update user
+        in: body
+        name: Request
+        required: true
+        schema:
+          $ref: '#/definitions/api.updateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UserResponse'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Update user
+      tags:
+      - Users
+  /usersreviews/{book_id}:
+    get:
+      consumes:
+      - application/json
+      description: Use this API to list review
+      parameters:
+      - description: List review id
+        in: path
+        name: book_id
+        required: true
+        type: integer
+      - in: query
+        minimum: 1
+        name: page_id
+        required: true
+        type: integer
+      - in: query
+        maximum: 10
+        minimum: 5
+        name: page_size
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.Review'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: List review
+      tags:
+      - Reviews
+    post:
+      consumes:
+      - application/json
+      description: Use this API to create review
+      parameters:
+      - description: Create review id
+        in: path
+        name: book_id
+        required: true
+        type: integer
+      - description: Create review data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.createReviewData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.Review'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create review
+      tags:
+      - Reviews
+schemes:
+- http
+swagger: "2.0"

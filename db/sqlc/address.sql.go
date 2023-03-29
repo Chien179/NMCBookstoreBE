@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createAddress = `-- name: CreateAddress :one
@@ -122,26 +123,26 @@ func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) ([
 
 const updateAddress = `-- name: UpdateAddress :one
 UPDATE address
-SET  address = $2,
-  district = $3,
-  city = $4
-WHERE id = $1
+SET  address = COALESCE($1, address),
+  district = COALESCE($2, district),
+  city = COALESCE($3, city)
+WHERE id = $4
 RETURNING id, address, username, district, city, created_at
 `
 
 type UpdateAddressParams struct {
-	ID       int64  `json:"id"`
-	Address  string `json:"address"`
-	District string `json:"district"`
-	City     string `json:"city"`
+	Address  sql.NullString `json:"address"`
+	District sql.NullString `json:"district"`
+	City     sql.NullString `json:"city"`
+	ID       int64          `json:"id"`
 }
 
 func (q *Queries) UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error) {
 	row := q.db.QueryRowContext(ctx, updateAddress,
-		arg.ID,
 		arg.Address,
 		arg.District,
 		arg.City,
+		arg.ID,
 	)
 	var i Address
 	err := row.Scan(

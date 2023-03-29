@@ -14,11 +14,11 @@ func createRandomBook(t *testing.T) Book {
 	arg := CreateBookParams{
 		Name:        util.RandomUser(),
 		Price:       util.RandomFloat(80000, 400000),
-		Image:       util.RandomString(10),
+		Image:       []string{util.RandomString(10), util.RandomString(10), util.RandomString(10)},
 		Description: util.RandomString(1000),
 		Author:      util.RandomUser(),
 		Publisher:   util.RandomUser(),
-		Quantity:    util.RandomInt(1, 50),
+		Quantity:    util.RandomInt32(1, 50),
 	}
 
 	book, err := testQueries.CreateBook(context.Background(), arg)
@@ -75,34 +75,70 @@ func TestDeleteBook(t *testing.T) {
 }
 
 func TestUpdateBook(t *testing.T) {
-	book1 := createRandomBook(t)
+	oldBook := createRandomBook(t)
+
+	newName := util.RandomString(6)
+	newPrice := util.RandomFloat(60000, 1000000)
+	newImages := []string{
+		util.RandomString(20),
+		util.RandomString(20),
+		util.RandomString(20),
+		util.RandomString(20),
+		util.RandomString(20),
+	}
+	newDescription := util.RandomString(100)
+	newAuthor := util.RandomString(6)
+	newPublisher := util.RandomString(6)
+	newQuantity := util.RandomInt32(1, 10)
 
 	arg := UpdateBookParams{
-		ID:          book1.ID,
-		Name:        book1.Name,
-		Price:       book1.Price,
-		Image:       book1.Image,
-		Description: book1.Description,
-		Author:      book1.Author,
-		Publisher:   book1.Publisher,
-		Quantity:    book1.Quantity,
+		ID: oldBook.ID,
+		Name: sql.NullString{
+			String: newName,
+			Valid:  true,
+		},
+		Price: sql.NullFloat64{
+			Float64: newPrice,
+			Valid:   true,
+		},
+		Image: newImages,
+		Description: sql.NullString{
+			String: newDescription,
+			Valid:  true,
+		},
+		Author: sql.NullString{
+			String: newAuthor,
+			Valid:  true,
+		},
+		Publisher: sql.NullString{
+			String: newPublisher,
+			Valid:  true,
+		},
+		Quantity: sql.NullInt32{
+			Int32: newQuantity,
+			Valid: true,
+		},
 	}
 
-	book2, err := testQueries.UpdateBook(context.Background(), arg)
+	updateBook, err := testQueries.UpdateBook(context.Background(), arg)
 
 	require.NoError(t, err)
-	require.NotEmpty(t, book2)
+	require.NotEmpty(t, updateBook)
 
-	require.Equal(t, book1.ID, book2.ID)
-	require.Equal(t, book1.Name, book2.Name)
-	require.Equal(t, book1.Price, book2.Price)
-	require.Equal(t, book1.Image, book2.Image)
-	require.Equal(t, book1.Description, book2.Description)
-	require.Equal(t, book1.Author, book2.Author)
-	require.Equal(t, book1.Publisher, book2.Publisher)
-	require.Equal(t, book1.Quantity, book2.Quantity)
-
-	require.WithinDuration(t, book1.CreatedAt, book2.CreatedAt, time.Second)
+	require.Equal(t, newName, updateBook.Name)
+	require.NotEqual(t, oldBook.Name, updateBook.Name)
+	require.Equal(t, newPrice, updateBook.Price)
+	require.NotEqual(t, oldBook.Price, updateBook.Price)
+	require.Equal(t, newImages, updateBook.Image)
+	require.NotEqual(t, oldBook.Image, updateBook.Image)
+	require.Equal(t, newDescription, updateBook.Description)
+	require.NotEqual(t, oldBook.Description, updateBook.Description)
+	require.Equal(t, newAuthor, updateBook.Author)
+	require.NotEqual(t, oldBook.Author, updateBook.Author)
+	require.Equal(t, newPublisher, updateBook.Publisher)
+	require.NotEqual(t, oldBook.Publisher, updateBook.Publisher)
+	require.Equal(t, newQuantity, updateBook.Quantity)
+	require.NotEqual(t, oldBook.Quantity, updateBook.Quantity)
 }
 
 func TestListBooks(t *testing.T) {

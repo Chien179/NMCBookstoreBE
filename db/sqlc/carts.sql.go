@@ -39,10 +39,16 @@ func (q *Queries) CreateCart(ctx context.Context, arg CreateCartParams) (Cart, e
 const deleteCart = `-- name: DeleteCart :exec
 DELETE FROM carts
 WHERE id = $1
+AND username = $2
 `
 
-func (q *Queries) DeleteCart(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteCart, id)
+type DeleteCartParams struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+}
+
+func (q *Queries) DeleteCart(ctx context.Context, arg DeleteCartParams) error {
+	_, err := q.db.ExecContext(ctx, deleteCart, arg.ID, arg.Username)
 	return err
 }
 
