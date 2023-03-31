@@ -26,7 +26,7 @@ type createReviewRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param        book_id path int  true  "Create review id"
-// @Param        request body createReviewData  true  "Create review data"
+// @Param        Request body createReviewData  true  "Create review data"
 // @Success      200 {object} db.Review
 // @failure	 	 400
 // @failure		 500
@@ -129,7 +129,7 @@ type listReviewRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param        book_id path int  true  "List review id"
-// @Param        request query listReviewFormdata  true  "List review formdata"
+// @Param        Request query listReviewFormdata  true  "List review formdata"
 // @Success      200 {object} []db.Review
 // @failure	 	 400
 // @failure		 500

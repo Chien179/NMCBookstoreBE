@@ -92,7 +92,7 @@ func (server *Server) getBook(ctx *gin.Context) {
 type updateBookData struct {
 	Name        string   `json:"name"`
 	Price       float64  `json:"price"`
-	Image       []string `json:"image"`
+	Image       []string `json:"image" binding:"required"`
 	Description string   `json:"description"`
 	Author      string   `json:"author"`
 	Publisher   string   `json:"publisher"`
@@ -110,7 +110,7 @@ type updateBookRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param        id path int  true  "Update book id"
-// @Param        request body updateBookData  false  "Update book request"
+// @Param        Request body updateBookData  false  "Update book request"
 // @Success      200  {object}  db.Book
 // @failure	 	 400
 // @failure	 	 404

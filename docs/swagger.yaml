@@ -130,6 +130,14 @@ definitions:
     properties:
       access_token:
         type: string
+      access_token_expires_at:
+        type: string
+      refresh_token:
+        type: string
+      refresh_token_expires_at:
+        type: string
+      session_id:
+        type: string
       user:
         $ref: '#/definitions/api.UserResponse'
     type: object
@@ -160,6 +168,8 @@ definitions:
         type: string
       quantity:
         type: integer
+    required:
+    - image
     type: object
   api.updateGenreData:
     properties:
@@ -187,12 +197,6 @@ definitions:
         type: string
       phone_number:
         type: string
-    required:
-    - email
-    - full_name
-    - image
-    - password
-    - phone_number
     type: object
   db.Address:
     properties:
@@ -379,7 +383,7 @@ paths:
         type: integer
       - description: Update book request
         in: body
-        name: request
+        name: Request
         schema:
           $ref: '#/definitions/api.updateBookData'
       produces:
@@ -463,7 +467,6 @@ paths:
       - description: Update genre data
         in: body
         name: Request
-        required: true
         schema:
           $ref: '#/definitions/api.updateGenreData'
       produces:
@@ -1203,7 +1206,6 @@ paths:
       - description: Update user
         in: body
         name: Request
-        required: true
         schema:
           $ref: '#/definitions/api.updateUserRequest'
       produces:
@@ -1272,7 +1274,7 @@ paths:
         type: integer
       - description: Create review data
         in: body
-        name: request
+        name: Request
         required: true
         schema:
           $ref: '#/definitions/api.createReviewData'

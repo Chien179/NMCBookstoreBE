@@ -53,7 +53,7 @@ type updateGenreRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param        ID path int true  "Update genre id"
-// @Param        Request body updateGenreData true  "Update genre data"
+// @Param        Request body updateGenreData false  "Update genre data"
 // @Success      200 {object} db.Genre
 // @failure	 	 400
 // @failure	 	 404

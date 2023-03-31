@@ -6,6 +6,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
@@ -17,6 +19,7 @@ type Querier interface {
 	CreateGenre(ctx context.Context, name string) (Genre, error)
 	CreateOrder(ctx context.Context, username string) (Order, error)
 	CreateReview(ctx context.Context, arg CreateReviewParams) (Review, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateSubgenre(ctx context.Context, arg CreateSubgenreParams) (Subgenre, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
@@ -40,6 +43,7 @@ type Querier interface {
 	GetGenre(ctx context.Context, id int64) (Genre, error)
 	GetOrder(ctx context.Context, id int64) (Order, error)
 	GetReview(ctx context.Context, id int64) (Review, error)
+	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetSubgenre(ctx context.Context, id int64) (Subgenre, error)
 	GetTransaction(ctx context.Context, id int64) (Transaction, error)
 	GetUser(ctx context.Context, username string) (User, error)
