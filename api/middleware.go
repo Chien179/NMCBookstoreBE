@@ -71,5 +71,4 @@ func corsMiddleware(router *gin.Engine) {
 	// config.AllowAllOrigins = true
 	// router.Use(cors.New(config))
 	router.Use(cors.Default())
-	router.Run()
 }
