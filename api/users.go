@@ -8,7 +8,9 @@ import (
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
 	"github.com/Chien179/NMCBookstoreBE/token"
 	"github.com/Chien179/NMCBookstoreBE/util"
+	"github.com/Chien179/NMCBookstoreBE/val"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
 
@@ -57,7 +59,7 @@ func newUserResponse(user db.User) UserResponse {
 func (server *Server) createUser(ctx *gin.Context) {
 	var req createUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, ValidateCreateUserRequest(&req))
 		return
 	}
 
@@ -99,8 +101,12 @@ type loginUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 type loginUserResponse struct {
-	AccessToken string       `json:"access_token"`
-	User        UserResponse `json:"user"`
+	SessionID             uuid.UUID    `json:"session_id"`
+	AccessToken           string       `json:"access_token"`
+	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
+	RefreshToken          string       `json:"refresh_token"`
+	RefreshTokenExpiresAt time.Time    `json:"refresh_token_expires_at"`
+	User                  UserResponse `json:"user"`
 }
 
 // @Summary      Login user
@@ -139,20 +145,47 @@ func (server *Server) loginUser(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := server.tokenMaker.CreateToken(
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(
 		user.Username,
 		user.Role,
 		server.config.AccessTokenDuration,
 	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
+	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(
+		user.Username,
+		user.Role,
+		server.config.RefreshTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	session, err := server.store.CreateSession(ctx, db.CreateSessionParams{
+		ID:           refreshPayload.ID,
+		Username:     user.Username,
+		RefreshToken: refreshToken,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    refreshPayload.ExpiredAt,
+	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	rsp := loginUserResponse{
-		AccessToken: accessToken,
-		User:        newUserResponse(user),
+		SessionID:             session.ID,
+		AccessToken:           accessToken,
+		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+		RefreshToken:          refreshToken,
+		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
+		User:                  newUserResponse(user),
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -186,11 +219,11 @@ func (server *Server) getUser(ctx *gin.Context) {
 }
 
 type updateUserRequest struct {
-	Fullname    string `json:"full_name" binding:"required"`
-	Email       string `json:"email" binding:"required,email"`
-	Image       string `json:"image" binding:"required"`
-	PhoneNumber string `json:"phone_number" binding:"required"`
-	Password    string `json:"password" binding:"required"`
+	Fullname    string `json:"full_name"`
+	Email       string `json:"email" binding:"email"`
+	Image       string `json:"image"`
+	PhoneNumber string `json:"phone_number"`
+	Password    string `json:"password"`
 }
 
 // @Summary      Update user
@@ -198,7 +231,7 @@ type updateUserRequest struct {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @Param        Request body updateUserRequest  true  "Update user"
+// @Param        Request body updateUserRequest  false  "Update user"
 // @Success      200  {object}  UserResponse
 // @failure		 400
 // @failure		 404
@@ -207,7 +240,7 @@ type updateUserRequest struct {
 func (server *Server) updateUser(ctx *gin.Context) {
 	var req updateUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		ctx.JSON(http.StatusBadRequest, ValidateUpdateUserRequest(&req))
 		return
 	}
 
@@ -280,4 +313,83 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, "User deleted successfully")
+}
+
+func ValidateCreateUserRequest(req *createUserRequest) (errs []errorCustom) {
+	if err := val.ValidateUsername(req.Username); err != nil {
+		errs = append(errs, errorCustom{
+			"username",
+			errorResponse(err),
+		})
+	}
+
+	if err := val.ValidatePassword(req.Password); err != nil {
+		errs = append(errs, errorCustom{
+			"password",
+			errorResponse(err),
+		})
+	}
+
+	if err := val.ValidateFullName(req.Fullname); err != nil {
+		errs = append(errs, errorCustom{
+			"full_name",
+			errorResponse(err),
+		})
+	}
+
+	if err := val.ValidateEmail(req.Email); err != nil {
+		errs = append(errs, errorCustom{
+			"email",
+			errorResponse(err),
+		})
+	}
+
+	if err := val.ValidatePhoneNumber(req.PhoneNumber); err != nil {
+		errs = append(errs, errorCustom{
+			"phone_number",
+			errorResponse(err),
+		})
+	}
+
+	return errs
+}
+
+func ValidateUpdateUserRequest(req *updateUserRequest) (errs []errorCustom) {
+	if req.Password != "" {
+		if err := val.ValidatePassword(req.Password); err != nil {
+			errs = append(errs, errorCustom{
+				"password",
+				errorResponse(err),
+			})
+		}
+	}
+
+	if req.Fullname != "" {
+		if err := val.ValidateFullName(req.Fullname); err != nil {
+			errs = append(errs, errorCustom{
+				"full_name",
+				errorResponse(err),
+			})
+		}
+	}
+
+	if req.Email != "" {
+		if err := val.ValidateEmail(req.Email); err != nil {
+			errs = append(errs, errorCustom{
+				"email",
+				errorResponse(err),
+			})
+		}
+	}
+
+	if req.PhoneNumber != "" {
+		if err := val.ValidatePhoneNumber(req.PhoneNumber); err != nil {
+			errs = append(errs, errorCustom{
+				"phone_number",
+				errorResponse(err),
+			})
+		}
+	}
+
+	return errs
 }

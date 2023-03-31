@@ -10,6 +10,8 @@ import (
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
+	corsMiddleware(router)
+
 	docs.SwaggerInfo.BasePath = "/"
 
 	server.publicRouter(router)
@@ -24,6 +26,7 @@ func (server *Server) setupRouter() {
 func (server *Server) publicRouter(router *gin.Engine) {
 	router.POST("/signup", server.createUser)
 	router.POST("/login", server.loginUser)
+	router.POST("/tokens/renew_access", server.renewAccessToken)
 
 	router.GET("/books/:id", server.getBook)
 	router.GET("/books", server.listBook)

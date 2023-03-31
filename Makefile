@@ -10,11 +10,23 @@ dropdb:
 migrateup:
 	migrate -path db/migrations -database "postgresql://root:123456@localhost:5432/nmc_bookstore?sslmode=disable" -verbose up	
 
+migrateup1:
+	migrate -path db/migrations -database "postgresql://root:123456@localhost:5432/nmc_bookstore?sslmode=disable" -verbose up 1
+
 migratedown:
 	migrate -path db/migrations -database "postgresql://root:123456@localhost:5432/nmc_bookstore?sslmode=disable" -verbose down
 
+migratedown1:
+	migrate -path db/migrations -database "postgresql://root:123456@localhost:5432/nmc_bookstore?sslmode=disable" -verbose down 1
+
+new_migration:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
 db_docs:
 	dbdocs build docs/db.dbml
+
+db_schema:
+	dbml2sql --postgres -o docs/schema.sql docs/db.dbml
 
 sqlc:
 	docker run --rm -v "C:\Users\chien\Projects\NMCBookstoreBE:/src" -w /src kjconroy/sqlc:1.16.0 generate

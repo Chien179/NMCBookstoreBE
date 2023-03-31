@@ -126,7 +126,7 @@ const docTemplate = `{
                     },
                     {
                         "description": "Update book request",
-                        "name": "request",
+                        "name": "Request",
                         "in": "body",
                         "schema": {
                             "$ref": "#/definitions/api.updateBookData"
@@ -255,7 +255,6 @@ const docTemplate = `{
                         "description": "Update genre data",
                         "name": "Request",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/api.updateGenreData"
                         }
@@ -1378,7 +1377,6 @@ const docTemplate = `{
                         "description": "Update user",
                         "name": "Request",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/api.updateUserRequest"
                         }
@@ -1480,7 +1478,7 @@ const docTemplate = `{
                     },
                     {
                         "description": "Create review data",
-                        "name": "request",
+                        "name": "Request",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -1696,6 +1694,18 @@ const docTemplate = `{
                 "access_token": {
                     "type": "string"
                 },
+                "access_token_expires_at": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "refresh_token_expires_at": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                },
                 "user": {
                     "$ref": "#/definitions/api.UserResponse"
                 }
@@ -1717,6 +1727,9 @@ const docTemplate = `{
         },
         "api.updateBookData": {
             "type": "object",
+            "required": [
+                "image"
+            ],
             "properties": {
                 "author": {
                     "type": "string"
@@ -1768,13 +1781,6 @@ const docTemplate = `{
         },
         "api.updateUserRequest": {
             "type": "object",
-            "required": [
-                "email",
-                "full_name",
-                "image",
-                "password",
-                "phone_number"
-            ],
             "properties": {
                 "email": {
                     "type": "string"

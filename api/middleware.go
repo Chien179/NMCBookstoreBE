@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Chien179/NMCBookstoreBE/token"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -62,4 +63,13 @@ func isAdmin() gin.HandlerFunc {
 			return
 		}
 	}
+}
+
+func corsMiddleware(router *gin.Engine) {
+	// same as
+	// config := cors.DefaultConfig()
+	// config.AllowAllOrigins = true
+	// router.Use(cors.New(config))
+	router.Use(cors.Default())
+	router.Run()
 }
