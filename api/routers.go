@@ -27,6 +27,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	router.POST("/signup", server.createUser)
 	router.POST("/login", server.loginUser)
 	router.POST("/tokens/renew_access", server.renewAccessToken)
+	router.GET("/verify_email", server.VerifyEmail)
 
 	router.GET("/books/:id", server.getBook)
 	router.GET("/books", server.listBook)

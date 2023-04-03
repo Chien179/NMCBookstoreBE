@@ -22,7 +22,7 @@ INSERT INTO users (
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7
 )
-RETURNING username, full_name, email, password, image, phone_number, role, created_at
+RETURNING username, full_name, email, password, image, phone_number, role, created_at, is_email_verified
 `
 
 type CreateUserParams struct {
@@ -55,6 +55,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.PhoneNumber,
 		&i.Role,
 		&i.CreatedAt,
+		&i.IsEmailVerified,
 	)
 	return i, err
 }
@@ -70,7 +71,7 @@ func (q *Queries) DeleteUser(ctx context.Context, username string) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT username, full_name, email, password, image, phone_number, role, created_at FROM users
+SELECT username, full_name, email, password, image, phone_number, role, created_at, is_email_verified FROM users
 WHERE username = $1 LIMIT 1
 `
 
@@ -86,12 +87,13 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.PhoneNumber,
 		&i.Role,
 		&i.CreatedAt,
+		&i.IsEmailVerified,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT username, full_name, email, password, image, phone_number, role, created_at FROM users
+SELECT username, full_name, email, password, image, phone_number, role, created_at, is_email_verified FROM users
 ORDER BY username
 LIMIT $1
 OFFSET $2
@@ -120,6 +122,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.PhoneNumber,
 			&i.Role,
 			&i.CreatedAt,
+			&i.IsEmailVerified,
 		); err != nil {
 			return nil, err
 		}
@@ -140,19 +143,21 @@ SET full_name = COALESCE($1, full_name),
     email = COALESCE($2, email),
     image = COALESCE($3, image),
     phone_number = COALESCE($4, phone_number),
-    password = COALESCE($5, password)
+    password = COALESCE($5, password),
+    is_email_verified = COALESCE($6, is_email_verified)
 WHERE 
-  username = $6
-RETURNING username, full_name, email, password, image, phone_number, role, created_at
+  username = $7
+RETURNING username, full_name, email, password, image, phone_number, role, created_at, is_email_verified
 `
 
 type UpdateUserParams struct {
-	FullName    sql.NullString `json:"full_name"`
-	Email       sql.NullString `json:"email"`
-	Image       sql.NullString `json:"image"`
-	PhoneNumber sql.NullString `json:"phone_number"`
-	Password    sql.NullString `json:"password"`
-	Username    string         `json:"username"`
+	FullName        sql.NullString `json:"full_name"`
+	Email           sql.NullString `json:"email"`
+	Image           sql.NullString `json:"image"`
+	PhoneNumber     sql.NullString `json:"phone_number"`
+	Password        sql.NullString `json:"password"`
+	IsEmailVerified sql.NullBool   `json:"is_email_verified"`
+	Username        string         `json:"username"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
@@ -162,6 +167,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.Image,
 		arg.PhoneNumber,
 		arg.Password,
+		arg.IsEmailVerified,
 		arg.Username,
 	)
 	var i User
@@ -174,6 +180,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.PhoneNumber,
 		&i.Role,
 		&i.CreatedAt,
+		&i.IsEmailVerified,
 	)
 	return i, err
 }

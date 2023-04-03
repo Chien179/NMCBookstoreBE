@@ -6,11 +6,14 @@ import (
 
 	"github.com/Chien179/NMCBookstoreBE/api"
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
+	"github.com/Chien179/NMCBookstoreBE/mail"
 	"github.com/Chien179/NMCBookstoreBE/util"
+	"github.com/Chien179/NMCBookstoreBE/worker"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/golang-migrate/migrate/v4/source/github"
+	"github.com/hibiken/asynq"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -54,7 +57,13 @@ func main() {
 
 	store := db.NewStore(conn)
 
-	runGinServer(config, store)
+	redisOpt := asynq.RedisClientOpt{
+		Addr: config.RedisAddress,
+	}
+
+	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
+	go runTaskProcessor(config, redisOpt, store)
+	runGinServer(config, store, taskDistributor)
 }
 
 func runDBMigration(migrationURL string, dbSource string) {
@@ -70,8 +79,18 @@ func runDBMigration(migrationURL string, dbSource string) {
 	log.Info().Msgf("db migrated successfully")
 }
 
-func runGinServer(config util.Config, store db.Store) {
-	server, err := api.NewServer(config, store)
+func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
+	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
+	log.Info().Msg("start task processor")
+	err := taskProcessor.Start()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed to start task processor")
+	}
+}
+
+func runGinServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
+	server, err := api.NewServer(config, store, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}

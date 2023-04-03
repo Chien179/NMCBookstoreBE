@@ -23,6 +23,7 @@ type Querier interface {
 	CreateSubgenre(ctx context.Context, arg CreateSubgenreParams) (Subgenre, error)
 	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
 	CreateWishlist(ctx context.Context, arg CreateWishlistParams) (Wishlist, error)
 	DeleteAddress(ctx context.Context, id int64) error
 	DeleteBook(ctx context.Context, id int64) error
@@ -67,6 +68,7 @@ type Querier interface {
 	UpdateGenre(ctx context.Context, arg UpdateGenreParams) (Genre, error)
 	UpdateSubgenre(ctx context.Context, arg UpdateSubgenreParams) (Subgenre, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
+	UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error)
 }
 
 var _ Querier = (*Queries)(nil)

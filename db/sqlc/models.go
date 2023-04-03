@@ -99,14 +99,25 @@ type Transaction struct {
 }
 
 type User struct {
-	Username    string    `json:"username"`
-	FullName    string    `json:"full_name"`
-	Email       string    `json:"email"`
-	Password    string    `json:"password"`
-	Image       string    `json:"image"`
-	PhoneNumber string    `json:"phone_number"`
-	Role        string    `json:"role"`
-	CreatedAt   time.Time `json:"created_at"`
+	Username        string    `json:"username"`
+	FullName        string    `json:"full_name"`
+	Email           string    `json:"email"`
+	Password        string    `json:"password"`
+	Image           string    `json:"image"`
+	PhoneNumber     string    `json:"phone_number"`
+	Role            string    `json:"role"`
+	CreatedAt       time.Time `json:"created_at"`
+	IsEmailVerified bool      `json:"is_email_verified"`
+}
+
+type VerifyEmail struct {
+	ID         int64     `json:"id"`
+	Username   string    `json:"username"`
+	Email      string    `json:"email"`
+	SecretCode string    `json:"secret_code"`
+	IsUsed     bool      `json:"is_used"`
+	CreatedAt  time.Time `json:"created_at"`
+	ExpiredAt  time.Time `json:"expired_at"`
 }
 
 type Wishlist struct {

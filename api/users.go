@@ -9,8 +9,10 @@ import (
 	"github.com/Chien179/NMCBookstoreBE/token"
 	"github.com/Chien179/NMCBookstoreBE/util"
 	"github.com/Chien179/NMCBookstoreBE/val"
+	"github.com/Chien179/NMCBookstoreBE/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/hibiken/asynq"
 	"github.com/lib/pq"
 )
 
@@ -76,23 +78,38 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.CreateUserParams{
-		Username:    req.Username,
-		Password:    hashedPassword,
-		FullName:    req.Fullname,
-		Email:       req.Email,
-		Image:       req.Image,
-		PhoneNumber: req.PhoneNumber,
-		Role:        "user",
+	arg := db.CreateUserTxParams{
+		CreateUserParams: db.CreateUserParams{
+			Username:    req.Username,
+			Password:    hashedPassword,
+			FullName:    req.Fullname,
+			Email:       req.Email,
+			Image:       req.Image,
+			PhoneNumber: req.PhoneNumber,
+			Role:        "user",
+		},
+		AfterCreate: func(user db.User) error {
+			taskPayload := &worker.PayloadSendVerifyEmail{
+				Username: user.Username,
+			}
+
+			opts := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+
+			return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opts...)
+		},
 	}
 
-	user, err := server.store.CreateUser(ctx, arg)
+	user, err := server.store.CreateUserTx(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	rsp := newUserResponse(user)
+	rsp := newUserResponse(user.User)
 	ctx.JSON(http.StatusOK, rsp)
 }
 

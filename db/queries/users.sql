@@ -32,7 +32,8 @@ SET full_name = COALESCE(sqlc.narg(full_name), full_name),
     email = COALESCE(sqlc.narg(email), email),
     image = COALESCE(sqlc.narg(image), image),
     phone_number = COALESCE(sqlc.narg(phone_number), phone_number),
-    password = COALESCE(sqlc.narg(password), password)
+    password = COALESCE(sqlc.narg(password), password),
+    is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified)
 WHERE 
   username = sqlc.arg(username)
 RETURNING *;

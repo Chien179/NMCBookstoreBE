@@ -6,28 +6,31 @@ import (
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
 	"github.com/Chien179/NMCBookstoreBE/token"
 	"github.com/Chien179/NMCBookstoreBE/util"
+	"github.com/Chien179/NMCBookstoreBE/worker"
 	"github.com/gin-gonic/gin"
 )
 
 // Server serves HTTP requests for our bookstore.
 type Server struct {
-	config     util.Config
-	store      db.Store
-	tokenMaker token.Maker
-	router     *gin.Engine
+	config          util.Config
+	store           db.Store
+	tokenMaker      token.Maker
+	router          *gin.Engine
+	taskDistributor worker.TaskDistributor
 }
 
 // NewServer creates a new HTTP server and setup routing.
-func NewServer(config util.Config, store db.Store) (*Server, error) {
+func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetrictKey)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
 
 	server := &Server{
-		config:     config,
-		store:      store,
-		tokenMaker: tokenMaker,
+		config:          config,
+		store:           store,
+		tokenMaker:      tokenMaker,
+		taskDistributor: taskDistributor,
 	}
 
 	server.setupRouter()
