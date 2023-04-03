@@ -22,5 +22,4 @@ services:
       - DB_SOURCE=postgresql://root:123456@postgres:5432/nmc_bookstore?sslmode=disable
     depends_on:
       - postgres
-    entrypoint: ["sh", "/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
-    command: ["/app/main"]
+    entrypoint: ["sh", "/app/wait-for", "postgres:5432", "--", "/app/main"]
