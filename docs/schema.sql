@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-04-02T08:25:34.840Z
+-- Generated at: 2023-04-05T10:20:50.415Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY NOT NULL,
@@ -20,6 +20,15 @@ CREATE TABLE "verify_emails" (
   "username" varchar NOT NULL,
   "email" varchar NOT NULL,
   "secret_code" varchar NOT NULL,
+  "is_used" bool NOT NULL DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT 'now()',
+  "expired_at" timestamptz NOT NULL DEFAULT (now()  + interval '15 minutes')
+);
+
+CREATE TABLE "reset_passwords" (
+  "id" bigserial PRIMARY KEY,
+  "username" varchar NOT NULL,
+  "reset_code" varchar NOT NULL,
   "is_used" bool NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT 'now()',
   "expired_at" timestamptz NOT NULL DEFAULT (now()  + interval '15 minutes')
@@ -163,6 +172,8 @@ CREATE INDEX ON "wishlists" ("username");
 CREATE INDEX ON "wishlists" ("books_id", "username");
 
 ALTER TABLE "verify_emails" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
+ALTER TABLE "reset_passwords" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "address" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 

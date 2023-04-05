@@ -29,6 +29,15 @@ Table verify_emails {
   expired_at timestamptz [not null, default:`now()  + interval '15 minutes'`]
 }
 
+Table reset_passwords {
+  id bigserial [pk]
+  username varchar [ref: > U.username, not null]
+  reset_code varchar [not null]
+  is_used bool [not null, default: false]
+  created_at timestamptz [not null, default:'now()']
+  expired_at timestamptz [not null, default:`now()  + interval '15 minutes'`]
+}
+
 Table address as A{
   id bigserial [pk, increment]
   address varchar [not null]

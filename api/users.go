@@ -26,24 +26,26 @@ type createUserRequest struct {
 }
 
 type UserResponse struct {
-	Username    string    `json:"username"`
-	FullName    string    `json:"full_name"`
-	Email       string    `json:"email"`
-	Image       string    `json:"image"`
-	PhoneNumber string    `json:"phone_number"`
-	Role        string    `json:"role"`
-	CreatedAt   time.Time `json:"created_at"`
+	Username          string    `json:"username"`
+	FullName          string    `json:"full_name"`
+	Email             string    `json:"email"`
+	Image             string    `json:"image"`
+	PhoneNumber       string    `json:"phone_number"`
+	Role              string    `json:"role"`
+	PasswordChangedAt time.Time `json:"password_changed_at"`
+	CreatedAt         time.Time `json:"created_at"`
 }
 
 func newUserResponse(user db.User) UserResponse {
 	return UserResponse{
-		Username:    user.Username,
-		FullName:    user.FullName,
-		Email:       user.Email,
-		Image:       user.Image,
-		PhoneNumber: user.PhoneNumber,
-		Role:        user.Role,
-		CreatedAt:   user.CreatedAt,
+		Username:          user.Username,
+		FullName:          user.FullName,
+		Email:             user.Email,
+		Image:             user.Image,
+		PhoneNumber:       user.PhoneNumber,
+		Role:              user.Role,
+		PasswordChangedAt: user.PasswordChangedAt,
+		CreatedAt:         user.CreatedAt,
 	}
 }
 
@@ -292,6 +294,10 @@ func (server *Server) updateUser(ctx *gin.Context) {
 			String: hashedPassword,
 			Valid:  true,
 		}
+		arg.PasswordChangedAt = sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		}
 	}
 
 	user, err := server.store.UpdateUser(ctx, arg)
@@ -304,7 +310,8 @@ func (server *Server) updateUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, newUserResponse(user))
+	rsp := newUserResponse(user)
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 // @Summary      Delete user

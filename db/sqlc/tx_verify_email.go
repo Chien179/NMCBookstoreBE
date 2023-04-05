@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 )
 
 type VerifyEmailTxParams struct {
@@ -19,8 +18,6 @@ type VerifyEmailTxResult struct {
 func (store *SQLStore) VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParams) (VerifyEmailTxResult, error) {
 	var result VerifyEmailTxResult
 
-	fmt.Println(arg.EmailId, arg.SecretCode)
-
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
 
@@ -29,7 +26,6 @@ func (store *SQLStore) VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParam
 			SecretCode: arg.SecretCode,
 		})
 		if err != nil {
-			fmt.Println("error")
 			return err
 		}
 

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
@@ -14,14 +13,12 @@ type verifyEmailRequest struct {
 	SecretCode string `form:"secret_code" binding:"required"`
 }
 
-func (server *Server) VerifyEmail(ctx *gin.Context) {
+func (server *Server) verifyEmail(ctx *gin.Context) {
 	var req verifyEmailRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, validateVerifyEmailRequest(&req))
 		return
 	}
-
-	fmt.Println(req)
 
 	txResult, err := server.store.VerifyEmailTx(ctx, db.VerifyEmailTxParams{
 		EmailId:    req.EmailID,

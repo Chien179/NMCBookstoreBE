@@ -2,6 +2,10 @@
 SELECT * FROM users
 WHERE username = $1 LIMIT 1;
 
+-- name: GetUserByEmail :one
+SELECT * FROM users
+WHERE email = $1 LIMIT 1;
+
 -- name: ListUsers :many
 SELECT * FROM users
 ORDER BY username
@@ -33,7 +37,9 @@ SET full_name = COALESCE(sqlc.narg(full_name), full_name),
     image = COALESCE(sqlc.narg(image), image),
     phone_number = COALESCE(sqlc.narg(phone_number), phone_number),
     password = COALESCE(sqlc.narg(password), password),
+    password_changed_at = COALESCE(sqlc.narg(password_changed_at), password_changed_at),
     is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified)
+
 WHERE 
   username = sqlc.arg(username)
 RETURNING *;

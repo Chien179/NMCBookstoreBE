@@ -12,6 +12,12 @@ type TaskDistributor interface {
 		payload *PayloadSendVerifyEmail,
 		opts ...asynq.Option,
 	) error
+
+	DistributeTaskSendResetPassword(
+		ctx context.Context,
+		payload *PayloadSendResetPassword,
+		opts ...asynq.Option,
+	) error
 }
 
 type RedisTaskDistributor struct {
