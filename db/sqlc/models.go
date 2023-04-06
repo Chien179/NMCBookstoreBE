@@ -50,6 +50,8 @@ type Cart struct {
 	BooksID   int64     `json:"books_id"`
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
+	Amount    int32     `json:"amount"`
+	Total     int32     `json:"total"`
 }
 
 type Genre struct {
@@ -62,6 +64,9 @@ type Order struct {
 	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
+	Status    string    `json:"status"`
+	SubAmount int32     `json:"sub_amount"`
+	SubTotal  int32     `json:"sub_total"`
 }
 
 type ResetPassword struct {
@@ -105,6 +110,8 @@ type Transaction struct {
 	OrdersID  int64     `json:"orders_id"`
 	BooksID   int64     `json:"books_id"`
 	CreatedAt time.Time `json:"created_at"`
+	Amount    int32     `json:"amount"`
+	Total     int32     `json:"total"`
 }
 
 type User struct {

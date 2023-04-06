@@ -16,7 +16,7 @@ INSERT INTO carts (
 ) VALUES (
   $1, $2
 )
-RETURNING id, books_id, username, created_at
+RETURNING id, books_id, username, created_at, amount, total
 `
 
 type CreateCartParams struct {
@@ -32,6 +32,8 @@ func (q *Queries) CreateCart(ctx context.Context, arg CreateCartParams) (Cart, e
 		&i.BooksID,
 		&i.Username,
 		&i.CreatedAt,
+		&i.Amount,
+		&i.Total,
 	)
 	return i, err
 }
@@ -53,7 +55,7 @@ func (q *Queries) DeleteCart(ctx context.Context, arg DeleteCartParams) error {
 }
 
 const getCart = `-- name: GetCart :one
-SELECT id, books_id, username, created_at FROM carts
+SELECT id, books_id, username, created_at, amount, total FROM carts
 WHERE id = $1 LIMIT 1
 `
 
@@ -65,12 +67,14 @@ func (q *Queries) GetCart(ctx context.Context, id int64) (Cart, error) {
 		&i.BooksID,
 		&i.Username,
 		&i.CreatedAt,
+		&i.Amount,
+		&i.Total,
 	)
 	return i, err
 }
 
 const listCartsByUsername = `-- name: ListCartsByUsername :many
-SELECT id, books_id, username, created_at FROM carts
+SELECT id, books_id, username, created_at, amount, total FROM carts
 WHERE username = $1
 ORDER BY id
 `
@@ -89,6 +93,8 @@ func (q *Queries) ListCartsByUsername(ctx context.Context, username string) ([]C
 			&i.BooksID,
 			&i.Username,
 			&i.CreatedAt,
+			&i.Amount,
+			&i.Total,
 		); err != nil {
 			return nil, err
 		}
@@ -101,4 +107,31 @@ func (q *Queries) ListCartsByUsername(ctx context.Context, username string) ([]C
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateAmout = `-- name: UpdateAmout :one
+UPDATE carts
+SET amount = $2
+WHERE 
+  id = $1
+RETURNING id, books_id, username, created_at, amount, total
+`
+
+type UpdateAmoutParams struct {
+	ID     int64 `json:"id"`
+	Amount int32 `json:"amount"`
+}
+
+func (q *Queries) UpdateAmout(ctx context.Context, arg UpdateAmoutParams) (Cart, error) {
+	row := q.db.QueryRowContext(ctx, updateAmout, arg.ID, arg.Amount)
+	var i Cart
+	err := row.Scan(
+		&i.ID,
+		&i.BooksID,
+		&i.Username,
+		&i.CreatedAt,
+		&i.Amount,
+		&i.Total,
+	)
+	return i, err
 }

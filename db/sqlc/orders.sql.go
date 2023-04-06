@@ -15,13 +15,20 @@ INSERT INTO orders (
 ) VALUES (
   $1
 )
-RETURNING id, username, created_at
+RETURNING id, username, created_at, status, sub_amount, sub_total
 `
 
 func (q *Queries) CreateOrder(ctx context.Context, username string) (Order, error) {
 	row := q.db.QueryRowContext(ctx, createOrder, username)
 	var i Order
-	err := row.Scan(&i.ID, &i.Username, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.CreatedAt,
+		&i.Status,
+		&i.SubAmount,
+		&i.SubTotal,
+	)
 	return i, err
 }
 
@@ -36,19 +43,26 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, username, created_at FROM orders
+SELECT id, username, created_at, status, sub_amount, sub_total FROM orders
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 	row := q.db.QueryRowContext(ctx, getOrder, id)
 	var i Order
-	err := row.Scan(&i.ID, &i.Username, &i.CreatedAt)
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.CreatedAt,
+		&i.Status,
+		&i.SubAmount,
+		&i.SubTotal,
+	)
 	return i, err
 }
 
 const listOdersByUserName = `-- name: ListOdersByUserName :many
-SELECT id, username, created_at FROM orders
+SELECT id, username, created_at, status, sub_amount, sub_total FROM orders
 WHERE username = $1
 ORDER BY id
 LIMIT $2
@@ -70,7 +84,14 @@ func (q *Queries) ListOdersByUserName(ctx context.Context, arg ListOdersByUserNa
 	items := []Order{}
 	for rows.Next() {
 		var i Order
-		if err := rows.Scan(&i.ID, &i.Username, &i.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.CreatedAt,
+			&i.Status,
+			&i.SubAmount,
+			&i.SubTotal,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -82,4 +103,32 @@ func (q *Queries) ListOdersByUserName(ctx context.Context, arg ListOdersByUserNa
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateStatus = `-- name: UpdateStatus :one
+UPDATE orders
+SET 
+  status = $2
+WHERE 
+  id = $1
+RETURNING id, username, created_at, status, sub_amount, sub_total
+`
+
+type UpdateStatusParams struct {
+	ID     int64  `json:"id"`
+	Status string `json:"status"`
+}
+
+func (q *Queries) UpdateStatus(ctx context.Context, arg UpdateStatusParams) (Order, error) {
+	row := q.db.QueryRowContext(ctx, updateStatus, arg.ID, arg.Status)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.CreatedAt,
+		&i.Status,
+		&i.SubAmount,
+		&i.SubTotal,
+	)
+	return i, err
 }

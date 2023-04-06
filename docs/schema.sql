@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-04-05T10:20:50.415Z
+-- Generated at: 2023-04-06T08:52:31.558Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY NOT NULL,
@@ -72,6 +72,8 @@ CREATE TABLE "carts" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "username" varchar NOT NULL,
+  "amount" int NOT NULL DEFAULT 1,
+  "total" float NOT NULL DEFAULT 0,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
@@ -101,6 +103,9 @@ CREATE TABLE "reviews" (
 CREATE TABLE "orders" (
   "id" BIGSERIAL PRIMARY KEY,
   "username" varchar NOT NULL,
+  "status" varchar NOT NULL DEFAULT 'unpaid',
+  "sub_amount" int NOT NULL DEFAULT 1,
+  "sub_total" float NOT NULL DEFAULT 0,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
@@ -108,6 +113,8 @@ CREATE TABLE "transactions" (
   "id" BIGSERIAL PRIMARY KEY,
   "orders_id" bigserial NOT NULL,
   "books_id" bigserial NOT NULL,
+  "amount" int NOT NULL DEFAULT 1,
+  "total" float NOT NULL DEFAULT 0,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 

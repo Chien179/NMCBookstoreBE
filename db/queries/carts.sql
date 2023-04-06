@@ -20,3 +20,10 @@ ORDER BY id;
 DELETE FROM carts
 WHERE id = $1
 AND username = $2;
+
+-- name: UpdateAmout :one
+UPDATE carts
+SET amount = $2
+WHERE 
+  id = $1
+RETURNING *;

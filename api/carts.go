@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
@@ -56,6 +57,49 @@ func (server *Server) addToCart(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, bookCart)
 }
 
+type updateAmountCartRequest struct {
+	ID     int64 `json:"id" binding:"required,min=1"`
+	Amount int32 `json:"amount" binding:"required,min=1"`
+}
+
+func (server *Server) upatdeAmountCart(ctx *gin.Context) {
+	var req updateAmountCartRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	cart, err := server.store.GetCart(ctx, req.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if cart.Username != authPayLoad.Username {
+		err := errors.New("cart doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateAmoutParams{
+		ID:     cart.ID,
+		Amount: req.Amount,
+	}
+
+	cart, err = server.store.UpdateAmout(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, cart)
+}
+
 type deleteBookInCartRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
@@ -97,17 +141,51 @@ func (server *Server) deleteBookInCart(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Book in cart deleted successfully")
 }
 
-func (server *Server) listBookInCartByUsername(ctx *gin.Context) ([]db.Cart, error) {
+type ListBooksInCartRespone struct {
+	CartID int64   `json:"cart_id"`
+	Book   db.Book `json:"book"`
+}
+
+// @Summary      Get book in cart
+// @Description  Use this API to get book in cart
+// @Tags         Books
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  []db.Book
+// @failure	 	 400
+// @failure		 404
+// @failure		 500
+// @Router       /users/list_book_in_cart [get]
+func (server *Server) listBookInCart(ctx *gin.Context) {
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	books, err := server.store.ListCartsByUsername(ctx, authPayLoad.Username)
+	carts, err := server.store.ListCartsByUsername(ctx, authPayLoad.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return nil, err
+			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return nil, err
+		return
 	}
 
-	return books, nil
+	rsp := []ListBooksInCartRespone{}
+	for _, cart := range carts {
+		book, err := server.store.GetBook(ctx, cart.BooksID)
+		if err != nil {
+			if err != nil {
+				if err == sql.ErrNoRows {
+					ctx.JSON(http.StatusNotFound, errorResponse(err))
+					return
+				}
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+		}
+		rsp = append(rsp, ListBooksInCartRespone{
+			CartID: cart.ID,
+			Book:   book,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }

@@ -84,6 +84,8 @@ Table carts as BC{
   id bigserial [pk, increment]
   books_id bigserial [ref: > B.id, not null]
   username varchar [ref: > U.username, not null]
+  amount int [not null, default: 1]
+  total float [not null, default: 0]
   created_at timestamptz [not null, default:"now()"]
   
   indexes{
@@ -137,6 +139,9 @@ Table reviews as R {
 Table orders as O {
   id bigserial [pk, increment]
   username varchar [ref: > U.username, not null]
+  status varchar [not null, default:"unpaid"]
+  sub_amount int [not null, default: 1]
+  sub_total float [not null, default:0]
   created_at timestamptz [not null, default:"now()"]
   
   indexes{
@@ -148,6 +153,8 @@ Table transactions as T {
   id bigserial [pk, increment]
   orders_id bigserial [ref: > O.id, not null]
   books_id bigserial [ref: > B.id, not null]
+  amount int [not null, default: 1]
+  total float [not null, default: 0]
   created_at timestamptz [not null, default:"now()"]
   
   indexes{

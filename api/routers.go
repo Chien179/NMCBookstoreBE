@@ -65,7 +65,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	userRoutes.DELETE("/reviews/delete/:id", server.deleteReview)
 
 	userRoutes.POST("/orders", server.createOrder)
-	userRoutes.GET("/orders", server.listOrder)
+	userRoutes.GET("/orders_paid", server.listOrderPaid)
 	userRoutes.DELETE("/orders/delete/:id", server.deleteOrder)
 }
 

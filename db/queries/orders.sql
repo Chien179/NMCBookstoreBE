@@ -20,3 +20,11 @@ WHERE username = $1
 ORDER BY id
 LIMIT $2
 OFFSET $3;
+
+-- name: UpdateStatus :one
+UPDATE orders
+SET 
+  status = $2
+WHERE 
+  id = $1
+RETURNING *;

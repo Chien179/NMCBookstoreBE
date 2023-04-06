@@ -10,8 +10,10 @@ ORDER BY id;
 -- name: CreateTransaction :one
 INSERT INTO transactions (
     orders_id,
-    books_id
+    books_id,
+    amount,
+    total
 ) VALUES (
-  $1, $2
+  $1, $2, $3, $4
 )
 RETURNING *;

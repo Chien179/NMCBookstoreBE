@@ -91,17 +91,49 @@ func (server *Server) deleteBookInWishlist(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Book in wishlist deleted successfully")
 }
 
-func (server *Server) listBookInWishlistByUsername(ctx *gin.Context) ([]db.Wishlist, error) {
+type ListBooksInWishlistRespone struct {
+	WishlistID int64   `json:"wishlist_id"`
+	Book       db.Book `json:"book"`
+}
+
+// @Summary      Get book in wishlist
+// @Description  Use this API to get book in wishlis
+// @Tags         Books
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  []db.Book
+// @failure	 	 400
+// @failure		 404
+// @failure		 500
+// @Router       /users/list_book_in_wishlist [get]
+func (server *Server) listBookInWishlist(ctx *gin.Context) {
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	books, err := server.store.ListWishlistsByUsername(ctx, authPayLoad.Username)
+	wishlist, err := server.store.ListWishlistsByUsername(ctx, authPayLoad.Username)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return nil, err
-		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return nil, err
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
-	return books, nil
+	rsp := []ListBooksInWishlistRespone{}
+
+	for _, wish := range wishlist {
+		book, err := server.store.GetBook(ctx, wish.BooksID)
+		if err != nil {
+			if err != nil {
+				if err == sql.ErrNoRows {
+					ctx.JSON(http.StatusNotFound, errorResponse(err))
+					return
+				}
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+		}
+
+		rsp = append(rsp, ListBooksInWishlistRespone{
+			WishlistID: wish.ID,
+			Book:       book,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }

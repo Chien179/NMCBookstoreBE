@@ -12,32 +12,43 @@ import (
 const createTransaction = `-- name: CreateTransaction :one
 INSERT INTO transactions (
     orders_id,
-    books_id
+    books_id,
+    amount,
+    total
 ) VALUES (
-  $1, $2
+  $1, $2, $3, $4
 )
-RETURNING id, orders_id, books_id, created_at
+RETURNING id, orders_id, books_id, created_at, amount, total
 `
 
 type CreateTransactionParams struct {
 	OrdersID int64 `json:"orders_id"`
 	BooksID  int64 `json:"books_id"`
+	Amount   int32 `json:"amount"`
+	Total    int32 `json:"total"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
-	row := q.db.QueryRowContext(ctx, createTransaction, arg.OrdersID, arg.BooksID)
+	row := q.db.QueryRowContext(ctx, createTransaction,
+		arg.OrdersID,
+		arg.BooksID,
+		arg.Amount,
+		arg.Total,
+	)
 	var i Transaction
 	err := row.Scan(
 		&i.ID,
 		&i.OrdersID,
 		&i.BooksID,
 		&i.CreatedAt,
+		&i.Amount,
+		&i.Total,
 	)
 	return i, err
 }
 
 const getTransaction = `-- name: GetTransaction :one
-SELECT id, orders_id, books_id, created_at FROM transactions
+SELECT id, orders_id, books_id, created_at, amount, total FROM transactions
 WHERE id = $1 LIMIT 1
 `
 
@@ -49,12 +60,14 @@ func (q *Queries) GetTransaction(ctx context.Context, id int64) (Transaction, er
 		&i.OrdersID,
 		&i.BooksID,
 		&i.CreatedAt,
+		&i.Amount,
+		&i.Total,
 	)
 	return i, err
 }
 
 const listTransactionsByOrderID = `-- name: ListTransactionsByOrderID :many
-SELECT id, orders_id, books_id, created_at FROM transactions
+SELECT id, orders_id, books_id, created_at, amount, total FROM transactions
 WHERE orders_id = $1
 ORDER BY id
 `
@@ -73,6 +86,8 @@ func (q *Queries) ListTransactionsByOrderID(ctx context.Context, ordersID int64)
 			&i.OrdersID,
 			&i.BooksID,
 			&i.CreatedAt,
+			&i.Amount,
+			&i.Total,
 		); err != nil {
 			return nil, err
 		}

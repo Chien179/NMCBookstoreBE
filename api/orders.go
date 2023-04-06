@@ -11,7 +11,7 @@ import (
 )
 
 type createOrderRequest struct {
-	Username string `json:"username" binding:"required"`
+	Carts []db.Cart `"json: carts", binding:"required"`
 }
 
 // @Summary      Create order
@@ -36,6 +36,21 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
+	}
+
+	for _, cart := range req.Carts {
+		arg := db.CreateTransactionParams{
+			OrdersID: order.ID,
+			BooksID:  cart.BooksID,
+			Amount:   cart.Amount,
+			Total:    cart.Total,
+		}
+		_, err := server.store.CreateTransaction(ctx, arg)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
 	}
 
 	ctx.JSON(http.StatusOK, order)
@@ -95,18 +110,23 @@ type listOrderRequest struct {
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
+type listOrderResponse struct {
+	ID    int64     `uri:"id"`
+	Books []db.Book `json:"books"`
+}
+
 // @Summary      List order
 // @Description  Use this API to list order
 // @Tags         Orders
 // @Accept       json
 // @Produce      json
 // @Param        Query query listOrderRequest  true  "List order"
-// @Success      200 {object} []db.Order
+// @Success      200 {object} []listOrderResponse
 // @failure	 	 400
 // @failure	 	 404
 // @failure		 500
 // @Router       /users/orders [get]
-func (server *Server) listOrder(ctx *gin.Context) {
+func (server *Server) listOrderPaid(ctx *gin.Context) {
 	var req listOrderRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -120,7 +140,7 @@ func (server *Server) listOrder(ctx *gin.Context) {
 		Offset:   (req.PageID - 1) * req.PageSize,
 	}
 
-	books, err := server.store.ListOdersByUserName(ctx, arg)
+	orders, err := server.store.ListOdersByUserName(ctx, arg)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -130,5 +150,36 @@ func (server *Server) listOrder(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, books)
+	rsp := []listOrderResponse{}
+
+	for _, order := range orders {
+		if order.Status == "paid" {
+			transactions, err := server.store.ListTransactionsByOrderID(ctx, order.ID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					ctx.JSON(http.StatusNotFound, errorResponse(err))
+					return
+				}
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			books, err := server.listBookByTransactions(ctx, transactions)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					ctx.JSON(http.StatusNotFound, errorResponse(err))
+					return
+				}
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			rsp = append(rsp, listOrderResponse{
+				ID:    order.ID,
+				Books: books,
+			})
+		}
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }
