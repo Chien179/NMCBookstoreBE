@@ -11,7 +11,7 @@ import (
 )
 
 type createOrderRequest struct {
-	Carts []db.Cart `"json: carts", binding:"required"`
+	Carts []db.Cart `json:"carts",binding:"required"`
 }
 
 // @Summary      Create order
@@ -32,6 +32,12 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	}
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if authPayLoad == nil {
+		err := errors.New("Login first")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	order, err := server.store.CreateOrder(ctx, authPayLoad.Username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))

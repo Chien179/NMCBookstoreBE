@@ -32,54 +32,71 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	router.GET("/forgot_password", server.forgotPassword)
 	router.GET("/reset_password", server.resetPassword)
 
-	router.GET("/books/:id", server.getBook)
-	router.GET("/books", server.listBook)
+	bookRoutes := router.Group("/books")
+	bookRoutes.GET("/:id", server.getBook)
+	bookRoutes.GET("/", server.listBook)
 
-	router.GET("/genres", server.listGenre)
-	router.GET("/subgenres/:genre_id", server.listSubgenre)
+	genreRoutes := router.Group("/genres")
+	genreRoutes.GET("/", server.listGenre)
 
-	router.GET("/reviews/:book_id", server.listReview)
+	subgenreRoutes := router.Group("/subgenres")
+	subgenreRoutes.GET("/:genre_id", server.listSubgenre)
+
+	reviewRoutes := router.Group("/reviews")
+	reviewRoutes.GET("/:book_id", server.listReview)
 }
 
 func (server *Server) userAuth(router *gin.Engine) {
-	userRoutes := router.Group("/users").Use(authMiddleware(server.tokenMaker))
-	userRoutes.GET("/me", server.getUser)
-	userRoutes.PUT("/update", server.updateUser)
-	userRoutes.DELETE("/delete", server.deleteUser)
+	usersRoutes := router.Group("/users")
 
-	userRoutes.POST("/add_to_cart/:id", server.addToCart)
-	userRoutes.DELETE("/delete_book_in_cart/:id", server.deleteBookInCart)
-	userRoutes.GET("/list_book_in_cart", server.listBookInCart)
+	userRoutes := usersRoutes.Use(authMiddleware(server.tokenMaker))
+	userRoutes.GET("/", server.getUser)
+	userRoutes.PUT("/", server.updateUser)
+	userRoutes.DELETE("/", server.deleteUser)
 
-	userRoutes.POST("/add_to_wishlist/:id", server.addToWishlist)
-	userRoutes.DELETE("/delete_book_in_wishlist/:id", server.deleteBookInWishlist)
-	userRoutes.GET("/list_book_in_wishlist", server.listBookInWishlist)
+	cartRoutes := usersRoutes.Group("/carts").Use(authMiddleware(server.tokenMaker))
+	cartRoutes.POST("/:id", server.addToCart)
+	cartRoutes.DELETE("/:id", server.deleteBookInCart)
+	cartRoutes.PUT("/:id", server.upatdeAmountCart)
+	cartRoutes.GET("/", server.listBookInCart)
 
-	userRoutes.POST("/addresses", server.createAddress)
-	userRoutes.GET("/addresses/:id", server.getAddress)
-	userRoutes.GET("/addresses", server.listAddress)
-	userRoutes.PUT("/addresses/update/:id", server.updateAddress)
-	userRoutes.DELETE("/addresses/delete/:id", server.deleteAddress)
+	wishlistRoutes := usersRoutes.Group("/wishlists").Use(authMiddleware(server.tokenMaker))
+	wishlistRoutes.POST("/:id", server.addToWishlist)
+	wishlistRoutes.DELETE("/:id", server.deleteBookInWishlist)
+	wishlistRoutes.GET("/", server.listBookInWishlist)
 
-	userRoutes.POST("/reviews/:book_id", server.createReview)
-	userRoutes.DELETE("/reviews/delete/:id", server.deleteReview)
+	addressRoutes := usersRoutes.Group("/addresses").Use(authMiddleware(server.tokenMaker))
+	addressRoutes.POST("/", server.createAddress)
+	addressRoutes.GET("/:id", server.getAddress)
+	addressRoutes.GET("/", server.listAddress)
+	addressRoutes.PUT("/:id", server.updateAddress)
+	addressRoutes.DELETE("/:id", server.deleteAddress)
 
-	userRoutes.POST("/orders", server.createOrder)
-	userRoutes.GET("/orders_paid", server.listOrderPaid)
-	userRoutes.DELETE("/orders/delete/:id", server.deleteOrder)
+	reviewRoutes := usersRoutes.Group("/reviews").Use(authMiddleware(server.tokenMaker))
+	reviewRoutes.POST("/:book_id", server.createReview)
+	reviewRoutes.DELETE("/:id", server.deleteReview)
+
+	orderRoutes := usersRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))
+	orderRoutes.POST("/", server.createOrder)
+	orderRoutes.GET("/", server.listOrderPaid)
+	orderRoutes.PUT("/:id", server.deleteOrder)
 }
 
 func (server *Server) adminAuth(router *gin.Engine) {
-	adminRoutes := router.Group("/admin").Use(authMiddleware(server.tokenMaker), isAdmin())
-	adminRoutes.POST("/books", server.createBook)
-	adminRoutes.PUT("/books/update/:id", server.updateBook)
-	adminRoutes.DELETE("/books/delete/:id", server.deleteBook)
+	adminRoutes := router.Group("/admin")
 
-	adminRoutes.POST("/genres", server.createGenre)
-	adminRoutes.PUT("/genres/update/:id", server.updateGenre)
-	adminRoutes.DELETE("/genres/delete/:id", server.deleteGenre)
+	bookRoutes := adminRoutes.Group("/books").Use(authMiddleware(server.tokenMaker), isAdmin())
+	bookRoutes.POST("/", server.createBook)
+	bookRoutes.PUT("/:id", server.updateBook)
+	bookRoutes.DELETE("/:id", server.deleteBook)
 
-	adminRoutes.POST("/subgenres", server.createSubgenre)
-	adminRoutes.PUT("/subgenres/update/:id", server.updateSubgenre)
-	adminRoutes.DELETE("/subgenres/delete/:id", server.deleteSubgenre)
+	genreRoutes := adminRoutes.Group("/genres").Use(authMiddleware(server.tokenMaker), isAdmin())
+	genreRoutes.POST("/", server.createGenre)
+	genreRoutes.PUT("/:id", server.updateGenre)
+	genreRoutes.DELETE("/:id", server.deleteGenre)
+
+	subgenreRoutes := adminRoutes.Group("/subgenres").Use(authMiddleware(server.tokenMaker), isAdmin())
+	subgenreRoutes.POST("/", server.createSubgenre)
+	subgenreRoutes.PUT("/:id", server.updateSubgenre)
+	subgenreRoutes.DELETE("/:id", server.deleteSubgenre)
 }

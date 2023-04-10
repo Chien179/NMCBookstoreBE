@@ -58,13 +58,18 @@ func (server *Server) addToCart(ctx *gin.Context) {
 }
 
 type updateAmountCartRequest struct {
-	ID     int64 `json:"id" binding:"required,min=1"`
+	ID     int64 `uri:"id" binding:"required,min=1"`
 	Amount int32 `json:"amount" binding:"required,min=1"`
 }
 
 func (server *Server) upatdeAmountCart(ctx *gin.Context) {
 	var req updateAmountCartRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -142,8 +147,12 @@ func (server *Server) deleteBookInCart(ctx *gin.Context) {
 }
 
 type ListBooksInCartRespone struct {
-	CartID int64   `json:"cart_id"`
-	Book   db.Book `json:"book"`
+	CartID   int64   `json:"cart_id"`
+	BookID   int64   `json:"book_id"`
+	BookName string  `json:"book_name"`
+	Image    string  `json:"image"`
+	Price    float64 `json:"price"`
+	Amount   int32   `json:"amount"`
 }
 
 // @Summary      Get book in cart
@@ -182,8 +191,12 @@ func (server *Server) listBookInCart(ctx *gin.Context) {
 			}
 		}
 		rsp = append(rsp, ListBooksInCartRespone{
-			CartID: cart.ID,
-			Book:   book,
+			CartID:   cart.ID,
+			BookID:   cart.BooksID,
+			BookName: book.Name,
+			Image:    book.Image[0],
+			Price:    book.Price,
+			Amount:   cart.Amount,
 		})
 	}
 
