@@ -8,6 +8,16 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+-- name: ListTop10TheBestBooks :many
+SELECT * FROM books
+ORDER BY rating DESC
+LIMIT 10;
+
+-- name: ListTop10NewestBooks :many
+SELECT * FROM books
+ORDER BY created_at DESC
+LIMIT 10;
+
 -- name: CreateBook :one
 INSERT INTO books (
   name,

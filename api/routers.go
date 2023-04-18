@@ -32,9 +32,13 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	router.GET("/forgot_password", server.forgotPassword)
 	router.GET("/reset_password", server.resetPassword)
 
+	router.POST("/searchs", server.fullSearch)
+
 	bookRoutes := router.Group("/books")
 	bookRoutes.GET("/:id", server.getBook)
 	bookRoutes.GET("/", server.listBook)
+	bookRoutes.GET("/the_best", server.listTop10TheBestBook)
+	bookRoutes.GET("/newest", server.listTop10NewestBook)
 
 	genreRoutes := router.Group("/genres")
 	genreRoutes.GET("/", server.listGenre)
@@ -79,7 +83,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	orderRoutes := usersRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))
 	orderRoutes.POST("/", server.createOrder)
 	orderRoutes.GET("/", server.listOrderPaid)
-	orderRoutes.PUT("/:id", server.deleteOrder)
+	orderRoutes.PUT("/:id", server.cancelOrder)
 }
 
 func (server *Server) adminAuth(router *gin.Engine) {

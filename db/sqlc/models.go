@@ -29,6 +29,7 @@ type Book struct {
 	Publisher   string    `json:"publisher"`
 	Quantity    int32     `json:"quantity"`
 	CreatedAt   time.Time `json:"created_at"`
+	Rating      float64   `json:"rating"`
 }
 
 type BooksGenre struct {
@@ -51,7 +52,7 @@ type Cart struct {
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 	Amount    int32     `json:"amount"`
-	Total     int32     `json:"total"`
+	Total     float64   `json:"total"`
 }
 
 type Genre struct {
@@ -66,7 +67,7 @@ type Order struct {
 	CreatedAt time.Time `json:"created_at"`
 	Status    string    `json:"status"`
 	SubAmount int32     `json:"sub_amount"`
-	SubTotal  int32     `json:"sub_total"`
+	SubTotal  float64   `json:"sub_total"`
 }
 
 type ResetPassword struct {
@@ -85,6 +86,18 @@ type Review struct {
 	Comments  string    `json:"comments"`
 	Rating    int32     `json:"rating"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Search struct {
+	ID         int64       `json:"id"`
+	BookNames  string      `json:"book_names"`
+	Price      float64     `json:"price"`
+	Author     string      `json:"author"`
+	Publisher  string      `json:"publisher"`
+	Rating     float64     `json:"rating"`
+	Genres     string      `json:"genres"`
+	Subgenres  string      `json:"subgenres"`
+	SearchsTsv interface{} `json:"searchs_tsv"`
 }
 
 type Session struct {
@@ -111,7 +124,7 @@ type Transaction struct {
 	BooksID   int64     `json:"books_id"`
 	CreatedAt time.Time `json:"created_at"`
 	Amount    int32     `json:"amount"`
-	Total     int32     `json:"total"`
+	Total     float64   `json:"total"`
 }
 
 type User struct {

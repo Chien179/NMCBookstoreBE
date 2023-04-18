@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createOrder = `-- name: CreateOrder :one
@@ -105,22 +106,31 @@ func (q *Queries) ListOdersByUserName(ctx context.Context, arg ListOdersByUserNa
 	return items, nil
 }
 
-const updateStatus = `-- name: UpdateStatus :one
+const updateOrder = `-- name: UpdateOrder :one
 UPDATE orders
 SET 
-  status = $2
+  status = COALESCE($1, status),
+  sub_amount = COALESCE($2, sub_amount),
+  sub_total = COALESCE($3, sub_total)
 WHERE 
-  id = $1
+  id = $4
 RETURNING id, username, created_at, status, sub_amount, sub_total
 `
 
-type UpdateStatusParams struct {
-	ID     int64  `json:"id"`
-	Status string `json:"status"`
+type UpdateOrderParams struct {
+	Status    sql.NullString  `json:"status"`
+	SubAmount sql.NullInt32   `json:"sub_amount"`
+	SubTotal  sql.NullFloat64 `json:"sub_total"`
+	ID        int64           `json:"id"`
 }
 
-func (q *Queries) UpdateStatus(ctx context.Context, arg UpdateStatusParams) (Order, error) {
-	row := q.db.QueryRowContext(ctx, updateStatus, arg.ID, arg.Status)
+func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
+	row := q.db.QueryRowContext(ctx, updateOrder,
+		arg.Status,
+		arg.SubAmount,
+		arg.SubTotal,
+		arg.ID,
+	)
 	var i Order
 	err := row.Scan(
 		&i.ID,

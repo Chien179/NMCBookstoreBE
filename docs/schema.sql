@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-04-06T08:52:31.558Z
+-- Generated at: 2023-04-17T14:57:02.951Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY NOT NULL,
@@ -52,6 +52,7 @@ CREATE TABLE "books" (
   "author" varchar NOT NULL,
   "publisher" varchar NOT NULL,
   "quantity" int NOT NULL,
+  "rating" float NOT NULL DEFAULT 0,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
@@ -134,6 +135,18 @@ CREATE TABLE "sessions" (
   "is_blocked" boolean NOT NULL DEFAULT 'false',
   "expires_at" timestamptz NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
+);
+
+CREATE TABLE "searchs" (
+  "id" bigserial PRIMARY KEY,
+  "book_name" varchar NOT NULL,
+  "price" float NOT NULL,
+  "author" varchar NOT NULL,
+  "publisher" varchar NOT NULL,
+  "rating" float NOT NULL,
+  "genres" varchar NOT NULL,
+  "subgenres" varchar NOT NULL,
+  "searchs_tsv" tsvector
 );
 
 CREATE INDEX ON "address" ("username");

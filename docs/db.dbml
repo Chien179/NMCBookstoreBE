@@ -60,6 +60,7 @@ Table books as B {
   author varchar [not null]
   publisher varchar [not null]
   quantity int [not null]
+  rating float [not null, default:0]
   created_at timestamptz [not null, default:"now()"]
 }
 
@@ -186,4 +187,16 @@ Table sessions {
     is_blocked boolean [not null, default: 'false']
     expires_at timestamptz [not null]
     created_at timestamptz [not null, default:'now()']
+}
+
+Table searchs {
+    id bigserial [pk]
+    book_name varchar [not null]
+    price float [not null]
+    author varchar [not null]
+    publisher varchar [not null]
+    rating float [not null]
+    genres varchar [not null]
+    subgenres varchar [not null]
+    searchs_tsv tsvector
 }

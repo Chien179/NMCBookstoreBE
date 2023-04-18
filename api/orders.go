@@ -11,7 +11,7 @@ import (
 )
 
 type createOrderRequest struct {
-	Carts []db.Cart `json:"carts",binding:"required"`
+	CartIDs []int64 `json:"cart_ids" binding:"required"`
 }
 
 // @Summary      Create order
@@ -33,7 +33,7 @@ func (server *Server) createOrder(ctx *gin.Context) {
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	if authPayLoad == nil {
-		err := errors.New("Login first")
+		err := errors.New("login first")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
@@ -44,19 +44,50 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		return
 	}
 
-	for _, cart := range req.Carts {
+	subTotal := 0.0
+	for _, cartID := range req.CartIDs {
+		cart, err := server.store.GetCart(ctx, cartID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
 		arg := db.CreateTransactionParams{
 			OrdersID: order.ID,
 			BooksID:  cart.BooksID,
 			Amount:   cart.Amount,
 			Total:    cart.Total,
 		}
-		_, err := server.store.CreateTransaction(ctx, arg)
+
+		_, err = server.store.CreateTransaction(ctx, arg)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
+		subTotal += cart.Total
+	}
+
+	arg := db.UpdateOrderParams{
+		ID: order.ID,
+		SubAmount: sql.NullInt32{
+			Int32: int32(len(req.CartIDs)),
+			Valid: true,
+		},
+		SubTotal: sql.NullFloat64{
+			Float64: subTotal,
+			Valid:   true,
+		},
+	}
+
+	order, err = server.store.UpdateOrder(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	ctx.JSON(http.StatusOK, order)
@@ -78,7 +109,7 @@ type deleteOrderRequest struct {
 // @failure	 	 404
 // @failure		 500
 // @Router       /users/orders/delete/{id} [delete]
-func (server *Server) deleteOrder(ctx *gin.Context) {
+func (server *Server) cancelOrder(ctx *gin.Context) {
 	var req deleteOrderRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -97,18 +128,26 @@ func (server *Server) deleteOrder(ctx *gin.Context) {
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	if order.Username != authPayLoad.Username {
-		err := errors.New("account doesn't belong to the authenticated user")
+		err := errors.New("order doesn't belong to the authenticated user")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 
-	err = server.store.DeleteOrder(ctx, req.ID)
+	arg := db.UpdateOrderParams{
+		ID: req.ID,
+		Status: sql.NullString{
+			String: "cancel",
+			Valid:  true,
+		},
+	}
+
+	order, err = server.store.UpdateOrder(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "Order deleted successfully")
+	ctx.JSON(http.StatusOK, order)
 }
 
 type listOrderRequest struct {
@@ -159,32 +198,30 @@ func (server *Server) listOrderPaid(ctx *gin.Context) {
 	rsp := []listOrderResponse{}
 
 	for _, order := range orders {
-		if order.Status == "paid" {
-			transactions, err := server.store.ListTransactionsByOrderID(ctx, order.ID)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					ctx.JSON(http.StatusNotFound, errorResponse(err))
-					return
-				}
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		transactions, err := server.store.ListTransactionsByOrderID(ctx, order.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
 				return
 			}
-
-			books, err := server.listBookByTransactions(ctx, transactions)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					ctx.JSON(http.StatusNotFound, errorResponse(err))
-					return
-				}
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-				return
-			}
-
-			rsp = append(rsp, listOrderResponse{
-				ID:    order.ID,
-				Books: books,
-			})
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
 		}
+
+		books, err := server.listBookByTransactions(ctx, transactions)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		rsp = append(rsp, listOrderResponse{
+			ID:    order.ID,
+			Books: books,
+		})
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

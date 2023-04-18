@@ -22,10 +22,10 @@ RETURNING id, orders_id, books_id, created_at, amount, total
 `
 
 type CreateTransactionParams struct {
-	OrdersID int64 `json:"orders_id"`
-	BooksID  int64 `json:"books_id"`
-	Amount   int32 `json:"amount"`
-	Total    int32 `json:"total"`
+	OrdersID int64   `json:"orders_id"`
+	BooksID  int64   `json:"books_id"`
+	Amount   int32   `json:"amount"`
+	Total    float64 `json:"total"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {

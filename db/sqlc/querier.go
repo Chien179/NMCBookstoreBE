@@ -37,6 +37,7 @@ type Querier interface {
 	DeleteSubgenre(ctx context.Context, id int64) error
 	DeleteUser(ctx context.Context, username string) error
 	DeleteWishlist(ctx context.Context, id int64) error
+	FullSearch(ctx context.Context, arg FullSearchParams) ([]FullSearchRow, error)
 	GetAddress(ctx context.Context, id int64) (Address, error)
 	GetBook(ctx context.Context, id int64) (Book, error)
 	GetBookGenre(ctx context.Context, id int64) (BooksGenre, error)
@@ -62,6 +63,8 @@ type Querier interface {
 	ListOdersByUserName(ctx context.Context, arg ListOdersByUserNameParams) ([]Order, error)
 	ListReviewsByBookID(ctx context.Context, arg ListReviewsByBookIDParams) ([]Review, error)
 	ListSubgenres(ctx context.Context, genresID int64) ([]Subgenre, error)
+	ListTop10NewestBooks(ctx context.Context) ([]Book, error)
+	ListTop10TheBestBooks(ctx context.Context) ([]Book, error)
 	ListTransactionsByOrderID(ctx context.Context, ordersID int64) ([]Transaction, error)
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	ListWishlistsByUsername(ctx context.Context, username string) ([]Wishlist, error)
@@ -69,8 +72,8 @@ type Querier interface {
 	UpdateAmout(ctx context.Context, arg UpdateAmoutParams) (Cart, error)
 	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
 	UpdateGenre(ctx context.Context, arg UpdateGenreParams) (Genre, error)
+	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
 	UpdateResetPassword(ctx context.Context, arg UpdateResetPasswordParams) (ResetPassword, error)
-	UpdateStatus(ctx context.Context, arg UpdateStatusParams) (Order, error)
 	UpdateSubgenre(ctx context.Context, arg UpdateSubgenreParams) (Subgenre, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 	UpdateVerifyEmail(ctx context.Context, arg UpdateVerifyEmailParams) (VerifyEmail, error)

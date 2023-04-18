@@ -251,3 +251,31 @@ func (server *Server) listBook(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, books)
 }
+
+func (server *Server) listTop10TheBestBook(ctx *gin.Context) {
+	books, err := server.store.ListTop10TheBestBooks(ctx)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, books)
+}
+
+func (server *Server) listTop10NewestBook(ctx *gin.Context) {
+	books, err := server.store.ListTop10NewestBooks(ctx)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, books)
+}

@@ -24,7 +24,7 @@ INSERT INTO books (
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7
 )
-RETURNING id, name, price, image, description, author, publisher, quantity, created_at
+RETURNING id, name, price, image, description, author, publisher, quantity, created_at, rating
 `
 
 type CreateBookParams struct {
@@ -58,6 +58,7 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 		&i.Publisher,
 		&i.Quantity,
 		&i.CreatedAt,
+		&i.Rating,
 	)
 	return i, err
 }
@@ -73,7 +74,7 @@ func (q *Queries) DeleteBook(ctx context.Context, id int64) error {
 }
 
 const getBook = `-- name: GetBook :one
-SELECT id, name, price, image, description, author, publisher, quantity, created_at FROM books
+SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
 WHERE id = $1 LIMIT 1
 `
 
@@ -90,12 +91,13 @@ func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
 		&i.Publisher,
 		&i.Quantity,
 		&i.CreatedAt,
+		&i.Rating,
 	)
 	return i, err
 }
 
 const listBooks = `-- name: ListBooks :many
-SELECT id, name, price, image, description, author, publisher, quantity, created_at FROM books
+SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -125,6 +127,87 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, e
 			&i.Publisher,
 			&i.Quantity,
 			&i.CreatedAt,
+			&i.Rating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTop10NewestBooks = `-- name: ListTop10NewestBooks :many
+SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
+ORDER BY created_at DESC
+LIMIT 10
+`
+
+func (q *Queries) ListTop10NewestBooks(ctx context.Context) ([]Book, error) {
+	rows, err := q.db.QueryContext(ctx, listTop10NewestBooks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Book{}
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			pq.Array(&i.Image),
+			&i.Description,
+			&i.Author,
+			&i.Publisher,
+			&i.Quantity,
+			&i.CreatedAt,
+			&i.Rating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTop10TheBestBooks = `-- name: ListTop10TheBestBooks :many
+SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
+ORDER BY rating DESC
+LIMIT 10
+`
+
+func (q *Queries) ListTop10TheBestBooks(ctx context.Context) ([]Book, error) {
+	rows, err := q.db.QueryContext(ctx, listTop10TheBestBooks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Book{}
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			pq.Array(&i.Image),
+			&i.Description,
+			&i.Author,
+			&i.Publisher,
+			&i.Quantity,
+			&i.CreatedAt,
+			&i.Rating,
 		); err != nil {
 			return nil, err
 		}
@@ -149,7 +232,7 @@ SET name = COALESCE($1, name),
   publisher = COALESCE($6, publisher),
   quantity = COALESCE($7, quantity)
 WHERE id = $8
-RETURNING id, name, price, image, description, author, publisher, quantity, created_at
+RETURNING id, name, price, image, description, author, publisher, quantity, created_at, rating
 `
 
 type UpdateBookParams struct {
@@ -185,6 +268,7 @@ func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, e
 		&i.Publisher,
 		&i.Quantity,
 		&i.CreatedAt,
+		&i.Rating,
 	)
 	return i, err
 }
