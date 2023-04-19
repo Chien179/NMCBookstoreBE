@@ -2,6 +2,11 @@
 SELECT * FROM orders
 WHERE id = $1 LIMIT 1;
 
+-- name: GetOrderToPayment :one
+SELECT * FROM orders
+WHERE username = $1 
+LIMIT 1;
+
 -- name: CreateOrder :one
 INSERT INTO orders (
     username

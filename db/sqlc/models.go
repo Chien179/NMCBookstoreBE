@@ -70,6 +70,16 @@ type Order struct {
 	SubTotal  float64   `json:"sub_total"`
 }
 
+type Payment struct {
+	ID         int64     `json:"id"`
+	Username   string    `json:"username"`
+	OrderID    int64     `json:"order_id"`
+	ShippingID int64     `json:"shipping_id"`
+	Subtotal   float64   `json:"subtotal"`
+	Status     string    `json:"status"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
 type ResetPassword struct {
 	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
@@ -109,6 +119,13 @@ type Session struct {
 	IsBlocked    bool      `json:"is_blocked"`
 	ExpiresAt    time.Time `json:"expires_at"`
 	CreatedAt    time.Time `json:"created_at"`
+}
+
+type Shipping struct {
+	ID          int64   `json:"id"`
+	FromAddress string  `json:"from_address"`
+	ToAddress   string  `json:"to_address"`
+	Total       float64 `json:"total"`
 }
 
 type Subgenre struct {

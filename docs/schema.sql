@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-04-17T14:57:02.951Z
+-- Generated at: 2023-04-18T03:30:20.124Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY NOT NULL,
@@ -149,6 +149,24 @@ CREATE TABLE "searchs" (
   "searchs_tsv" tsvector
 );
 
+CREATE TABLE "payments" (
+  "id" bigserial PRIMARY KEY,
+  "username" varchar NOT NULL,
+  "order_id" bigserial NOT NULL,
+  "shipping_id" bigserial NOT NULL,
+  "price" float NOT NULL DEFAULT 0,
+  "subtotal" float NOT NULL DEFAULT 0,
+  "status" varchar NOT NULL DEFAULT 'failed',
+  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+);
+
+CREATE TABLE "shippings" (
+  "id" bigserial PRIMARY KEY,
+  "from_address" varchar NOT NULL,
+  "to_address" varchar NOT NULL,
+  "total" float NOT NULL DEFAULT 0
+);
+
 CREATE INDEX ON "address" ("username");
 
 CREATE INDEX ON "subgenres" ("genres_id");
@@ -191,6 +209,14 @@ CREATE INDEX ON "wishlists" ("username");
 
 CREATE INDEX ON "wishlists" ("books_id", "username");
 
+CREATE INDEX ON "payments" ("username");
+
+CREATE INDEX ON "payments" ("order_id");
+
+CREATE INDEX ON "payments" ("shipping_id");
+
+CREATE INDEX ON "payments" ("username", "order_id", "shipping_id");
+
 ALTER TABLE "verify_emails" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "reset_passwords" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
@@ -226,3 +252,9 @@ ALTER TABLE "wishlists" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
 ALTER TABLE "wishlists" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "sessions" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
+ALTER TABLE "payments" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
+ALTER TABLE "payments" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+
+ALTER TABLE "payments" ADD FOREIGN KEY ("shipping_id") REFERENCES "shippings" ("id");

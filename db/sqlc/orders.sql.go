@@ -62,6 +62,26 @@ func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 	return i, err
 }
 
+const getOrderToPayment = `-- name: GetOrderToPayment :one
+SELECT id, username, created_at, status, sub_amount, sub_total FROM orders
+WHERE username = $1 
+LIMIT 1
+`
+
+func (q *Queries) GetOrderToPayment(ctx context.Context, username string) (Order, error) {
+	row := q.db.QueryRowContext(ctx, getOrderToPayment, username)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.CreatedAt,
+		&i.Status,
+		&i.SubAmount,
+		&i.SubTotal,
+	)
+	return i, err
+}
+
 const listOdersByUserName = `-- name: ListOdersByUserName :many
 SELECT id, username, created_at, status, sub_amount, sub_total FROM orders
 WHERE username = $1

@@ -32,12 +32,6 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	}
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	if authPayLoad == nil {
-		err := errors.New("login first")
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
-		return
-	}
-
 	order, err := server.store.CreateOrder(ctx, authPayLoad.Username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -109,6 +103,39 @@ type deleteOrderRequest struct {
 // @failure	 	 404
 // @failure		 500
 // @Router       /users/orders/delete/{id} [delete]
+func (server *Server) deleteOrder(ctx *gin.Context) {
+	var req deleteOrderRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	order, err := server.store.GetOrder(ctx, req.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	if order.Username != authPayLoad.Username {
+		err := errors.New("order doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	err = server.store.DeleteOrder(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "deleted successfully")
+}
+
 func (server *Server) cancelOrder(ctx *gin.Context) {
 	var req deleteOrderRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -136,7 +163,7 @@ func (server *Server) cancelOrder(ctx *gin.Context) {
 	arg := db.UpdateOrderParams{
 		ID: req.ID,
 		Status: sql.NullString{
-			String: "cancel",
+			String: "cancelled",
 			Valid:  true,
 		},
 	}

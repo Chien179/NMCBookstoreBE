@@ -200,3 +200,28 @@ Table searchs {
     subgenres varchar [not null]
     searchs_tsv tsvector
 }
+
+Table payments as P{
+  id bigserial [pk]
+  username varchar [ref: > U.username, not null]
+  order_id bigserial [ref: - O.id, not null]
+  shipping_id bigserial [ref: - S.id, not null]
+  price float [not null, default:0]
+  subtotal float [not null, default:0]
+  status varchar [not null, default:"failed"]
+  created_at timestamptz [not null, default:'now()']
+
+  indexes{
+    username
+    order_id
+    shipping_id
+    (username, order_id, shipping_id)
+  }
+}
+
+Table shippings as S {
+  id bigserial [pk]
+  from_address varchar [not null]
+  to_address varchar [not null]
+  total float [not null, default:0]
+}

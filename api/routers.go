@@ -84,6 +84,10 @@ func (server *Server) userAuth(router *gin.Engine) {
 	orderRoutes.POST("/", server.createOrder)
 	orderRoutes.GET("/", server.listOrderPaid)
 	orderRoutes.PUT("/:id", server.cancelOrder)
+	orderRoutes.DELETE("/:id", server.deleteOrder)
+
+	paymentRoutes := usersRoutes.Group("/payments").Use(authMiddleware(server.tokenMaker))
+	paymentRoutes.POST("/", server.createPayment)
 }
 
 func (server *Server) adminAuth(router *gin.Engine) {
@@ -103,4 +107,10 @@ func (server *Server) adminAuth(router *gin.Engine) {
 	subgenreRoutes.POST("/", server.createSubgenre)
 	subgenreRoutes.PUT("/:id", server.updateSubgenre)
 	subgenreRoutes.DELETE("/:id", server.deleteSubgenre)
+
+	revenueRoutes := adminRoutes.Group("/revenues").Use(authMiddleware(server.tokenMaker), isAdmin())
+	revenueRoutes.GET("/hours", server.revenueHours)
+	revenueRoutes.GET("/days", server.revenueDays)
+	revenueRoutes.GET("/months", server.revenueMonths)
+	revenueRoutes.GET("/years", server.revenueYears)
 }
