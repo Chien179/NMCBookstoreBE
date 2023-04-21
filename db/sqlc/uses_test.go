@@ -20,8 +20,9 @@ func createRandomUser(t *testing.T) User {
 		Email:       util.RandomEmail(),
 		Password:    hashedPassword,
 		Image:       util.RandomString(10),
+		Age:         util.RandomInt32(15, 60),
+		Sex:         util.RandomSex(),
 		PhoneNumber: util.RandomString(10),
-		Role:        "user",
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -34,7 +35,6 @@ func createRandomUser(t *testing.T) User {
 	require.Equal(t, arg.Password, user.Password)
 	require.Equal(t, arg.Image, user.Image)
 	require.Equal(t, arg.PhoneNumber, user.PhoneNumber)
-	require.Equal(t, arg.Role, user.Role)
 
 	require.NotZero(t, user.CreatedAt)
 

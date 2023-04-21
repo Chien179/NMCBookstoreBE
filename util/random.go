@@ -41,6 +41,18 @@ func RandomString(n int) string {
 	return sb.String()
 }
 
+// RandomSex generates a random sex
+func RandomSex() string {
+	genders := []string{
+		"male",
+		"female",
+		"other",
+	}
+	n := rand.Int() % len(genders)
+
+	return genders[n]
+}
+
 // RandomOwner generates a random user name
 func RandomUser() string {
 	return RandomString(6)

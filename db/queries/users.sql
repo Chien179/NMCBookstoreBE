@@ -18,11 +18,12 @@ INSERT INTO users (
   full_name,
   email,
   password,
+  age,
+  sex,
   image,
-  phone_number,
-  role
+  phone_number
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
+  $1, $2, $3, $4, $5, $6, $7, $8
 )
 RETURNING *;
 
@@ -36,6 +37,8 @@ SET full_name = COALESCE(sqlc.narg(full_name), full_name),
     email = COALESCE(sqlc.narg(email), email),
     image = COALESCE(sqlc.narg(image), image),
     phone_number = COALESCE(sqlc.narg(phone_number), phone_number),
+    age = COALESCE(sqlc.narg(age), age),
+    sex = COALESCE(sqlc.narg(sex), sex),
     password = COALESCE(sqlc.narg(password), password),
     password_changed_at = COALESCE(sqlc.narg(password_changed_at), password_changed_at),
     is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified)

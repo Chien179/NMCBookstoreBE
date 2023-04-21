@@ -11,6 +11,8 @@ Table users as U {
   full_name varchar [not null]
   email varchar [not null, unique]
   password varchar [not null]
+  age int [not null]
+  sex varchar [not null]
   image varchar [not null]
   phone_number varchar [not null]
   role varchar [not null]

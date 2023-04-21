@@ -5,7 +5,7 @@ CREATE TABLE "users" (
   "password" varchar NOT NULL,
   "image" varchar NOT NULL,
   "phone_number" varchar NOT NULL,
-  "role" varchar NOT NULL,
+  "role" varchar NOT NULL DEFAULT 'user',
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );

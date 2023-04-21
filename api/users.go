@@ -22,6 +22,8 @@ type createUserRequest struct {
 	Fullname    string `json:"full_name" binding:"required"`
 	Email       string `json:"email" binding:"required,email"`
 	Image       string `json:"image" binding:"required"`
+	Age         int32  `json:"age" binding:"required"`
+	Sex         string `json:"sex" binding:"required"`
 	PhoneNumber string `json:"phone_number" binding:"required"`
 }
 
@@ -30,6 +32,8 @@ type UserResponse struct {
 	FullName          string    `json:"full_name"`
 	Email             string    `json:"email"`
 	Image             string    `json:"image"`
+	Age               int32     `json:"age"`
+	Sex               string    `json:"sex"`
 	PhoneNumber       string    `json:"phone_number"`
 	Role              string    `json:"role"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
@@ -42,6 +46,8 @@ func newUserResponse(user db.User) UserResponse {
 		FullName:          user.FullName,
 		Email:             user.Email,
 		Image:             user.Image,
+		Age:               user.Age,
+		Sex:               user.Sex,
 		PhoneNumber:       user.PhoneNumber,
 		Role:              user.Role,
 		PasswordChangedAt: user.PasswordChangedAt,
@@ -87,8 +93,9 @@ func (server *Server) createUser(ctx *gin.Context) {
 			FullName:    req.Fullname,
 			Email:       req.Email,
 			Image:       req.Image,
+			Age:         req.Age,
+			Sex:         req.Sex,
 			PhoneNumber: req.PhoneNumber,
-			Role:        "user",
 		},
 		AfterCreate: func(user db.User) error {
 			taskPayload := &worker.PayloadSendVerifyEmail{
@@ -241,6 +248,8 @@ type updateUserRequest struct {
 	Fullname    string `json:"full_name"`
 	Email       string `json:"email" binding:"email"`
 	Image       string `json:"image"`
+	Age         int32  `json:"age"`
+	Sex         string `json:"sex"`
 	PhoneNumber string `json:"phone_number"`
 	Password    string `json:"password"`
 }
@@ -276,6 +285,14 @@ func (server *Server) updateUser(ctx *gin.Context) {
 		},
 		Image: sql.NullString{
 			String: req.Image,
+			Valid:  true,
+		},
+		Age: sql.NullInt32{
+			Int32: req.Age,
+			Valid: true,
+		},
+		Sex: sql.NullString{
+			String: req.Sex,
 			Valid:  true,
 		},
 		PhoneNumber: sql.NullString{
