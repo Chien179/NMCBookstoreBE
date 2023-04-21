@@ -10,12 +10,12 @@ OFFSET $2;
 
 -- name: ListTop10TheBestBooks :many
 SELECT * FROM books
-ORDER BY rating DESC
+ORDER BY rating ASC
 LIMIT 10;
 
 -- name: ListTop10NewestBooks :many
 SELECT * FROM books
-ORDER BY created_at DESC
+ORDER BY created_at ASC
 LIMIT 10;
 
 -- name: CreateBook :one
