@@ -245,6 +245,10 @@ func (server *Server) listBook(ctx *gin.Context) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
+		if books.Books == nil {
+			ctx.JSON(http.StatusOK, books)
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

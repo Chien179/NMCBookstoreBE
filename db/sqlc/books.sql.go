@@ -97,7 +97,7 @@ func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
 	return i, err
 }
 
-const listBooks = `-- name: ListBooks :many
+const listBooks = `-- name: ListBooks :one
 SELECT
     (SELECT (COUNT(*)/$1)
      FROM books) 
@@ -120,27 +120,11 @@ type ListBooksRow struct {
 	Books     json.RawMessage `json:"books"`
 }
 
-func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBooksRow, error) {
-	rows, err := q.db.QueryContext(ctx, listBooks, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []ListBooksRow{}
-	for rows.Next() {
-		var i ListBooksRow
-		if err := rows.Scan(&i.TotalPage, &i.Books); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) (ListBooksRow, error) {
+	row := q.db.QueryRowContext(ctx, listBooks, arg.Limit, arg.Offset)
+	var i ListBooksRow
+	err := row.Scan(&i.TotalPage, &i.Books)
+	return i, err
 }
 
 const listTop10NewestBooks = `-- name: ListTop10NewestBooks :many

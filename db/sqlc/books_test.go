@@ -156,7 +156,7 @@ func TestListBooks(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, books)
 
-	for _, book := range books {
+	for _, book := range books.Books {
 		require.NotEmpty(t, book)
 	}
 }

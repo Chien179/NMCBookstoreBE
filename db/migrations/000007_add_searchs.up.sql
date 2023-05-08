@@ -27,7 +27,24 @@ BEGIN
 	ALTER TABLE searchs ADD COLUMN searchs_tsv tsvector;
 END $$;
 
-SELECT create_searchs_table_func();
+CREATE TABLE "searchs" AS
+		SELECT
+			b.id AS id,
+			b."name" AS book_names,
+			b.price AS price,
+			b.author AS author,
+			b.publisher AS publisher,
+			b.rating AS rating,
+			g."name" AS genres,
+			s."name" AS subgenres
+		FROM
+			books b
+			INNER JOIN books_genres bg ON b.id = bg.id
+			INNER JOIN books_subgenres bs ON b.id = bs.books_id
+			INNER JOIN genres g ON bg.genres_id = g.id
+			INNER JOIN subgenres s ON bs.subgenres_id = s.id;
+
+ALTER TABLE searchs ADD COLUMN searchs_tsv tsvector;
 
 CREATE OR REPLACE FUNCTION update_searchs_table_trigger_func()
 RETURNS TRIGGER
@@ -49,22 +66,22 @@ BEGIN
 	RETURN NEW;
 END $$;
 
-CREATE OR REPLACE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
+CREATE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
 OF name, price, author, publisher, rating ON books FOR EACH ROW
 EXECUTE PROCEDURE update_searchs_table_trigger_func();
 
-CREATE OR REPLACE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
+CREATE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
 OF name ON genres FOR EACH ROW
 EXECUTE PROCEDURE update_searchs_table_trigger_func();
 
-CREATE OR REPLACE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
+CREATE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
 OF genres_id,name ON subgenres FOR EACH ROW
 EXECUTE PROCEDURE update_searchs_table_trigger_func();
 
-CREATE OR REPLACE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
+CREATE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
 OF books_id,genres_id ON books_genres FOR EACH ROW
 EXECUTE PROCEDURE update_searchs_table_trigger_func();
 
-CREATE OR REPLACE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
+CREATE TRIGGER update_searchs_table_trigger AFTER INSERT OR UPDATE
 OF books_id,subgenres_id ON books_subgenres FOR EACH ROW
 EXECUTE PROCEDURE update_searchs_table_trigger_func();

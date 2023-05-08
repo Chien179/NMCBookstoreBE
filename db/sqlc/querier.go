@@ -56,7 +56,7 @@ type Querier interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetWishlist(ctx context.Context, id int64) (Wishlist, error)
 	ListAddresses(ctx context.Context, arg ListAddressesParams) ([]Address, error)
-	ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBooksRow, error)
+	ListBooks(ctx context.Context, arg ListBooksParams) (ListBooksRow, error)
 	ListBooksGenresByBookID(ctx context.Context, booksID int64) ([]BooksGenre, error)
 	ListBooksGenresByGenreID(ctx context.Context, genresID int64) ([]BooksGenre, error)
 	ListBooksSubgenresByBookID(ctx context.Context, booksID int64) ([]BooksSubgenre, error)

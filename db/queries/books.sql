@@ -2,7 +2,7 @@
 SELECT * FROM books
 WHERE id = $1 LIMIT 1;
 
--- name: ListBooks :many
+-- name: ListBooks :one
 SELECT
     (SELECT (COUNT(*)/sqlc.arg('limit'))
      FROM books) 

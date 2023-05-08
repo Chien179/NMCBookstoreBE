@@ -447,7 +447,7 @@ func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1 interface{}) *gomock.Call
 }
 
 // DeleteWishlist mocks base method.
-func (m *MockStore) DeleteWishlist(arg0 context.Context, arg1 int64) error {
+func (m *MockStore) DeleteWishlist(arg0 context.Context, arg1 db.DeleteWishlistParams) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteWishlist", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -716,10 +716,10 @@ func (mr *MockStoreMockRecorder) ListAddresses(arg0, arg1 interface{}) *gomock.C
 }
 
 // ListBooks mocks base method.
-func (m *MockStore) ListBooks(arg0 context.Context, arg1 db.ListBooksParams) ([]db.Book, error) {
+func (m *MockStore) ListBooks(arg0 context.Context, arg1 db.ListBooksParams) ([]db.ListBooksRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListBooks", arg0, arg1)
-	ret0, _ := ret[0].([]db.Book)
+	ret0, _ := ret[0].([]db.ListBooksRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
