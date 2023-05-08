@@ -18,4 +18,5 @@ RETURNING *;
 
 -- name: DeleteWishlist :exec
 DELETE FROM wishlists
-WHERE id = $1;
+WHERE id = $1
+AND username = $2;

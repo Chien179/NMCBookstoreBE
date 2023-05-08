@@ -64,6 +64,17 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		}
 
 		subTotal += cart.Total
+
+		argCart := db.DeleteCartParams{
+			ID:       cartID,
+			Username: authPayLoad.Username,
+		}
+
+		err = server.store.DeleteCart(ctx, argCart)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
 	}
 
 	arg := db.UpdateOrderParams{

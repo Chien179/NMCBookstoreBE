@@ -7,31 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type FullSearchQuery struct {
-	PageID   int32 `form:"page_id" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=24,max=100"`
-}
-
-type FullSearchData struct {
-	Text     string  `json:"text" binding:"required"`
-	MinPrice float64 `json:"min_price" binding:"required,min=1000,max=100000000"`
-	MaxPrice float64 `json:"max_price" binding:"required,min=1000,max=100000000"`
-	Rating   float64 `json:"rating" binding:"required,min=0,max=5"`
-}
-
 type FullSearchRequest struct {
-	FullSearchQuery
-	FullSearchData
+	PageID   int32   `form:"page_id" binding:"required,min=1"`
+	PageSize int32   `form:"page_size" binding:"required,min=24,max=100"`
+	Text     string  `form:"text"`
+	MinPrice float64 `form:"min_price"`
+	MaxPrice float64 `form:"max_price"`
+	Rating   float64 `form:"rating"`
 }
 
 func (server *Server) fullSearch(ctx *gin.Context) {
 	var req FullSearchRequest
-	if err := ctx.ShouldBindQuery(&req.FullSearchQuery); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
-	if err := ctx.ShouldBindJSON(&req.FullSearchData); err != nil {
+	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}

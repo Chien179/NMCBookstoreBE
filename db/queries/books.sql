@@ -3,10 +3,16 @@ SELECT * FROM books
 WHERE id = $1 LIMIT 1;
 
 -- name: ListBooks :many
-SELECT * FROM books
-ORDER BY id
-LIMIT $1
-OFFSET $2;
+SELECT
+    (SELECT (COUNT(*)/sqlc.arg('limit'))
+     FROM books) 
+     as total_page, 
+    (SELECT JSON_AGG(t.*) FROM (
+        SELECT * FROM books
+        ORDER BY id
+        LIMIT sqlc.arg('limit')
+        OFFSET sqlc.arg('offset')
+    ) AS t) AS books ;
 
 -- name: ListTop10TheBestBooks :many
 SELECT * FROM books

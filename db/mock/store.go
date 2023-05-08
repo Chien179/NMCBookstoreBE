@@ -1045,19 +1045,19 @@ func (mr *MockStoreMockRecorder) UpdateAddress(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAddress", reflect.TypeOf((*MockStore)(nil).UpdateAddress), arg0, arg1)
 }
 
-// UpdateAmout mocks base method.
-func (m *MockStore) UpdateAmout(arg0 context.Context, arg1 db.UpdateAmoutParams) (db.Cart, error) {
+// UpdateAmount mocks base method.
+func (m *MockStore) UpdateAmount(arg0 context.Context, arg1 db.UpdateAmountParams) (db.Cart, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateAmout", arg0, arg1)
+	ret := m.ctrl.Call(m, "UpdateAmount", arg0, arg1)
 	ret0, _ := ret[0].(db.Cart)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateAmout indicates an expected call of UpdateAmout.
-func (mr *MockStoreMockRecorder) UpdateAmout(arg0, arg1 interface{}) *gomock.Call {
+// UpdateAmount indicates an expected call of UpdateAmount.
+func (mr *MockStoreMockRecorder) UpdateAmount(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAmout", reflect.TypeOf((*MockStore)(nil).UpdateAmout), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAmount", reflect.TypeOf((*MockStore)(nil).UpdateAmount), arg0, arg1)
 }
 
 // UpdateBook mocks base method.

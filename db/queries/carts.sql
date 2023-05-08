@@ -5,9 +5,10 @@ WHERE id = $1 LIMIT 1;
 -- name: CreateCart :one
 INSERT INTO carts (
   books_id,
-  username
+  username,
+  amount
 ) VALUES (
-  $1, $2
+  $1, $2, $3
 )
 RETURNING *;
 
@@ -21,7 +22,7 @@ DELETE FROM carts
 WHERE id = $1
 AND username = $2;
 
--- name: UpdateAmout :one
+-- name: UpdateAmount :one
 UPDATE carts
 SET amount = $2
 WHERE 

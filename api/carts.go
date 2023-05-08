@@ -11,7 +11,8 @@ import (
 )
 
 type addToCartRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
+	ID      int64 `uri:"id" binding:"required,min=1"`
+	Amounnt int32 `json:"amount" binding:"required,min=1"`
 }
 
 // @Summary      Add to cart
@@ -32,6 +33,14 @@ func (server *Server) addToCart(ctx *gin.Context) {
 		return
 	}
 
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	carts, err := server.store.ListCartsByUsername(ctx, authPayLoad.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	book, err := server.store.GetBook(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -42,10 +51,27 @@ func (server *Server) addToCart(ctx *gin.Context) {
 		return
 	}
 
-	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+	for _, cart := range carts {
+		if cart.BooksID == book.ID {
+			arg := db.UpdateAmountParams{
+				ID:     cart.ID,
+				Amount: cart.Amount + req.Amounnt,
+			}
+			cart, err = server.store.UpdateAmount(ctx, arg)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			ctx.JSON(http.StatusOK, cart)
+			return
+		}
+	}
+
 	arg := db.CreateCartParams{
 		BooksID:  book.ID,
 		Username: authPayLoad.Username,
+		Amount:   req.Amounnt,
 	}
 
 	bookCart, err := server.store.CreateCart(ctx, arg)
@@ -91,12 +117,12 @@ func (server *Server) upatdeAmountCart(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.UpdateAmoutParams{
+	arg := db.UpdateAmountParams{
 		ID:     cart.ID,
 		Amount: req.Amount,
 	}
 
-	cart, err = server.store.UpdateAmout(ctx, arg)
+	cart, err = server.store.UpdateAmount(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -144,6 +170,39 @@ func (server *Server) deleteBookInCart(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, "Book in cart deleted successfully")
+}
+
+type deleteMultiBookInCartRequest struct {
+	List_ID []int64 `uri:"list_id" binding:"required"`
+}
+
+func (server *Server) deleteMultiBookInCart(ctx *gin.Context) {
+	var req deleteMultiBookInCartRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	for _, cartID := range req.List_ID {
+		arg := db.DeleteCartParams{
+			ID:       cartID,
+			Username: authPayLoad.Username,
+		}
+
+		err := server.store.DeleteCart(ctx, arg)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+	}
+
+	ctx.JSON(http.StatusOK, "Books in cart deleted successfully")
 }
 
 type ListBooksInCartRespone struct {

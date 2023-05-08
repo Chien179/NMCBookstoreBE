@@ -38,7 +38,7 @@ type Querier interface {
 	DeleteReview(ctx context.Context, id int64) error
 	DeleteSubgenre(ctx context.Context, id int64) error
 	DeleteUser(ctx context.Context, username string) error
-	DeleteWishlist(ctx context.Context, id int64) error
+	DeleteWishlist(ctx context.Context, arg DeleteWishlistParams) error
 	FullSearch(ctx context.Context, arg FullSearchParams) ([]FullSearchRow, error)
 	GetAddress(ctx context.Context, id int64) (Address, error)
 	GetBook(ctx context.Context, id int64) (Book, error)
@@ -56,7 +56,7 @@ type Querier interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetWishlist(ctx context.Context, id int64) (Wishlist, error)
 	ListAddresses(ctx context.Context, arg ListAddressesParams) ([]Address, error)
-	ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, error)
+	ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBooksRow, error)
 	ListBooksGenresByBookID(ctx context.Context, booksID int64) ([]BooksGenre, error)
 	ListBooksGenresByGenreID(ctx context.Context, genresID int64) ([]BooksGenre, error)
 	ListBooksSubgenresByBookID(ctx context.Context, booksID int64) ([]BooksSubgenre, error)
@@ -77,7 +77,7 @@ type Querier interface {
 	RevenueQuarters(ctx context.Context, arg RevenueQuartersParams) ([]RevenueQuartersRow, error)
 	RevenueYears(ctx context.Context, arg RevenueYearsParams) ([]RevenueYearsRow, error)
 	UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error)
-	UpdateAmout(ctx context.Context, arg UpdateAmoutParams) (Cart, error)
+	UpdateAmount(ctx context.Context, arg UpdateAmountParams) (Cart, error)
 	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
 	UpdateGenre(ctx context.Context, arg UpdateGenreParams) (Genre, error)
 	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)

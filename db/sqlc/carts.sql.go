@@ -12,9 +12,10 @@ import (
 const createCart = `-- name: CreateCart :one
 INSERT INTO carts (
   books_id,
-  username
+  username,
+  amount
 ) VALUES (
-  $1, $2
+  $1, $2, $3
 )
 RETURNING id, books_id, username, created_at, amount, total
 `
@@ -22,10 +23,11 @@ RETURNING id, books_id, username, created_at, amount, total
 type CreateCartParams struct {
 	BooksID  int64  `json:"books_id"`
 	Username string `json:"username"`
+	Amount   int32  `json:"amount"`
 }
 
 func (q *Queries) CreateCart(ctx context.Context, arg CreateCartParams) (Cart, error) {
-	row := q.db.QueryRowContext(ctx, createCart, arg.BooksID, arg.Username)
+	row := q.db.QueryRowContext(ctx, createCart, arg.BooksID, arg.Username, arg.Amount)
 	var i Cart
 	err := row.Scan(
 		&i.ID,
@@ -109,7 +111,7 @@ func (q *Queries) ListCartsByUsername(ctx context.Context, username string) ([]C
 	return items, nil
 }
 
-const updateAmout = `-- name: UpdateAmout :one
+const updateAmount = `-- name: UpdateAmount :one
 UPDATE carts
 SET amount = $2
 WHERE 
@@ -117,13 +119,13 @@ WHERE
 RETURNING id, books_id, username, created_at, amount, total
 `
 
-type UpdateAmoutParams struct {
+type UpdateAmountParams struct {
 	ID     int64 `json:"id"`
 	Amount int32 `json:"amount"`
 }
 
-func (q *Queries) UpdateAmout(ctx context.Context, arg UpdateAmoutParams) (Cart, error) {
-	row := q.db.QueryRowContext(ctx, updateAmout, arg.ID, arg.Amount)
+func (q *Queries) UpdateAmount(ctx context.Context, arg UpdateAmountParams) (Cart, error) {
+	row := q.db.QueryRowContext(ctx, updateAmount, arg.ID, arg.Amount)
 	var i Cart
 	err := row.Scan(
 		&i.ID,

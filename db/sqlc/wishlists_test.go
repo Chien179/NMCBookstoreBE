@@ -38,7 +38,12 @@ func TestDeleteBookWishlist(t *testing.T) {
 	book := createRandomBook(t)
 	Wishlist1 := createRandomWishlist(t, book, user)
 
-	err := testQueries.DeleteWishlist(context.Background(), Wishlist1.ID)
+	arg := DeleteWishlistParams{
+		ID:       Wishlist1.ID,
+		Username: user.Username,
+	}
+
+	err := testQueries.DeleteWishlist(context.Background(), arg)
 	require.NoError(t, err)
 
 	Wishlist2, err := testQueries.GetWishlist(context.Background(), Wishlist1.ID)

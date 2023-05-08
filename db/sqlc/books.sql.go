@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/lib/pq"
 )
@@ -97,38 +98,38 @@ func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
 }
 
 const listBooks = `-- name: ListBooks :many
-SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
-ORDER BY id
-LIMIT $1
-OFFSET $2
+SELECT
+    (SELECT (COUNT(*)/$1)
+     FROM books) 
+     as total_page, 
+    (SELECT JSON_AGG(t.*) FROM (
+        SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
+        ORDER BY id
+        LIMIT $1
+        OFFSET $2
+    ) AS t) AS books
 `
 
 type ListBooksParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
+	Limit  interface{} `json:"limit"`
+	Offset int32       `json:"offset"`
 }
 
-func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]Book, error) {
+type ListBooksRow struct {
+	TotalPage int32           `json:"total_page"`
+	Books     json.RawMessage `json:"books"`
+}
+
+func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) ([]ListBooksRow, error) {
 	rows, err := q.db.QueryContext(ctx, listBooks, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Book{}
+	items := []ListBooksRow{}
 	for rows.Next() {
-		var i Book
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Price,
-			pq.Array(&i.Image),
-			&i.Description,
-			&i.Author,
-			&i.Publisher,
-			&i.Quantity,
-			&i.CreatedAt,
-			&i.Rating,
-		); err != nil {
+		var i ListBooksRow
+		if err := rows.Scan(&i.TotalPage, &i.Books); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

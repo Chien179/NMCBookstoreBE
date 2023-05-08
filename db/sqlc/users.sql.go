@@ -23,7 +23,7 @@ INSERT INTO users (
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8
 )
-RETURNING username, full_name, email, password, image, phone_number, role, password_changed_at, created_at, is_email_verified, age, sex
+RETURNING username, full_name, email, password, image, phone_number, age, sex, role, password_changed_at, created_at, is_email_verified
 `
 
 type CreateUserParams struct {
@@ -56,12 +56,12 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Password,
 		&i.Image,
 		&i.PhoneNumber,
+		&i.Age,
+		&i.Sex,
 		&i.Role,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
-		&i.Age,
-		&i.Sex,
 	)
 	return i, err
 }
@@ -77,7 +77,7 @@ func (q *Queries) DeleteUser(ctx context.Context, username string) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT username, full_name, email, password, image, phone_number, role, password_changed_at, created_at, is_email_verified, age, sex FROM users
+SELECT username, full_name, email, password, image, phone_number, age, sex, role, password_changed_at, created_at, is_email_verified FROM users
 WHERE username = $1 LIMIT 1
 `
 
@@ -91,18 +91,18 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.Password,
 		&i.Image,
 		&i.PhoneNumber,
+		&i.Age,
+		&i.Sex,
 		&i.Role,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
-		&i.Age,
-		&i.Sex,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT username, full_name, email, password, image, phone_number, role, password_changed_at, created_at, is_email_verified, age, sex FROM users
+SELECT username, full_name, email, password, image, phone_number, age, sex, role, password_changed_at, created_at, is_email_verified FROM users
 WHERE email = $1 LIMIT 1
 `
 
@@ -116,18 +116,18 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Password,
 		&i.Image,
 		&i.PhoneNumber,
+		&i.Age,
+		&i.Sex,
 		&i.Role,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
-		&i.Age,
-		&i.Sex,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT username, full_name, email, password, image, phone_number, role, password_changed_at, created_at, is_email_verified, age, sex FROM users
+SELECT username, full_name, email, password, image, phone_number, age, sex, role, password_changed_at, created_at, is_email_verified FROM users
 ORDER BY username
 LIMIT $1
 OFFSET $2
@@ -154,12 +154,12 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.Password,
 			&i.Image,
 			&i.PhoneNumber,
+			&i.Age,
+			&i.Sex,
 			&i.Role,
 			&i.PasswordChangedAt,
 			&i.CreatedAt,
 			&i.IsEmailVerified,
-			&i.Age,
-			&i.Sex,
 		); err != nil {
 			return nil, err
 		}
@@ -188,7 +188,7 @@ SET full_name = COALESCE($1, full_name),
 
 WHERE 
   username = $10
-RETURNING username, full_name, email, password, image, phone_number, role, password_changed_at, created_at, is_email_verified, age, sex
+RETURNING username, full_name, email, password, image, phone_number, age, sex, role, password_changed_at, created_at, is_email_verified
 `
 
 type UpdateUserParams struct {
@@ -225,12 +225,12 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Password,
 		&i.Image,
 		&i.PhoneNumber,
+		&i.Age,
+		&i.Sex,
 		&i.Role,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
-		&i.Age,
-		&i.Sex,
 	)
 	return i, err
 }

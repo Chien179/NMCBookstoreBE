@@ -32,7 +32,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	router.GET("/forgot_password", server.forgotPassword)
 	router.GET("/reset_password", server.resetPassword)
 
-	router.POST("/searchs", server.fullSearch)
+	router.GET("/searchs", server.fullSearch)
 
 	bookRoutes := router.Group("/books")
 	bookRoutes.GET("/:id", server.getBook)
@@ -61,12 +61,14 @@ func (server *Server) userAuth(router *gin.Engine) {
 	cartRoutes := usersRoutes.Group("/carts").Use(authMiddleware(server.tokenMaker))
 	cartRoutes.POST("/:id", server.addToCart)
 	cartRoutes.DELETE("/:id", server.deleteBookInCart)
+	cartRoutes.DELETE("/mutil/:list_id", server.deleteMultiBookInCart)
 	cartRoutes.PUT("/:id", server.upatdeAmountCart)
 	cartRoutes.GET("/", server.listBookInCart)
 
 	wishlistRoutes := usersRoutes.Group("/wishlists").Use(authMiddleware(server.tokenMaker))
 	wishlistRoutes.POST("/:id", server.addToWishlist)
 	wishlistRoutes.DELETE("/:id", server.deleteBookInWishlist)
+	wishlistRoutes.DELETE("/mutil/:list_id", server.deleteMutilBookInWishlist)
 	wishlistRoutes.GET("/", server.listBookInWishlist)
 
 	addressRoutes := usersRoutes.Group("/addresses").Use(authMiddleware(server.tokenMaker))
