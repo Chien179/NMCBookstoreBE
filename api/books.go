@@ -142,28 +142,28 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		ID: book.ID,
 		Name: sql.NullString{
 			String: req.updateBookData.Name,
-			Valid:  true,
+			Valid:  req.updateBookData.Name != "",
 		},
 		Price: sql.NullFloat64{
 			Float64: req.updateBookData.Price,
-			Valid:   true,
+			Valid:   req.updateBookData.Price > -1,
 		},
 		Image: req.updateBookData.Image,
 		Description: sql.NullString{
 			String: req.updateBookData.Description,
-			Valid:  true,
+			Valid:  req.updateBookData.Description != "",
 		},
 		Author: sql.NullString{
 			String: req.updateBookData.Author,
-			Valid:  true,
+			Valid:  req.updateBookData.Author != "",
 		},
 		Publisher: sql.NullString{
 			String: req.updateBookData.Publisher,
-			Valid:  true,
+			Valid:  req.updateBookData.Publisher != "",
 		},
 		Quantity: sql.NullInt32{
 			Int32: req.updateBookData.Quantity,
-			Valid: true,
+			Valid: req.updateBookData.Quantity > 0,
 		},
 	}
 

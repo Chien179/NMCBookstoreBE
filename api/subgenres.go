@@ -91,11 +91,11 @@ func (server *Server) updateSubgenre(ctx *gin.Context) {
 		ID: subgenre.ID,
 		GenresID: sql.NullInt64{
 			Int64: req.updateSubgenreData.GenreID,
-			Valid: true,
+			Valid: req.updateSubgenreData.GenreID > 0,
 		},
 		Name: sql.NullString{
 			String: req.updateSubgenreData.Name,
-			Valid:  true,
+			Valid:  req.updateSubgenreData.Name != "",
 		},
 	}
 

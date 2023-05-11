@@ -160,15 +160,15 @@ func (server *Server) updateAddress(ctx *gin.Context) {
 		ID: req.ID,
 		Address: sql.NullString{
 			String: req.updateAddressData.Address,
-			Valid:  true,
+			Valid:  req.updateAddressData.Address != "",
 		},
 		District: sql.NullString{
 			String: req.updateAddressData.District,
-			Valid:  true,
+			Valid:  req.updateAddressData.District != "",
 		},
 		City: sql.NullString{
 			String: req.updateAddressData.City,
-			Valid:  true,
+			Valid:  req.updateAddressData.District != "",
 		},
 	}
 

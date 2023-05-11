@@ -9,8 +9,7 @@ import (
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
-
-	corsMiddleware(router)
+	router.Use(corsMiddleware())
 
 	docs.SwaggerInfo.BasePath = "/"
 

@@ -246,7 +246,7 @@ func (server *Server) getUser(ctx *gin.Context) {
 
 type updateUserRequest struct {
 	Fullname    string `json:"full_name"`
-	Email       string `json:"email" binding:"email"`
+	Email       string `json:"email"`
 	Image       string `json:"image"`
 	Age         int32  `json:"age"`
 	Sex         string `json:"sex"`
@@ -277,27 +277,27 @@ func (server *Server) updateUser(ctx *gin.Context) {
 		Username: authPayLoad.Username,
 		FullName: sql.NullString{
 			String: req.Fullname,
-			Valid:  true,
+			Valid:  req.Fullname != "",
 		},
 		Email: sql.NullString{
 			String: req.Email,
-			Valid:  true,
+			Valid:  req.Email != "",
 		},
 		Image: sql.NullString{
 			String: req.Image,
-			Valid:  true,
+			Valid:  req.Image != "",
 		},
 		Age: sql.NullInt32{
 			Int32: req.Age,
-			Valid: true,
+			Valid: req.Age > 0 && req.Age < 200,
 		},
 		Sex: sql.NullString{
 			String: req.Sex,
-			Valid:  true,
+			Valid:  req.Sex != "",
 		},
 		PhoneNumber: sql.NullString{
 			String: req.PhoneNumber,
-			Valid:  true,
+			Valid:  req.PhoneNumber != "",
 		},
 	}
 

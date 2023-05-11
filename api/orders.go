@@ -81,11 +81,11 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		ID: order.ID,
 		SubAmount: sql.NullInt32{
 			Int32: int32(len(req.CartIDs)),
-			Valid: true,
+			Valid: int32(len(req.CartIDs)) > 0,
 		},
 		SubTotal: sql.NullFloat64{
 			Float64: subTotal,
-			Valid:   true,
+			Valid:   subTotal > 0,
 		},
 	}
 

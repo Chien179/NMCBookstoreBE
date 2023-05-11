@@ -42,7 +42,6 @@ SET full_name = COALESCE(sqlc.narg(full_name), full_name),
     password = COALESCE(sqlc.narg(password), password),
     password_changed_at = COALESCE(sqlc.narg(password_changed_at), password_changed_at),
     is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified)
-
 WHERE 
   username = sqlc.arg(username)
 RETURNING *;
