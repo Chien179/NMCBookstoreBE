@@ -60,15 +60,13 @@ func (server *Server) userAuth(router *gin.Engine) {
 
 	cartRoutes := usersRoutes.Group("/carts").Use(authMiddleware(server.tokenMaker))
 	cartRoutes.POST("/:id", server.addToCart)
-	cartRoutes.DELETE("/:id", server.deleteBookInCart)
-	cartRoutes.DELETE("/mutil/:list_id", server.deleteMultiBookInCart)
+	cartRoutes.DELETE("/", server.deleteBookInCart)
 	cartRoutes.PUT("/:id", server.upatdeAmountCart)
 	cartRoutes.GET("/", server.listBookInCart)
 
 	wishlistRoutes := usersRoutes.Group("/wishlists").Use(authMiddleware(server.tokenMaker))
 	wishlistRoutes.POST("/:id", server.addToWishlist)
-	wishlistRoutes.DELETE("/:id", server.deleteBookInWishlist)
-	wishlistRoutes.DELETE("/mutil/:list_id", server.deleteMutilBookInWishlist)
+	wishlistRoutes.DELETE("/", server.deleteBookInWishlist)
 	wishlistRoutes.GET("/", server.listBookInWishlist)
 
 	addressRoutes := usersRoutes.Group("/addresses").Use(authMiddleware(server.tokenMaker))

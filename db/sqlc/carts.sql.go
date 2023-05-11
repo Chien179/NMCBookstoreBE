@@ -13,21 +13,28 @@ const createCart = `-- name: CreateCart :one
 INSERT INTO carts (
   books_id,
   username,
-  amount
+  amount,
+  total
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 )
 RETURNING id, books_id, username, created_at, amount, total
 `
 
 type CreateCartParams struct {
-	BooksID  int64  `json:"books_id"`
-	Username string `json:"username"`
-	Amount   int32  `json:"amount"`
+	BooksID  int64   `json:"books_id"`
+	Username string  `json:"username"`
+	Amount   int32   `json:"amount"`
+	Total    float64 `json:"total"`
 }
 
 func (q *Queries) CreateCart(ctx context.Context, arg CreateCartParams) (Cart, error) {
-	row := q.db.QueryRowContext(ctx, createCart, arg.BooksID, arg.Username, arg.Amount)
+	row := q.db.QueryRowContext(ctx, createCart,
+		arg.BooksID,
+		arg.Username,
+		arg.Amount,
+		arg.Total,
+	)
 	var i Cart
 	err := row.Scan(
 		&i.ID,
@@ -113,19 +120,21 @@ func (q *Queries) ListCartsByUsername(ctx context.Context, username string) ([]C
 
 const updateAmount = `-- name: UpdateAmount :one
 UPDATE carts
-SET amount = $2
+SET amount = $2,
+    total = $3
 WHERE 
   id = $1
 RETURNING id, books_id, username, created_at, amount, total
 `
 
 type UpdateAmountParams struct {
-	ID     int64 `json:"id"`
-	Amount int32 `json:"amount"`
+	ID     int64   `json:"id"`
+	Amount int32   `json:"amount"`
+	Total  float64 `json:"total"`
 }
 
 func (q *Queries) UpdateAmount(ctx context.Context, arg UpdateAmountParams) (Cart, error) {
-	row := q.db.QueryRowContext(ctx, updateAmount, arg.ID, arg.Amount)
+	row := q.db.QueryRowContext(ctx, updateAmount, arg.ID, arg.Amount, arg.Total)
 	var i Cart
 	err := row.Scan(
 		&i.ID,

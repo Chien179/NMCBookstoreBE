@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
@@ -56,10 +57,6 @@ func (server *Server) addToWishlist(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, bookWishlist)
 }
 
-type deleteBookInWishlistRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
-}
-
 // @Summary      Delete book in wishlist
 // @Description  Use this API to delete book in wishlist
 // @Tags         Carts
@@ -71,38 +68,11 @@ type deleteBookInWishlistRequest struct {
 // @failure	 	 404
 // @failure		 500
 // @Router       /users/add_to_wishlist/{id} [delete]
-func (server *Server) deleteBookInWishlist(ctx *gin.Context) {
-	var req deleteBookInWishlistRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
-	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-
-	arg := db.DeleteWishlistParams{
-		ID:       req.ID,
-		Username: authPayLoad.Username,
-	}
-
-	err := server.store.DeleteWishlist(ctx, arg)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	ctx.JSON(http.StatusOK, "Book in wishlist deleted successfully")
-}
-
 type deleteMultiBookInWishlistRequest struct {
-	List_ID []int64 `uri:"list_id" binding:"required"`
+	IDs []int64 `form:"IDs" binding:"required"`
 }
 
-func (server *Server) deleteMutilBookInWishlist(ctx *gin.Context) {
+func (server *Server) deleteBookInWishlist(ctx *gin.Context) {
 	var req deleteMultiBookInWishlistRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -111,13 +81,28 @@ func (server *Server) deleteMutilBookInWishlist(ctx *gin.Context) {
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
-	for _, wishlistID := range req.List_ID {
+	for _, wishlistID := range req.IDs {
+		wishlist, err := server.store.GetWishlist(ctx, wishlistID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		if wishlist.Username != authPayLoad.Username {
+			err := errors.New("cart doesn't belong to the authenticated user")
+			ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+			return
+		}
 		arg := db.DeleteWishlistParams{
 			ID:       wishlistID,
 			Username: authPayLoad.Username,
 		}
 
-		err := server.store.DeleteWishlist(ctx, arg)
+		err = server.store.DeleteWishlist(ctx, arg)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				ctx.JSON(http.StatusNotFound, errorResponse(err))

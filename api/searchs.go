@@ -8,12 +8,14 @@ import (
 )
 
 type FullSearchRequest struct {
-	PageID   int32   `form:"page_id" binding:"required,min=1"`
-	PageSize int32   `form:"page_size" binding:"required,min=24,max=100"`
-	Text     string  `form:"text"`
-	MinPrice float64 `form:"min_price"`
-	MaxPrice float64 `form:"max_price"`
-	Rating   float64 `form:"rating"`
+	PageID    int32   `form:"page_id" binding:"required,min=1"`
+	PageSize  int32   `form:"page_size" binding:"required,min=24,max=100"`
+	Text      string  `form:"text"`
+	Genres    string  `form:"genres"`
+	Subgenres string  `form:"sub_genres"`
+	MinPrice  float64 `form:"min_price"`
+	MaxPrice  float64 `form:"max_price"`
+	Rating    float64 `form:"rating"`
 }
 
 func (server *Server) fullSearch(ctx *gin.Context) {
@@ -23,10 +25,20 @@ func (server *Server) fullSearch(ctx *gin.Context) {
 		return
 	}
 
+	text := req.Text
+
+	if req.Genres != "" {
+		text = text + " " + req.Genres
+	}
+
+	if req.Subgenres != "" {
+		text = " " + req.Subgenres
+	}
+
 	arg := db.FullSearchParams{
 		Limit:    req.PageSize,
 		Offset:   (req.PageID - 1) * req.PageSize,
-		Text:     req.Text,
+		Text:     text,
 		MinPrice: req.MinPrice,
 		MaxPrice: req.MaxPrice,
 		Rating:   req.Rating,

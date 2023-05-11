@@ -6,9 +6,10 @@ WHERE id = $1 LIMIT 1;
 INSERT INTO carts (
   books_id,
   username,
-  amount
+  amount,
+  total
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 )
 RETURNING *;
 
@@ -24,7 +25,8 @@ AND username = $2;
 
 -- name: UpdateAmount :one
 UPDATE carts
-SET amount = $2
+SET amount = $2,
+    total = $3
 WHERE 
   id = $1
 RETURNING *;
