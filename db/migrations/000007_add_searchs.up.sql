@@ -63,7 +63,7 @@ BEGIN
 	UPDATE searchs
 	SET
 		searchs_tsv =
-			setweight(to_tsvector(coalesce(unaccent(book_names))), 'A') ||
+			setweight(to_tsvector(coalesce(unaccent(name))), 'A') ||
 			setweight(to_tsvector(coalesce(unaccent(genres))), 'A') || 
 			setweight(to_tsvector(coalesce(unaccent(subgenres))), 'A') ||
 			setweight(to_tsvector(coalesce(unaccent(author))), 'B') || 
