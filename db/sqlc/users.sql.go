@@ -185,7 +185,6 @@ SET full_name = COALESCE($1, full_name),
     password = COALESCE($7, password),
     password_changed_at = COALESCE($8, password_changed_at),
     is_email_verified = COALESCE($9, is_email_verified)
-
 WHERE 
   username = $10
 RETURNING username, full_name, email, password, image, phone_number, age, sex, role, password_changed_at, created_at, is_email_verified

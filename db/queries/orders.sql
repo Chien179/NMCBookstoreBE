@@ -26,6 +26,10 @@ ORDER BY id
 LIMIT $2
 OFFSET $3;
 
+-- name: ListOders :many
+SELECT * FROM orders
+ORDER BY id;
+
 -- name: UpdateOrder :one
 UPDATE orders
 SET 

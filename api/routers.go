@@ -40,6 +40,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	bookRoutes.GET("/newest", server.listTop10NewestBook)
 
 	genreRoutes := router.Group("/genres")
+	genreRoutes.GET("/:id", server.getGenre)
 	genreRoutes.GET("/", server.listGenre)
 
 	subgenreRoutes := router.Group("/subgenres")
@@ -81,7 +82,9 @@ func (server *Server) userAuth(router *gin.Engine) {
 
 	orderRoutes := usersRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))
 	orderRoutes.POST("/", server.createOrder)
-	orderRoutes.GET("/", server.listOrderPaid)
+	orderRoutes.GET("/", server.listOrder)
+	orderRoutes.GET("/paid", server.listOrderPaid)
+	orderRoutes.GET("/cancelled", server.listOrderCancelled)
 	orderRoutes.PUT("/:id", server.cancelOrder)
 	orderRoutes.DELETE("/:id", server.deleteOrder)
 
@@ -93,6 +96,7 @@ func (server *Server) adminAuth(router *gin.Engine) {
 	adminRoutes := router.Group("/admin")
 
 	bookRoutes := adminRoutes.Group("/books").Use(authMiddleware(server.tokenMaker), isAdmin())
+	bookRoutes.GET("/", server.listAllBook)
 	bookRoutes.POST("/", server.createBook)
 	bookRoutes.PUT("/:id", server.updateBook)
 	bookRoutes.DELETE("/:id", server.deleteBook)
@@ -112,4 +116,7 @@ func (server *Server) adminAuth(router *gin.Engine) {
 	revenueRoutes.GET("/days", server.revenueDays)
 	revenueRoutes.GET("/months", server.revenueMonths)
 	revenueRoutes.GET("/years", server.revenueYears)
+
+	orderRoutes := adminRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))
+	orderRoutes.GET("/", server.listOrder)
 }

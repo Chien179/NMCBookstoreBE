@@ -97,6 +97,45 @@ func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
 	return i, err
 }
 
+const listAllBooks = `-- name: ListAllBooks :many
+SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
+ORDER BY id
+`
+
+func (q *Queries) ListAllBooks(ctx context.Context) ([]Book, error) {
+	rows, err := q.db.QueryContext(ctx, listAllBooks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Book{}
+	for rows.Next() {
+		var i Book
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			pq.Array(&i.Image),
+			&i.Description,
+			&i.Author,
+			&i.Publisher,
+			&i.Quantity,
+			&i.CreatedAt,
+			&i.Rating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listBooks = `-- name: ListBooks :one
 SELECT
     (SELECT (COUNT(*)/$1)

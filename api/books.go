@@ -211,6 +211,16 @@ func (server *Server) deleteBook(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Book deleted successfully")
 }
 
+func (server *Server) listAllBook(ctx *gin.Context) {
+	books, err := server.store.ListAllBooks(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, books)
+}
+
 type listBookRequest struct {
 	PageID   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=24,max=100"`

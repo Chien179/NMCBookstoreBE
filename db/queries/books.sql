@@ -14,6 +14,10 @@ SELECT
         OFFSET sqlc.arg('offset')
     ) AS t) AS books ;
 
+-- name: ListAllBooks :many
+SELECT * FROM books
+ORDER BY id;
+
 -- name: ListTop10TheBestBooks :many
 SELECT * FROM books
 ORDER BY rating DESC

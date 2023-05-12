@@ -50,10 +50,53 @@ func (server *Server) createPayment(ctx *gin.Context) {
 				Valid:  true,
 			},
 		}
+
 		_, err := server.store.UpdateOrder(ctx, arg)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
+		}
+
+		carts, err := server.store.ListCartsByUsername(ctx, order.Username)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		for _, cart := range carts {
+			book, err := server.store.GetBook(ctx, cart.BooksID)
+			if err != nil {
+				if err == sql.ErrNoRows {
+					ctx.JSON(http.StatusNotFound, errorResponse(err))
+					return
+				}
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			arg := db.UpdateBookParams{
+				Quantity: sql.NullInt32{
+					Int32: book.Quantity - 1,
+					Valid: true,
+				},
+				Image: book.Image,
+			}
+			_, err = server.store.UpdateBook(ctx, arg)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			argCart := db.DeleteCartParams{
+				ID:       cart.ID,
+				Username: authPayLoad.Username,
+			}
+
+			err = server.store.DeleteCart(ctx, argCart)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
 		}
 	}
 
@@ -61,7 +104,7 @@ func (server *Server) createPayment(ctx *gin.Context) {
 		Username:   authPayLoad.Username,
 		OrderID:    order.ID,
 		ShippingID: shipping.ID,
-		Subtotal:   req.SubTotal,
+		Subtotal:   order.SubTotal,
 		Status:     req.Status,
 	}
 
