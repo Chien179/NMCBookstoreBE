@@ -60,13 +60,7 @@ func TestListOrdersByUserID(t *testing.T) {
 		createRandomOrder(t, user)
 	}
 
-	arg := ListOdersByUserNameParams{
-		Username: user.Username,
-		Limit:    5,
-		Offset:   0,
-	}
-
-	orders, err := testQueries.ListOdersByUserName(context.Background(), arg)
+	orders, err := testQueries.ListOdersByUserName(context.Background(), user.Username)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, orders)
