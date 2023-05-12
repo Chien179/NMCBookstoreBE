@@ -2,12 +2,19 @@
 SELECT * FROM address
 WHERE id = $1 LIMIT 1;
 
--- name: ListAddresses :many
-SELECT * FROM address
-WHERE username = $1
-ORDER BY id
-LIMIT $2
-OFFSET $3;
+-- name: ListAddresses :one
+SELECT
+  (SELECT (COUNT(*)/sqlc.arg('limit'))
+     FROM address
+     WHERE address.username = $1) 
+     as total_page, 
+  (SELECT JSON_AGG(t.*) FROM (
+    SELECT * FROM address
+    WHERE address.username = $1
+    ORDER BY id
+    LIMIT sqlc.arg('limit')
+    OFFSET sqlc.arg('offset')
+  ) AS t) AS address;
 
 -- name: CreateAddress :one
 INSERT INTO address (

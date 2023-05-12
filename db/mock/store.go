@@ -461,10 +461,10 @@ func (mr *MockStoreMockRecorder) DeleteWishlist(arg0, arg1 interface{}) *gomock.
 }
 
 // FullSearch mocks base method.
-func (m *MockStore) FullSearch(arg0 context.Context, arg1 db.FullSearchParams) ([]db.FullSearchRow, error) {
+func (m *MockStore) FullSearch(arg0 context.Context, arg1 db.FullSearchParams) (db.FullSearchRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FullSearch", arg0, arg1)
-	ret0, _ := ret[0].([]db.FullSearchRow)
+	ret0, _ := ret[0].(db.FullSearchRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -701,10 +701,10 @@ func (mr *MockStoreMockRecorder) GetWishlist(arg0, arg1 interface{}) *gomock.Cal
 }
 
 // ListAddresses mocks base method.
-func (m *MockStore) ListAddresses(arg0 context.Context, arg1 db.ListAddressesParams) ([]db.Address, error) {
+func (m *MockStore) ListAddresses(arg0 context.Context, arg1 db.ListAddressesParams) (db.ListAddressesRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAddresses", arg0, arg1)
-	ret0, _ := ret[0].([]db.Address)
+	ret0, _ := ret[0].(db.ListAddressesRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -715,11 +715,26 @@ func (mr *MockStoreMockRecorder) ListAddresses(arg0, arg1 interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAddresses", reflect.TypeOf((*MockStore)(nil).ListAddresses), arg0, arg1)
 }
 
+// ListAllBooks mocks base method.
+func (m *MockStore) ListAllBooks(arg0 context.Context) ([]db.Book, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAllBooks", arg0)
+	ret0, _ := ret[0].([]db.Book)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAllBooks indicates an expected call of ListAllBooks.
+func (mr *MockStoreMockRecorder) ListAllBooks(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAllBooks", reflect.TypeOf((*MockStore)(nil).ListAllBooks), arg0)
+}
+
 // ListBooks mocks base method.
-func (m *MockStore) ListBooks(arg0 context.Context, arg1 db.ListBooksParams) ([]db.ListBooksRow, error) {
+func (m *MockStore) ListBooks(arg0 context.Context, arg1 db.ListBooksParams) (db.ListBooksRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListBooks", arg0, arg1)
-	ret0, _ := ret[0].([]db.ListBooksRow)
+	ret0, _ := ret[0].(db.ListBooksRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -820,8 +835,23 @@ func (mr *MockStoreMockRecorder) ListGenres(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGenres", reflect.TypeOf((*MockStore)(nil).ListGenres), arg0)
 }
 
+// ListOders mocks base method.
+func (m *MockStore) ListOders(arg0 context.Context) ([]db.Order, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListOders", arg0)
+	ret0, _ := ret[0].([]db.Order)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListOders indicates an expected call of ListOders.
+func (mr *MockStoreMockRecorder) ListOders(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOders", reflect.TypeOf((*MockStore)(nil).ListOders), arg0)
+}
+
 // ListOdersByUserName mocks base method.
-func (m *MockStore) ListOdersByUserName(arg0 context.Context, arg1 db.ListOdersByUserNameParams) ([]db.Order, error) {
+func (m *MockStore) ListOdersByUserName(arg0 context.Context, arg1 string) ([]db.Order, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListOdersByUserName", arg0, arg1)
 	ret0, _ := ret[0].([]db.Order)
@@ -836,10 +866,10 @@ func (mr *MockStoreMockRecorder) ListOdersByUserName(arg0, arg1 interface{}) *go
 }
 
 // ListReviewsByBookID mocks base method.
-func (m *MockStore) ListReviewsByBookID(arg0 context.Context, arg1 db.ListReviewsByBookIDParams) ([]db.Review, error) {
+func (m *MockStore) ListReviewsByBookID(arg0 context.Context, arg1 db.ListReviewsByBookIDParams) (db.ListReviewsByBookIDRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListReviewsByBookID", arg0, arg1)
-	ret0, _ := ret[0].([]db.Review)
+	ret0, _ := ret[0].(db.ListReviewsByBookIDRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -956,78 +986,78 @@ func (mr *MockStoreMockRecorder) ResetPasswordTx(arg0, arg1 interface{}) *gomock
 }
 
 // RevenueDays mocks base method.
-func (m *MockStore) RevenueDays(arg0 context.Context, arg1 db.RevenueDaysParams) ([]db.RevenueDaysRow, error) {
+func (m *MockStore) RevenueDays(arg0 context.Context) ([]db.RevenueDaysRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RevenueDays", arg0, arg1)
+	ret := m.ctrl.Call(m, "RevenueDays", arg0)
 	ret0, _ := ret[0].([]db.RevenueDaysRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RevenueDays indicates an expected call of RevenueDays.
-func (mr *MockStoreMockRecorder) RevenueDays(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) RevenueDays(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueDays", reflect.TypeOf((*MockStore)(nil).RevenueDays), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueDays", reflect.TypeOf((*MockStore)(nil).RevenueDays), arg0)
 }
 
 // RevenueHours mocks base method.
-func (m *MockStore) RevenueHours(arg0 context.Context, arg1 db.RevenueHoursParams) ([]db.RevenueHoursRow, error) {
+func (m *MockStore) RevenueHours(arg0 context.Context) ([]db.RevenueHoursRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RevenueHours", arg0, arg1)
+	ret := m.ctrl.Call(m, "RevenueHours", arg0)
 	ret0, _ := ret[0].([]db.RevenueHoursRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RevenueHours indicates an expected call of RevenueHours.
-func (mr *MockStoreMockRecorder) RevenueHours(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) RevenueHours(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueHours", reflect.TypeOf((*MockStore)(nil).RevenueHours), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueHours", reflect.TypeOf((*MockStore)(nil).RevenueHours), arg0)
 }
 
 // RevenueMonths mocks base method.
-func (m *MockStore) RevenueMonths(arg0 context.Context, arg1 db.RevenueMonthsParams) ([]db.RevenueMonthsRow, error) {
+func (m *MockStore) RevenueMonths(arg0 context.Context) ([]db.RevenueMonthsRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RevenueMonths", arg0, arg1)
+	ret := m.ctrl.Call(m, "RevenueMonths", arg0)
 	ret0, _ := ret[0].([]db.RevenueMonthsRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RevenueMonths indicates an expected call of RevenueMonths.
-func (mr *MockStoreMockRecorder) RevenueMonths(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) RevenueMonths(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueMonths", reflect.TypeOf((*MockStore)(nil).RevenueMonths), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueMonths", reflect.TypeOf((*MockStore)(nil).RevenueMonths), arg0)
 }
 
 // RevenueQuarters mocks base method.
-func (m *MockStore) RevenueQuarters(arg0 context.Context, arg1 db.RevenueQuartersParams) ([]db.RevenueQuartersRow, error) {
+func (m *MockStore) RevenueQuarters(arg0 context.Context) ([]db.RevenueQuartersRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RevenueQuarters", arg0, arg1)
+	ret := m.ctrl.Call(m, "RevenueQuarters", arg0)
 	ret0, _ := ret[0].([]db.RevenueQuartersRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RevenueQuarters indicates an expected call of RevenueQuarters.
-func (mr *MockStoreMockRecorder) RevenueQuarters(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) RevenueQuarters(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueQuarters", reflect.TypeOf((*MockStore)(nil).RevenueQuarters), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueQuarters", reflect.TypeOf((*MockStore)(nil).RevenueQuarters), arg0)
 }
 
 // RevenueYears mocks base method.
-func (m *MockStore) RevenueYears(arg0 context.Context, arg1 db.RevenueYearsParams) ([]db.RevenueYearsRow, error) {
+func (m *MockStore) RevenueYears(arg0 context.Context) ([]db.RevenueYearsRow, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RevenueYears", arg0, arg1)
+	ret := m.ctrl.Call(m, "RevenueYears", arg0)
 	ret0, _ := ret[0].([]db.RevenueYearsRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RevenueYears indicates an expected call of RevenueYears.
-func (mr *MockStoreMockRecorder) RevenueYears(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockStoreMockRecorder) RevenueYears(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueYears", reflect.TypeOf((*MockStore)(nil).RevenueYears), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueYears", reflect.TypeOf((*MockStore)(nil).RevenueYears), arg0)
 }
 
 // UpdateAddress mocks base method.

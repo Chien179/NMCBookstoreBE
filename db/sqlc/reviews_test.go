@@ -88,7 +88,7 @@ func TestListReviewByBookID(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, reviews)
 
-	for _, book := range reviews {
+	for _, book := range reviews.Reviews {
 		require.NotEmpty(t, book)
 	}
 }

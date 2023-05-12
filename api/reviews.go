@@ -148,11 +148,15 @@ func (server *Server) listReview(ctx *gin.Context) {
 		Offset:  (req.listReviewFormdata.PageID - 1) * req.listReviewFormdata.PageSize,
 	}
 
-	books, err := server.store.ListReviewsByBookID(ctx, arg)
+	reviews, err := server.store.ListReviewsByBookID(ctx, arg)
 	if err != nil {
+		if reviews.Reviews == nil {
+			ctx.JSON(http.StatusOK, reviews)
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, books)
+	ctx.JSON(http.StatusOK, reviews)
 }

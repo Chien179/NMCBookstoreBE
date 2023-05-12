@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"net/http"
 
-	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,12 +19,7 @@ func (server *Server) revenueHours(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.RevenueHoursParams{
-		Limit:  req.PageSize,
-		Offset: (req.PageID - 1) * req.PageSize,
-	}
-
-	revenueHours, err := server.store.RevenueHours(ctx, arg)
+	revenueHours, err := server.store.RevenueHours(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -45,12 +39,7 @@ func (server *Server) revenueDays(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.RevenueDaysParams{
-		Limit:  req.PageSize,
-		Offset: (req.PageID - 1) * req.PageSize,
-	}
-
-	revenueDays, err := server.store.RevenueDays(ctx, arg)
+	revenueDays, err := server.store.RevenueDays(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -70,12 +59,7 @@ func (server *Server) revenueMonths(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.RevenueMonthsParams{
-		Limit:  req.PageSize,
-		Offset: (req.PageID - 1) * req.PageSize,
-	}
-
-	revenueMonths, err := server.store.RevenueMonths(ctx, arg)
+	revenueMonths, err := server.store.RevenueMonths(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -95,12 +79,7 @@ func (server *Server) revenueYears(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.RevenueYearsParams{
-		Limit:  req.PageSize,
-		Offset: (req.PageID - 1) * req.PageSize,
-	}
-
-	revenueYears, err := server.store.RevenueYears(ctx, arg)
+	revenueYears, err := server.store.RevenueYears(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))

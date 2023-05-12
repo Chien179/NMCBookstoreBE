@@ -121,18 +121,10 @@ const listOdersByUserName = `-- name: ListOdersByUserName :many
 SELECT id, username, created_at, status, sub_amount, sub_total FROM orders
 WHERE username = $1
 ORDER BY id
-LIMIT $2
-OFFSET $3
 `
 
-type ListOdersByUserNameParams struct {
-	Username string `json:"username"`
-	Limit    int32  `json:"limit"`
-	Offset   int32  `json:"offset"`
-}
-
-func (q *Queries) ListOdersByUserName(ctx context.Context, arg ListOdersByUserNameParams) ([]Order, error) {
-	rows, err := q.db.QueryContext(ctx, listOdersByUserName, arg.Username, arg.Limit, arg.Offset)
+func (q *Queries) ListOdersByUserName(ctx context.Context, username string) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, listOdersByUserName, username)
 	if err != nil {
 		return nil, err
 	}

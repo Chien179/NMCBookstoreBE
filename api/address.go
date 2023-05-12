@@ -275,6 +275,10 @@ func (server *Server) listAddress(ctx *gin.Context) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
+		if addresses.Address == nil {
+			ctx.JSON(http.StatusOK, addresses)
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

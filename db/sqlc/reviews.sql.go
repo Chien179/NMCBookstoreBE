@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 )
 
 const createReview = `-- name: CreateReview :one
@@ -76,46 +77,35 @@ func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
 	return i, err
 }
 
-const listReviewsByBookID = `-- name: ListReviewsByBookID :many
-SELECT id, username, books_id, comments, rating, created_at FROM reviews
-WHERE books_id = $1
-ORDER BY id
-LIMIT $2
-OFFSET $3
+const listReviewsByBookID = `-- name: ListReviewsByBookID :one
+SELECT
+  (SELECT (COUNT(*)/$2)
+     FROM reviews
+     WHERE reviews.books_id = $1) 
+     as total_page, 
+    (SELECT JSON_AGG(t.*) FROM (
+      SELECT id, username, books_id, comments, rating, created_at FROM reviews
+      WHERE reviews.books_id = $1
+      ORDER BY id
+      LIMIT $2
+      OFFSET $3
+    )AS t) AS reviews
 `
 
 type ListReviewsByBookIDParams struct {
-	BooksID int64 `json:"books_id"`
-	Limit   int32 `json:"limit"`
-	Offset  int32 `json:"offset"`
+	BooksID int64       `json:"books_id"`
+	Limit   interface{} `json:"limit"`
+	Offset  int32       `json:"offset"`
 }
 
-func (q *Queries) ListReviewsByBookID(ctx context.Context, arg ListReviewsByBookIDParams) ([]Review, error) {
-	rows, err := q.db.QueryContext(ctx, listReviewsByBookID, arg.BooksID, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Review{}
-	for rows.Next() {
-		var i Review
-		if err := rows.Scan(
-			&i.ID,
-			&i.Username,
-			&i.BooksID,
-			&i.Comments,
-			&i.Rating,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type ListReviewsByBookIDRow struct {
+	TotalPage int32           `json:"total_page"`
+	Reviews   json.RawMessage `json:"reviews"`
+}
+
+func (q *Queries) ListReviewsByBookID(ctx context.Context, arg ListReviewsByBookIDParams) (ListReviewsByBookIDRow, error) {
+	row := q.db.QueryRowContext(ctx, listReviewsByBookID, arg.BooksID, arg.Limit, arg.Offset)
+	var i ListReviewsByBookIDRow
+	err := row.Scan(&i.TotalPage, &i.Reviews)
+	return i, err
 }

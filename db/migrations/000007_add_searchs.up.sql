@@ -9,11 +9,15 @@ BEGIN
 		CREATE TABLE "searchs" AS
 		SELECT
 			b.id AS id,
-			b."name" AS book_names,
+			b."name" AS name,
 			b.price AS price,
+			b.image AS image,
+			b.description AS description,
 			b.author AS author,
 			b.publisher AS publisher,
+			b.quantity AS quantity,
 			b.rating AS rating,
+			b.created_at AS created_at,
 			g."name" AS genres,
 			s."name" AS subgenres
 		FROM
@@ -30,11 +34,15 @@ END $$;
 CREATE TABLE "searchs" AS
 		SELECT
 			b.id AS id,
-			b."name" AS book_names,
+			b."name" AS name,
 			b.price AS price,
+			b.image AS image,
+			b.description AS description,
 			b.author AS author,
 			b.publisher AS publisher,
+			b.quantity AS quantity,
 			b.rating AS rating,
+			b.created_at AS created_at,
 			g."name" AS genres,
 			s."name" AS subgenres
 		FROM

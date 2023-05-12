@@ -46,6 +46,10 @@ func (server *Server) fullSearch(ctx *gin.Context) {
 
 	results, err := server.store.FullSearch(ctx, arg)
 	if err != nil {
+		if results.Books == nil {
+			ctx.JSON(http.StatusOK, results)
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

@@ -7,82 +7,61 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 )
 
-const fullSearch = `-- name: FullSearch :many
-SELECT book_names,
-    price,
-    author,
-    publisher,
-    rating,
-    genres,
-    subgenres,
-    ts_rank(searchs_tsv, plainto_tsquery($3)) AS ts_rank
-FROM searchs
-WHERE searchs_tsv @@ plainto_tsquery($3)
-    AND price BETWEEN $4
-    AND $5
-    AND rating >= $6
-ORDER BY ts_rank DESC
-LIMIT $1
-OFFSET $2
+const fullSearch = `-- name: FullSearch :one
+SELECT
+    (SELECT (COUNT(*)/$1)
+        FROM searchs) 
+        as total_page, 
+    (SELECT JSON_AGG(t.*) FROM (
+        SELECT 
+            id,
+            name,
+            price,
+            image,
+            description,
+            author,
+            publisher,
+            quantity,
+            rating,
+            created_at
+        FROM searchs
+        WHERE searchs_tsv @@ plainto_tsquery($2)
+            AND searchs.price BETWEEN $3
+            AND $4
+            AND searchs.rating >= $5
+        ORDER BY ts_rank DESC
+        LIMIT $1
+        OFFSET $6
+    ) AS t) AS books
 `
 
 type FullSearchParams struct {
-	Limit    int32   `json:"limit"`
-	Offset   int32   `json:"offset"`
-	Text     string  `json:"text"`
-	MinPrice float64 `json:"min_price"`
-	MaxPrice float64 `json:"max_price"`
-	Rating   float64 `json:"rating"`
+	Limit    interface{} `json:"limit"`
+	Text     string      `json:"text"`
+	MinPrice float64     `json:"min_price"`
+	MaxPrice float64     `json:"max_price"`
+	Rating   float64     `json:"rating"`
+	Offset   int32       `json:"offset"`
 }
 
 type FullSearchRow struct {
-	BookNames string  `json:"book_names"`
-	Price     float64 `json:"price"`
-	Author    string  `json:"author"`
-	Publisher string  `json:"publisher"`
-	Rating    float64 `json:"rating"`
-	Genres    string  `json:"genres"`
-	Subgenres string  `json:"subgenres"`
-	TsRank    float32 `json:"ts_rank"`
+	TotalPage int32           `json:"total_page"`
+	Books     json.RawMessage `json:"books"`
 }
 
-func (q *Queries) FullSearch(ctx context.Context, arg FullSearchParams) ([]FullSearchRow, error) {
-	rows, err := q.db.QueryContext(ctx, fullSearch,
+func (q *Queries) FullSearch(ctx context.Context, arg FullSearchParams) (FullSearchRow, error) {
+	row := q.db.QueryRowContext(ctx, fullSearch,
 		arg.Limit,
-		arg.Offset,
 		arg.Text,
 		arg.MinPrice,
 		arg.MaxPrice,
 		arg.Rating,
+		arg.Offset,
 	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []FullSearchRow{}
-	for rows.Next() {
-		var i FullSearchRow
-		if err := rows.Scan(
-			&i.BookNames,
-			&i.Price,
-			&i.Author,
-			&i.Publisher,
-			&i.Rating,
-			&i.Genres,
-			&i.Subgenres,
-			&i.TsRank,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+	var i FullSearchRow
+	err := row.Scan(&i.TotalPage, &i.Books)
+	return i, err
 }

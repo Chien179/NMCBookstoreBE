@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 )
 
 const createAddress = `-- name: CreateAddress :one
@@ -77,48 +78,37 @@ func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
 	return i, err
 }
 
-const listAddresses = `-- name: ListAddresses :many
-SELECT id, address, username, district, city, created_at FROM address
-WHERE username = $1
-ORDER BY id
-LIMIT $2
-OFFSET $3
+const listAddresses = `-- name: ListAddresses :one
+SELECT
+  (SELECT (COUNT(*)/$2)
+     FROM address
+     WHERE address.username = $1) 
+     as total_page, 
+  (SELECT JSON_AGG(t.*) FROM (
+    SELECT id, address, username, district, city, created_at FROM address
+    WHERE address.username = $1
+    ORDER BY id
+    LIMIT $2
+    OFFSET $3
+  ) AS t) AS address
 `
 
 type ListAddressesParams struct {
-	Username string `json:"username"`
-	Limit    int32  `json:"limit"`
-	Offset   int32  `json:"offset"`
+	Username string      `json:"username"`
+	Limit    interface{} `json:"limit"`
+	Offset   int32       `json:"offset"`
 }
 
-func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) ([]Address, error) {
-	rows, err := q.db.QueryContext(ctx, listAddresses, arg.Username, arg.Limit, arg.Offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Address{}
-	for rows.Next() {
-		var i Address
-		if err := rows.Scan(
-			&i.ID,
-			&i.Address,
-			&i.Username,
-			&i.District,
-			&i.City,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type ListAddressesRow struct {
+	TotalPage int32           `json:"total_page"`
+	Address   json.RawMessage `json:"address"`
+}
+
+func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) (ListAddressesRow, error) {
+	row := q.db.QueryRowContext(ctx, listAddresses, arg.Username, arg.Limit, arg.Offset)
+	var i ListAddressesRow
+	err := row.Scan(&i.TotalPage, &i.Address)
+	return i, err
 }
 
 const updateAddress = `-- name: UpdateAddress :one

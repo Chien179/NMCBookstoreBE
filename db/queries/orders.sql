@@ -22,9 +22,7 @@ WHERE id = $1;
 -- name: ListOdersByUserName :many
 SELECT * FROM orders
 WHERE username = $1
-ORDER BY id
-LIMIT $2
-OFFSET $3;
+ORDER BY id;
 
 -- name: ListOders :many
 SELECT * FROM orders

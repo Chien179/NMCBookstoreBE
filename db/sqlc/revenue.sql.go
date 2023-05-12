@@ -19,14 +19,7 @@ FROM payments
 WHERE status = 'success'
 GROUP BY dates
 ORDER BY dates
-LIMIT $1
-OFFSET $2
 `
-
-type RevenueDaysParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
 
 type RevenueDaysRow struct {
 	RevenueDays    interface{} `json:"revenue_days"`
@@ -34,8 +27,8 @@ type RevenueDaysRow struct {
 	Dates          string      `json:"dates"`
 }
 
-func (q *Queries) RevenueDays(ctx context.Context, arg RevenueDaysParams) ([]RevenueDaysRow, error) {
-	rows, err := q.db.QueryContext(ctx, revenueDays, arg.Limit, arg.Offset)
+func (q *Queries) RevenueDays(ctx context.Context) ([]RevenueDaysRow, error) {
+	rows, err := q.db.QueryContext(ctx, revenueDays)
 	if err != nil {
 		return nil, err
 	}
@@ -66,14 +59,7 @@ FROM payments
 WHERE status = 'success'
 GROUP BY created_at
 ORDER BY created_at
-LIMIT $1
-OFFSET $2
 `
-
-type RevenueHoursParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
 
 type RevenueHoursRow struct {
 	RevenueDays    interface{} `json:"revenue_days"`
@@ -81,8 +67,8 @@ type RevenueHoursRow struct {
 	CreatedAt      time.Time   `json:"created_at"`
 }
 
-func (q *Queries) RevenueHours(ctx context.Context, arg RevenueHoursParams) ([]RevenueHoursRow, error) {
-	rows, err := q.db.QueryContext(ctx, revenueHours, arg.Limit, arg.Offset)
+func (q *Queries) RevenueHours(ctx context.Context) ([]RevenueHoursRow, error) {
+	rows, err := q.db.QueryContext(ctx, revenueHours)
 	if err != nil {
 		return nil, err
 	}
@@ -113,14 +99,7 @@ FROM payments
 WHERE status = 'success'
 GROUP BY year_months
 ORDER BY year_months
-LIMIT $1
-OFFSET $2
 `
-
-type RevenueMonthsParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
 
 type RevenueMonthsRow struct {
 	RevenueMonths    interface{} `json:"revenue_months"`
@@ -128,8 +107,8 @@ type RevenueMonthsRow struct {
 	YearMonths       string      `json:"year_months"`
 }
 
-func (q *Queries) RevenueMonths(ctx context.Context, arg RevenueMonthsParams) ([]RevenueMonthsRow, error) {
-	rows, err := q.db.QueryContext(ctx, revenueMonths, arg.Limit, arg.Offset)
+func (q *Queries) RevenueMonths(ctx context.Context) ([]RevenueMonthsRow, error) {
+	rows, err := q.db.QueryContext(ctx, revenueMonths)
 	if err != nil {
 		return nil, err
 	}
@@ -160,14 +139,7 @@ FROM payments
 WHERE status = 'success'
 GROUP BY year_quarters
 ORDER BY year_quarters
-LIMIT $1
-OFFSET $2
 `
-
-type RevenueQuartersParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
 
 type RevenueQuartersRow struct {
 	RevenueQuarters    interface{} `json:"revenue_quarters"`
@@ -175,8 +147,8 @@ type RevenueQuartersRow struct {
 	YearQuarters       string      `json:"year_quarters"`
 }
 
-func (q *Queries) RevenueQuarters(ctx context.Context, arg RevenueQuartersParams) ([]RevenueQuartersRow, error) {
-	rows, err := q.db.QueryContext(ctx, revenueQuarters, arg.Limit, arg.Offset)
+func (q *Queries) RevenueQuarters(ctx context.Context) ([]RevenueQuartersRow, error) {
+	rows, err := q.db.QueryContext(ctx, revenueQuarters)
 	if err != nil {
 		return nil, err
 	}
@@ -207,14 +179,7 @@ FROM payments
 WHERE status = 'success'
 GROUP BY years
 ORDER BY years
-LIMIT $1
-OFFSET $2
 `
-
-type RevenueYearsParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
 
 type RevenueYearsRow struct {
 	RevenueYears    interface{} `json:"revenue_years"`
@@ -222,8 +187,8 @@ type RevenueYearsRow struct {
 	Years           string      `json:"years"`
 }
 
-func (q *Queries) RevenueYears(ctx context.Context, arg RevenueYearsParams) ([]RevenueYearsRow, error) {
-	rows, err := q.db.QueryContext(ctx, revenueYears, arg.Limit, arg.Offset)
+func (q *Queries) RevenueYears(ctx context.Context) ([]RevenueYearsRow, error) {
+	rows, err := q.db.QueryContext(ctx, revenueYears)
 	if err != nil {
 		return nil, err
 	}

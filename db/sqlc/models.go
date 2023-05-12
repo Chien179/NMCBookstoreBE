@@ -99,15 +99,19 @@ type Review struct {
 }
 
 type Search struct {
-	ID         int64       `json:"id"`
-	BookNames  string      `json:"book_names"`
-	Price      float64     `json:"price"`
-	Author     string      `json:"author"`
-	Publisher  string      `json:"publisher"`
-	Rating     float64     `json:"rating"`
-	Genres     string      `json:"genres"`
-	Subgenres  string      `json:"subgenres"`
-	SearchsTsv interface{} `json:"searchs_tsv"`
+	ID          int64       `json:"id"`
+	Name        string      `json:"name"`
+	Price       float64     `json:"price"`
+	Image       []string    `json:"image"`
+	Description string      `json:"description"`
+	Author      string      `json:"author"`
+	Publisher   string      `json:"publisher"`
+	Quantity    int32       `json:"quantity"`
+	Rating      float64     `json:"rating"`
+	CreatedAt   time.Time   `json:"created_at"`
+	Genres      string      `json:"genres"`
+	Subgenres   string      `json:"subgenres"`
+	SearchsTsv  interface{} `json:"searchs_tsv"`
 }
 
 type Session struct {

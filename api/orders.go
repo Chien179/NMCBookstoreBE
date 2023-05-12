@@ -222,13 +222,8 @@ func (server *Server) listOrderPaid(ctx *gin.Context) {
 	}
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	arg := db.ListOdersByUserNameParams{
-		Username: authPayLoad.Username,
-		Limit:    req.PageSize,
-		Offset:   (req.PageID - 1) * req.PageSize,
-	}
 
-	orders, err := server.store.ListOdersByUserName(ctx, arg)
+	orders, err := server.store.ListOdersByUserName(ctx, authPayLoad.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -280,13 +275,8 @@ func (server *Server) listOrderCancelled(ctx *gin.Context) {
 	}
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	arg := db.ListOdersByUserNameParams{
-		Username: authPayLoad.Username,
-		Limit:    req.PageSize,
-		Offset:   (req.PageID - 1) * req.PageSize,
-	}
 
-	orders, err := server.store.ListOdersByUserName(ctx, arg)
+	orders, err := server.store.ListOdersByUserName(ctx, authPayLoad.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
