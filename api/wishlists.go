@@ -74,7 +74,7 @@ type deleteMultiBookInWishlistRequest struct {
 
 func (server *Server) deleteBookInWishlist(ctx *gin.Context) {
 	var req deleteMultiBookInWishlistRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
+	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}

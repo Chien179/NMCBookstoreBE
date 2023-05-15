@@ -3,7 +3,7 @@ module github.com/Chien179/NMCBookstoreBE
 go 1.19
 
 require (
-	github.com/gin-contrib/cors v1.4.0
+	github.com/cloudinary/cloudinary-go v1.7.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-migrate/migrate/v4 v4.15.2
@@ -30,6 +30,7 @@ require (
 	github.com/bytedance/sonic v1.8.6 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
+	github.com/creasty/defaults v1.5.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
@@ -45,6 +46,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-github/v39 v39.2.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

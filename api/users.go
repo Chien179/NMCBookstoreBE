@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -17,14 +18,14 @@ import (
 )
 
 type createUserRequest struct {
-	Username    string `json:"username" binding:"required,alphanum"`
-	Password    string `json:"password" binding:"required,min=8"`
-	Fullname    string `json:"full_name" binding:"required"`
-	Email       string `json:"email" binding:"required,email"`
-	Image       string `json:"image" binding:"required"`
-	Age         int32  `json:"age" binding:"required"`
-	Sex         string `json:"sex" binding:"required"`
-	PhoneNumber string `json:"phone_number" binding:"required"`
+	Username    string                `form:"username" binding:"required,alphanum"`
+	Password    string                `form:"password" binding:"required,min=8"`
+	Fullname    string                `form:"full_name" binding:"required"`
+	Email       string                `form:"email" binding:"required,email"`
+	Image       *multipart.FileHeader `form:"image" binding:"required"`
+	Age         int32                 `form:"age" binding:"required"`
+	Sex         string                `form:"sex" binding:"required"`
+	PhoneNumber string                `form:"phone_number" binding:"required"`
 }
 
 type UserResponse struct {
@@ -68,7 +69,7 @@ func newUserResponse(user db.User) UserResponse {
 // @Router       /signup [post]
 func (server *Server) createUser(ctx *gin.Context) {
 	var req createUserRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, ValidateCreateUserRequest(&req))
 		return
 	}
@@ -86,13 +87,19 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
+	imgUrl, err := server.uploadFile(ctx, req.Image, "NMCBookstore/Image/Users", req.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	arg := db.CreateUserTxParams{
 		CreateUserParams: db.CreateUserParams{
 			Username:    req.Username,
 			Password:    hashedPassword,
 			FullName:    req.Fullname,
 			Email:       req.Email,
-			Image:       req.Image,
+			Image:       imgUrl,
 			Age:         req.Age,
 			Sex:         req.Sex,
 			PhoneNumber: req.PhoneNumber,
@@ -245,13 +252,13 @@ func (server *Server) getUser(ctx *gin.Context) {
 }
 
 type updateUserRequest struct {
-	Fullname    string `json:"full_name"`
-	Email       string `json:"email"`
-	Image       string `json:"image"`
-	Age         int32  `json:"age"`
-	Sex         string `json:"sex"`
-	PhoneNumber string `json:"phone_number"`
-	Password    string `json:"password"`
+	Fullname    string                `form:"full_name"`
+	Email       string                `form:"email"`
+	Image       *multipart.FileHeader `form:"image"`
+	Age         int32                 `form:"age"`
+	Sex         string                `form:"sex"`
+	PhoneNumber string                `form:"phone_number"`
+	Password    string                `form:"password"`
 }
 
 // @Summary      Update user
@@ -267,7 +274,7 @@ type updateUserRequest struct {
 // @Router       /users/update [put]
 func (server *Server) updateUser(ctx *gin.Context) {
 	var req updateUserRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, ValidateUpdateUserRequest(&req))
 		return
 	}
@@ -283,10 +290,6 @@ func (server *Server) updateUser(ctx *gin.Context) {
 			String: req.Email,
 			Valid:  req.Email != "",
 		},
-		Image: sql.NullString{
-			String: req.Image,
-			Valid:  req.Image != "",
-		},
 		Age: sql.NullInt32{
 			Int32: req.Age,
 			Valid: req.Age > 0 && req.Age < 200,
@@ -299,6 +302,18 @@ func (server *Server) updateUser(ctx *gin.Context) {
 			String: req.PhoneNumber,
 			Valid:  req.PhoneNumber != "",
 		},
+	}
+
+	if req.Image != nil {
+		imgUrl, err := server.uploadFile(ctx, req.Image, "NMCBookstore/Image/Users", authPayLoad.Username)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		arg.Image = sql.NullString{
+			String: imgUrl,
+			Valid:  true,
+		}
 	}
 
 	if req.Password != "" {

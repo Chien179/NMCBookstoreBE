@@ -17,6 +17,7 @@ type Server struct {
 	tokenMaker      token.Maker
 	router          *gin.Engine
 	taskDistributor worker.TaskDistributor
+	uploader        util.MediaUpload
 }
 
 // NewServer creates a new HTTP server and setup routing.
