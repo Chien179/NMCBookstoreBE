@@ -2,20 +2,22 @@ package api
 
 import (
 	"database/sql"
+	"mime/multipart"
 	"net/http"
+	"strconv"
 
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
 	"github.com/gin-gonic/gin"
 )
 
 type createBookRequest struct {
-	Name        string   `json:"name" binding:"required"`
-	Price       float64  `json:"price" binding:"required"`
-	Image       []string `json:"image" binding:"required"`
-	Description string   `json:"description" binding:"required"`
-	Author      string   `json:"author" binding:"required"`
-	Publisher   string   `json:"publisher" binding:"required"`
-	Quantity    int32    `json:"quanlity" binding:"required"`
+	Name        string                 `form:"name" binding:"required"`
+	Price       float64                `form:"price" binding:"required"`
+	Image       []multipart.FileHeader `form:"image" binding:"required"`
+	Description string                 `form:"description" binding:"required"`
+	Author      string                 `form:"author" binding:"required"`
+	Publisher   string                 `form:"publisher" binding:"required"`
+	Quantity    int32                  `form:"quantity" binding:"required"`
 }
 
 // @Summary      Create book
@@ -30,15 +32,26 @@ type createBookRequest struct {
 // @Router       /admin/books [post]
 func (server *Server) createBook(ctx *gin.Context) {
 	var req createBookRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
+	}
+
+	var imgUrls []string
+
+	for i, img := range req.Image {
+		imgUrl, err := server.uploadFile(ctx, &img, "NMCBookstore/Image/Books/"+req.Name, req.Name+" "+strconv.Itoa(int(i)))
+		if err != nil {
+			return
+		} else {
+			imgUrls = append(imgUrls, imgUrl)
+		}
 	}
 
 	arg := db.CreateBookParams{
 		Name:        req.Name,
 		Price:       req.Price,
-		Image:       req.Image,
+		Image:       imgUrls,
 		Description: req.Description,
 		Author:      req.Author,
 		Publisher:   req.Publisher,
@@ -90,13 +103,13 @@ func (server *Server) getBook(ctx *gin.Context) {
 }
 
 type updateBookData struct {
-	Name        string   `json:"name"`
-	Price       float64  `json:"price"`
-	Image       []string `json:"image" binding:"required"`
-	Description string   `json:"description"`
-	Author      string   `json:"author"`
-	Publisher   string   `json:"publisher"`
-	Quantity    int32    `json:"quantity"`
+	Name        string                 `form:"name"`
+	Price       float64                `form:"price"`
+	Image       []multipart.FileHeader `form:"image" binding:"required"`
+	Description string                 `form:"description"`
+	Author      string                 `form:"author"`
+	Publisher   string                 `form:"publisher"`
+	Quantity    int32                  `form:"quantity"`
 }
 
 type updateBookRequest struct {
@@ -123,7 +136,7 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctx.ShouldBindJSON(&req.updateBookData); err != nil {
+	if err := ctx.ShouldBind(&req.updateBookData); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -138,6 +151,17 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		return
 	}
 
+	var imgUrls []string
+
+	for i, img := range req.Image {
+		imgUrl, err := server.uploadFile(ctx, &img, "NMCBookstore/Image/Books/"+req.Name, req.Name+" "+strconv.Itoa(int(i)))
+		if err != nil {
+			return
+		} else {
+			imgUrls = append(imgUrls, imgUrl)
+		}
+	}
+
 	arg := db.UpdateBookParams{
 		ID: book.ID,
 		Name: sql.NullString{
@@ -148,7 +172,7 @@ func (server *Server) updateBook(ctx *gin.Context) {
 			Float64: req.updateBookData.Price,
 			Valid:   req.updateBookData.Price > -1,
 		},
-		Image: req.updateBookData.Image,
+		Image: imgUrls,
 		Description: sql.NullString{
 			String: req.updateBookData.Description,
 			Valid:  req.updateBookData.Description != "",

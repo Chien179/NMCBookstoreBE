@@ -9,7 +9,6 @@ import (
 
 func (server *Server) uploadFile(ctx *gin.Context, fileHeader *multipart.FileHeader, filePath string, fileName string) (string, error) {
 	file, err := fileHeader.Open()
-
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return "", err

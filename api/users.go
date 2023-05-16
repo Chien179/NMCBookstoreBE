@@ -22,7 +22,7 @@ type createUserRequest struct {
 	Password    string                `form:"password" binding:"required,min=8"`
 	Fullname    string                `form:"full_name" binding:"required"`
 	Email       string                `form:"email" binding:"required,email"`
-	Image       *multipart.FileHeader `form:"image" binding:"required"`
+	Image       *multipart.FileHeader `form:"image"`
 	Age         int32                 `form:"age" binding:"required"`
 	Sex         string                `form:"sex" binding:"required"`
 	PhoneNumber string                `form:"phone_number" binding:"required"`
@@ -70,7 +70,7 @@ func newUserResponse(user db.User) UserResponse {
 func (server *Server) createUser(ctx *gin.Context) {
 	var req createUserRequest
 	if err := ctx.ShouldBind(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, ValidateCreateUserRequest(&req))
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
@@ -79,18 +79,21 @@ func (server *Server) createUser(ctx *gin.Context) {
 		if pqErr, ok := err.(*pq.Error); ok {
 			switch pqErr.Code.Name() {
 			case "unique_violation":
-				ctx.JSON(http.StatusForbidden, err)
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
 				return
 			}
 		}
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	imgUrl, err := server.uploadFile(ctx, req.Image, "NMCBookstore/Image/Users", req.Username)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
+	imgUrl := "https://res.cloudinary.com/doqhasjec/image/upload/v1681990980/samples/NMC%20Bookstore/Default_ct9xzk.png"
+
+	if req.Image != nil {
+		imgUrl, err = server.uploadFile(ctx, req.Image, "NMCBookstore/Image/Users", req.Username)
+		if err != nil {
+			return
+		}
 	}
 
 	arg := db.CreateUserTxParams{
@@ -121,7 +124,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 
 	user, err := server.store.CreateUserTx(ctx, arg)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
@@ -307,7 +310,6 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	if req.Image != nil {
 		imgUrl, err := server.uploadFile(ctx, req.Image, "NMCBookstore/Image/Users", authPayLoad.Username)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 		arg.Image = sql.NullString{
@@ -375,6 +377,13 @@ func ValidateCreateUserRequest(req *createUserRequest) (errs []errorCustom) {
 	if err := val.ValidateUsername(req.Username); err != nil {
 		errs = append(errs, errorCustom{
 			"username",
+			errorResponse(err),
+		})
+	}
+
+	if err := val.ValidatePassword(req.Password); err != nil {
+		errs = append(errs, errorCustom{
+			"password",
 			errorResponse(err),
 		})
 	}

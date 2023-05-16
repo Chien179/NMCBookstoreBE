@@ -32,6 +32,7 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 		store:           store,
 		tokenMaker:      tokenMaker,
 		taskDistributor: taskDistributor,
+		uploader:        util.NewMediaUpload(&config),
 	}
 
 	server.setupRouter()
