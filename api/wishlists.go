@@ -69,7 +69,7 @@ func (server *Server) addToWishlist(ctx *gin.Context) {
 // @failure		 500
 // @Router       /users/add_to_wishlist/{id} [delete]
 type deleteMultiBookInWishlistRequest struct {
-	IDs []int64 `form:"IDs" binding:"required"`
+	IDs []int64 `form:"ids" binding:"required"`
 }
 
 func (server *Server) deleteBookInWishlist(ctx *gin.Context) {

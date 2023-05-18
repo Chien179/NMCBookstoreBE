@@ -109,8 +109,8 @@ type Search struct {
 	Quantity    int32       `json:"quantity"`
 	Rating      float64     `json:"rating"`
 	CreatedAt   time.Time   `json:"created_at"`
-	Genres      string      `json:"genres"`
-	Subgenres   string      `json:"subgenres"`
+	GenresID    int64       `json:"genres_id"`
+	SubgenresID int64       `json:"subgenres_id"`
 	SearchsTsv  interface{} `json:"searchs_tsv"`
 }
 

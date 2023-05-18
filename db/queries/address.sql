@@ -3,18 +3,24 @@ SELECT * FROM address
 WHERE id = $1 LIMIT 1;
 
 -- name: ListAddresses :one
-SELECT
-  (SELECT (COUNT(*)/sqlc.arg('limit'))
-     FROM address
-     WHERE address.username = $1) 
-     as total_page, 
-  (SELECT JSON_AGG(t.*) FROM (
-    SELECT * FROM address
-    WHERE address.username = $1
-    ORDER BY id
-    LIMIT sqlc.arg('limit')
-    OFFSET sqlc.arg('offset')
-  ) AS t) AS address;
+(SELECT t.total_page, JSON_AGG(json_build_object
+    ('id',id,
+    'address',address,
+    'username',username,
+    'district',district,
+    'city',city,
+    'created_at',created_at)
+    ) AS addresses
+	FROM (
+      SELECT 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/sqlc.arg('limit')) AS total_page, * 
+      FROM address
+      WHERE address.username = $1
+      ORDER BY id
+      LIMIT sqlc.arg('limit')
+      OFFSET sqlc.arg('offset')
+    ) AS t
+    GROUP BY t.total_page);
 
 -- name: CreateAddress :one
 INSERT INTO address (

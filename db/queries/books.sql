@@ -3,16 +3,26 @@ SELECT * FROM books
 WHERE id = $1 LIMIT 1;
 
 -- name: ListBooks :one
-SELECT
-    (SELECT (COUNT(*)/sqlc.arg('limit'))
-     FROM books) 
-     as total_page, 
-    (SELECT JSON_AGG(t.*) FROM (
-        SELECT * FROM books
-        ORDER BY id
-        LIMIT sqlc.arg('limit')
-        OFFSET sqlc.arg('offset')
-    ) AS t) AS books ;
+SELECT t.total_page, JSON_AGG(json_build_object
+    ('id',t.id,
+    'name',t.name,
+    'price',t.price,
+    'image',t.image,
+    'description',t.description,
+    'author',t.author,
+    'publisher',t.publisher,
+    'quantity',t.quantity,
+    'created_at',t.created_at)
+    ) AS books
+	FROM (
+      SELECT 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/sqlc.arg('limit')) AS total_page, * 
+      FROM books
+      ORDER BY id
+      LIMIT sqlc.arg('limit')
+      OFFSET sqlc.arg('offset')
+    ) AS t
+    GROUP BY t.total_page;
 
 -- name: ListAllBooks :many
 SELECT * FROM books

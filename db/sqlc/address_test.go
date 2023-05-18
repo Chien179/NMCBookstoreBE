@@ -123,7 +123,7 @@ func TestListAddresses(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, addresss)
 
-	for _, address := range addresss.Address {
+	for _, address := range addresss.Addresses {
 		require.NotEmpty(t, address)
 	}
 }

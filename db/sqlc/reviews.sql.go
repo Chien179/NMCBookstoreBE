@@ -78,28 +78,34 @@ func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
 }
 
 const listReviewsByBookID = `-- name: ListReviewsByBookID :one
-SELECT
-  (SELECT (COUNT(*)/$2)
-     FROM reviews
-     WHERE reviews.books_id = $1) 
-     as total_page, 
-    (SELECT JSON_AGG(t.*) FROM (
-      SELECT id, username, books_id, comments, rating, created_at FROM reviews
+SELECT t.total_page, JSON_AGG(json_build_object
+    ('id',id,
+    'username',username,
+    'books_id',books_id,
+    'comments',comments,
+    'rating',rating,
+    'created_at',created_at)
+    ) AS reviews
+	FROM (
+      SELECT 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$2) AS total_page, id, username, books_id, comments, rating, created_at 
+      FROM reviews
       WHERE reviews.books_id = $1
       ORDER BY id
       LIMIT $2
       OFFSET $3
-    )AS t) AS reviews
+    ) AS t
+    GROUP BY t.total_page
 `
 
 type ListReviewsByBookIDParams struct {
-	BooksID int64       `json:"books_id"`
-	Limit   interface{} `json:"limit"`
-	Offset  int32       `json:"offset"`
+	BooksID int64 `json:"books_id"`
+	Limit   int32 `json:"limit"`
+	Offset  int32 `json:"offset"`
 }
 
 type ListReviewsByBookIDRow struct {
-	TotalPage int32           `json:"total_page"`
+	TotalPage float64         `json:"total_page"`
 	Reviews   json.RawMessage `json:"reviews"`
 }
 

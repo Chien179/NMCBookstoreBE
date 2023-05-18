@@ -3,18 +3,24 @@ SELECT * FROM reviews
 WHERE id = $1 LIMIT 1;
 
 -- name: ListReviewsByBookID :one
-SELECT
-  (SELECT (COUNT(*)/sqlc.arg('limit'))
-     FROM reviews
-     WHERE reviews.books_id = $1) 
-     as total_page, 
-    (SELECT JSON_AGG(t.*) FROM (
-      SELECT * FROM reviews
+SELECT t.total_page, JSON_AGG(json_build_object
+    ('id',id,
+    'username',username,
+    'books_id',books_id,
+    'comments',comments,
+    'rating',rating,
+    'created_at',created_at)
+    ) AS reviews
+	FROM (
+      SELECT 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/sqlc.arg('limit')) AS total_page, * 
+      FROM reviews
       WHERE reviews.books_id = $1
       ORDER BY id
       LIMIT sqlc.arg('limit')
       OFFSET sqlc.arg('offset')
-    )AS t) AS reviews;
+    ) AS t
+    GROUP BY t.total_page;
 
 -- name: CreateReview :one
 INSERT INTO reviews (

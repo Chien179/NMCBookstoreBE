@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/cloudinary/cloudinary-go v1.7.0
+	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-migrate/migrate/v4 v4.15.2

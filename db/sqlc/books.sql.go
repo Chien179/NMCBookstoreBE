@@ -137,25 +137,35 @@ func (q *Queries) ListAllBooks(ctx context.Context) ([]Book, error) {
 }
 
 const listBooks = `-- name: ListBooks :one
-SELECT
-    (SELECT (COUNT(*)/$1)
-     FROM books) 
-     as total_page, 
-    (SELECT JSON_AGG(t.*) FROM (
-        SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
-        ORDER BY id
-        LIMIT $1
-        OFFSET $2
-    ) AS t) AS books
+SELECT t.total_page, JSON_AGG(json_build_object
+    ('id',t.id,
+    'name',t.name,
+    'price',t.price,
+    'image',t.image,
+    'description',t.description,
+    'author',t.author,
+    'publisher',t.publisher,
+    'quantity',t.quantity,
+    'created_at',t.created_at)
+    ) AS books
+	FROM (
+      SELECT 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$1) AS total_page, id, name, price, image, description, author, publisher, quantity, created_at, rating 
+      FROM books
+      ORDER BY id
+      LIMIT $1
+      OFFSET $2
+    ) AS t
+    GROUP BY t.total_page
 `
 
 type ListBooksParams struct {
-	Limit  interface{} `json:"limit"`
-	Offset int32       `json:"offset"`
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
 }
 
 type ListBooksRow struct {
-	TotalPage int32           `json:"total_page"`
+	TotalPage float64         `json:"total_page"`
 	Books     json.RawMessage `json:"books"`
 }
 

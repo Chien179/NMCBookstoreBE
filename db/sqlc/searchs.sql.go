@@ -7,16 +7,25 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 )
 
 const fullSearch = `-- name: FullSearch :one
-SELECT
-    (SELECT (COUNT(*)/$1)
-        FROM searchs) 
-        as total_page, 
-    (SELECT JSON_AGG(t.*) FROM (
+SELECT t.total_page, JSON_AGG(json_build_object
+	('id',id,
+	'name',name,
+    'price',price,
+    'image',image,
+    'description',description,
+    'author',author,
+    'publisher',publisher,
+    'quantity',quantity,
+    'rating',rating,
+    'created_at',created_at)
+	) AS books FROM (
         SELECT 
+        	CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$1) AS total_page,
             id,
             name,
             price,
@@ -26,29 +35,35 @@ SELECT
             publisher,
             quantity,
             rating,
-            created_at
+            created_at,
+            ts_rank(searchs_tsv, plainto_tsquery($2)) as ts_rank
         FROM searchs
-        WHERE searchs_tsv @@ plainto_tsquery($2)
-            AND searchs.price BETWEEN $3
-            AND $4
-            AND searchs.rating >= $5
+        WHERE
+            searchs.price BETWEEN $3 AND $4
+            AND (searchs_tsv @@ plainto_tsquery($2) OR $2 IS NULL)
+            AND (searchs.rating >= $5 OR $5 IS NULL)
+            AND (searchs.genres_id = $6 OR $6 IS NULL)
+            AND (searchs.subgenres_id = $7 OR $7 IS NULL)
         ORDER BY ts_rank DESC
         LIMIT $1
-        OFFSET $6
-    ) AS t) AS books
+        OFFSET $8
+        ) AS t
+    GROUP BY t.total_page
 `
 
 type FullSearchParams struct {
-	Limit    interface{} `json:"limit"`
-	Text     string      `json:"text"`
-	MinPrice float64     `json:"min_price"`
-	MaxPrice float64     `json:"max_price"`
-	Rating   float64     `json:"rating"`
-	Offset   int32       `json:"offset"`
+	Limit       int32           `json:"limit"`
+	Text        sql.NullString  `json:"text"`
+	MinPrice    float64         `json:"min_price"`
+	MaxPrice    float64         `json:"max_price"`
+	Rating      sql.NullFloat64 `json:"rating"`
+	GenresID    sql.NullInt64   `json:"genres_id"`
+	SubgenresID sql.NullInt64   `json:"subgenres_id"`
+	Offset      int32           `json:"offset"`
 }
 
 type FullSearchRow struct {
-	TotalPage int32           `json:"total_page"`
+	TotalPage float64         `json:"total_page"`
 	Books     json.RawMessage `json:"books"`
 }
 
@@ -59,6 +74,8 @@ func (q *Queries) FullSearch(ctx context.Context, arg FullSearchParams) (FullSea
 		arg.MinPrice,
 		arg.MaxPrice,
 		arg.Rating,
+		arg.GenresID,
+		arg.SubgenresID,
 		arg.Offset,
 	)
 	var i FullSearchRow

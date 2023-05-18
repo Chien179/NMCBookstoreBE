@@ -1,36 +1,5 @@
 CREATE EXTENSION unaccent;
 
-CREATE OR REPLACE FUNCTION create_searchs_table_func()
-RETURNS VOID
-LANGUAGE plpgsql AS $$
-BEGIN
-	DROP TABLE IF EXISTS "searchs" CASCADE;
-	EXECUTE format('
-		CREATE TABLE "searchs" AS
-		SELECT
-			b.id AS id,
-			b."name" AS name,
-			b.price AS price,
-			b.image AS image,
-			b.description AS description,
-			b.author AS author,
-			b.publisher AS publisher,
-			b.quantity AS quantity,
-			b.rating AS rating,
-			b.created_at AS created_at,
-			g."name" AS genres,
-			s."name" AS subgenres
-		FROM
-			books b
-			INNER JOIN books_genres bg ON b.id = bg.id
-			INNER JOIN books_subgenres bs ON b.id = bs.books_id
-			INNER JOIN genres g ON bg.genres_id = g.id
-			INNER JOIN subgenres s ON bs.subgenres_id = s.id
-	');
-	
-	ALTER TABLE searchs ADD COLUMN searchs_tsv tsvector;
-END $$;
-
 CREATE TABLE "searchs" AS
 		SELECT
 			b.id AS id,
@@ -43,8 +12,8 @@ CREATE TABLE "searchs" AS
 			b.quantity AS quantity,
 			b.rating AS rating,
 			b.created_at AS created_at,
-			g."name" AS genres,
-			s."name" AS subgenres
+			g.id AS genres_id,
+			s.id AS subgenres_id
 		FROM
 			books b
 			INNER JOIN books_genres bg ON b.id = bg.id
@@ -58,14 +27,34 @@ CREATE OR REPLACE FUNCTION update_searchs_table_trigger_func()
 RETURNS TRIGGER
 LANGUAGE plpgsql AS $$
 BEGIN
-	PERFORM create_searchs_table_func();
+	DROP TABLE IF EXISTS "searchs" CASCADE;
+	CREATE TABLE "searchs" AS
+		SELECT
+			b.id AS id,
+			b."name" AS name,
+			b.price AS price,
+			b.image AS image,
+			b.description AS description,
+			b.author AS author,
+			b.publisher AS publisher,
+			b.quantity AS quantity,
+			b.rating AS rating,
+			b.created_at AS created_at,
+			g.id AS genres_id,
+			s.id AS subgenres_id
+		FROM
+			books b
+			INNER JOIN books_genres bg ON b.id = bg.id
+			INNER JOIN books_subgenres bs ON b.id = bs.books_id
+			INNER JOIN genres g ON bg.genres_id = g.id
+			INNER JOIN subgenres s ON bs.subgenres_id = s.id;
+	
+	ALTER TABLE searchs ADD COLUMN searchs_tsv tsvector;
 	
 	UPDATE searchs
 	SET
 		searchs_tsv =
 			setweight(to_tsvector(coalesce(unaccent(name))), 'A') ||
-			setweight(to_tsvector(coalesce(unaccent(genres))), 'A') || 
-			setweight(to_tsvector(coalesce(unaccent(subgenres))), 'A') ||
 			setweight(to_tsvector(coalesce(unaccent(author))), 'B') || 
 			setweight(to_tsvector(coalesce(unaccent(publisher))), 'B');
 			

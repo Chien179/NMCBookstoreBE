@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
@@ -8,14 +9,14 @@ import (
 )
 
 type FullSearchRequest struct {
-	PageID    int32   `form:"page_id" binding:"required,min=1"`
-	PageSize  int32   `form:"page_size" binding:"required,min=24,max=100"`
-	Text      string  `form:"text"`
-	Genres    string  `form:"genres"`
-	Subgenres string  `form:"sub_genres"`
-	MinPrice  float64 `form:"min_price"`
-	MaxPrice  float64 `form:"max_price"`
-	Rating    float64 `form:"rating"`
+	PageID      int32   `form:"page_id" binding:"required,min=1"`
+	PageSize    int32   `form:"page_size" binding:"required,min=24,max=100"`
+	Text        string  `form:"text"`
+	GenresID    int64   `form:"genres_id"`
+	SubgenresID int64   `form:"subgenres_id"`
+	MinPrice    float64 `form:"min_price"`
+	MaxPrice    float64 `form:"max_price"`
+	Rating      float64 `form:"rating"`
 }
 
 func (server *Server) fullSearch(ctx *gin.Context) {
@@ -25,23 +26,27 @@ func (server *Server) fullSearch(ctx *gin.Context) {
 		return
 	}
 
-	text := req.Text
-
-	if req.Genres != "" {
-		text = text + " " + req.Genres
-	}
-
-	if req.Subgenres != "" {
-		text = " " + req.Subgenres
-	}
-
 	arg := db.FullSearchParams{
-		Limit:    req.PageSize,
-		Offset:   (req.PageID - 1) * req.PageSize,
-		Text:     text,
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+		Text: sql.NullString{
+			String: req.Text,
+			Valid:  req.Text != "",
+		},
+		GenresID: sql.NullInt64{
+			Int64: req.GenresID,
+			Valid: req.GenresID > 0,
+		},
+		SubgenresID: sql.NullInt64{
+			Int64: req.SubgenresID,
+			Valid: req.SubgenresID > 0,
+		},
 		MinPrice: req.MinPrice,
 		MaxPrice: req.MaxPrice,
-		Rating:   req.Rating,
+		Rating: sql.NullFloat64{
+			Float64: req.Rating,
+			Valid:   req.Rating >= 0,
+		},
 	}
 
 	results, err := server.store.FullSearch(ctx, arg)

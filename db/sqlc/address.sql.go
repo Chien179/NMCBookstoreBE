@@ -79,35 +79,41 @@ func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
 }
 
 const listAddresses = `-- name: ListAddresses :one
-SELECT
-  (SELECT (COUNT(*)/$2)
-     FROM address
-     WHERE address.username = $1) 
-     as total_page, 
-  (SELECT JSON_AGG(t.*) FROM (
-    SELECT id, address, username, district, city, created_at FROM address
-    WHERE address.username = $1
-    ORDER BY id
-    LIMIT $2
-    OFFSET $3
-  ) AS t) AS address
+(SELECT t.total_page, JSON_AGG(json_build_object
+    ('id',id,
+    'address',address,
+    'username',username,
+    'district',district,
+    'city',city,
+    'created_at',created_at)
+    ) AS addresses
+	FROM (
+      SELECT 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$2) AS total_page, id, address, username, district, city, created_at 
+      FROM address
+      WHERE address.username = $1
+      ORDER BY id
+      LIMIT $2
+      OFFSET $3
+    ) AS t
+    GROUP BY t.total_page)
 `
 
 type ListAddressesParams struct {
-	Username string      `json:"username"`
-	Limit    interface{} `json:"limit"`
-	Offset   int32       `json:"offset"`
+	Username string `json:"username"`
+	Limit    int32  `json:"limit"`
+	Offset   int32  `json:"offset"`
 }
 
 type ListAddressesRow struct {
-	TotalPage int32           `json:"total_page"`
-	Address   json.RawMessage `json:"address"`
+	TotalPage float64         `json:"total_page"`
+	Addresses json.RawMessage `json:"addresses"`
 }
 
 func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) (ListAddressesRow, error) {
 	row := q.db.QueryRowContext(ctx, listAddresses, arg.Username, arg.Limit, arg.Offset)
 	var i ListAddressesRow
-	err := row.Scan(&i.TotalPage, &i.Address)
+	err := row.Scan(&i.TotalPage, &i.Addresses)
 	return i, err
 }
 

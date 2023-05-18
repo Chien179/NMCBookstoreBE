@@ -2,6 +2,7 @@ package api
 
 import (
 	docs "github.com/Chien179/NMCBookstoreBE/docs"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
@@ -19,6 +20,7 @@ func (server *Server) setupRouter() {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	router.Use(cors.Default())
 	server.router = router
 }
 
