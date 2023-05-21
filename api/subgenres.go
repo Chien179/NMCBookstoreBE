@@ -176,3 +176,13 @@ func (server *Server) listSubgenre(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, subgenres)
 }
+
+func (server *Server) listSubgenresNoticeable(ctx *gin.Context) {
+	fiveSubgenres, err := server.store.ListSubgenresNoticeable(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, fiveSubgenres)
+}

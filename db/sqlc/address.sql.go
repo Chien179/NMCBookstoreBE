@@ -15,35 +15,35 @@ const createAddress = `-- name: CreateAddress :one
 INSERT INTO address (
   username,
   address,
-  district,
-  city
+  district_id,
+  city_id
 ) VALUES (
   $1, $2, $3, $4
 )
-RETURNING id, address, username, district, city, created_at
+RETURNING id, address, username, city_id, district_id, created_at
 `
 
 type CreateAddressParams struct {
-	Username string `json:"username"`
-	Address  string `json:"address"`
-	District string `json:"district"`
-	City     string `json:"city"`
+	Username   string `json:"username"`
+	Address    string `json:"address"`
+	DistrictID int64  `json:"district_id"`
+	CityID     int64  `json:"city_id"`
 }
 
 func (q *Queries) CreateAddress(ctx context.Context, arg CreateAddressParams) (Address, error) {
 	row := q.db.QueryRowContext(ctx, createAddress,
 		arg.Username,
 		arg.Address,
-		arg.District,
-		arg.City,
+		arg.DistrictID,
+		arg.CityID,
 	)
 	var i Address
 	err := row.Scan(
 		&i.ID,
 		&i.Address,
 		&i.Username,
-		&i.District,
-		&i.City,
+		&i.CityID,
+		&i.DistrictID,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -60,7 +60,7 @@ func (q *Queries) DeleteAddress(ctx context.Context, id int64) error {
 }
 
 const getAddress = `-- name: GetAddress :one
-SELECT id, address, username, district, city, created_at FROM address
+SELECT id, address, username, city_id, district_id, created_at FROM address
 WHERE id = $1 LIMIT 1
 `
 
@@ -71,8 +71,8 @@ func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
 		&i.ID,
 		&i.Address,
 		&i.Username,
-		&i.District,
-		&i.City,
+		&i.CityID,
+		&i.DistrictID,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -83,13 +83,11 @@ const listAddresses = `-- name: ListAddresses :one
     ('id',id,
     'address',address,
     'username',username,
-    'district',district,
-    'city',city,
     'created_at',created_at)
     ) AS addresses
 	FROM (
       SELECT 
-        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$2) AS total_page, id, address, username, district, city, created_at 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$2) AS total_page, id, address, username, city_id, district_id, created_at 
       FROM address
       WHERE address.username = $1
       ORDER BY id
@@ -120,24 +118,24 @@ func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) (L
 const updateAddress = `-- name: UpdateAddress :one
 UPDATE address
 SET  address = COALESCE($1, address),
-  district = COALESCE($2, district),
-  city = COALESCE($3, city)
+  district_id = COALESCE($2, district_id),
+  city_id = COALESCE($3, city_id)
 WHERE id = $4
-RETURNING id, address, username, district, city, created_at
+RETURNING id, address, username, city_id, district_id, created_at
 `
 
 type UpdateAddressParams struct {
-	Address  sql.NullString `json:"address"`
-	District sql.NullString `json:"district"`
-	City     sql.NullString `json:"city"`
-	ID       int64          `json:"id"`
+	Address    sql.NullString `json:"address"`
+	DistrictID sql.NullInt64  `json:"district_id"`
+	CityID     sql.NullInt64  `json:"city_id"`
+	ID         int64          `json:"id"`
 }
 
 func (q *Queries) UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error) {
 	row := q.db.QueryRowContext(ctx, updateAddress,
 		arg.Address,
-		arg.District,
-		arg.City,
+		arg.DistrictID,
+		arg.CityID,
 		arg.ID,
 	)
 	var i Address
@@ -145,8 +143,8 @@ func (q *Queries) UpdateAddress(ctx context.Context, arg UpdateAddressParams) (A
 		&i.ID,
 		&i.Address,
 		&i.Username,
-		&i.District,
-		&i.City,
+		&i.CityID,
+		&i.DistrictID,
 		&i.CreatedAt,
 	)
 	return i, err

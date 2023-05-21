@@ -44,12 +44,31 @@ Table address as A{
   id bigserial [pk, increment]
   address varchar [not null]
   username varchar [ref: > U.username, not null]
-  district varchar [not null]
-  city varchar [not null]
+  city_id bigserial [ref: > C.id, not null]
+  district_id bigserial [ref: > D.id, not null]
   created_at timestamptz [not null, default:"now()"]
   
   indexes{
     username
+    city_id
+    district_id
+    (username, city_id, district_id)
+  }
+}
+
+Table cities as C {
+  id bigserial [pk]
+  name varchar [not null]
+  created_at timestamptz [not null, default:"now()"]
+}
+
+Table districts as D {
+  id bigserial [pk]
+  city_id bigserial [ref: > C.id, not null]
+  name varchar [not null]
+  created_at timestamptz [not null, default:"now()"]
+  indexes{
+    city_id
   }
 }
 

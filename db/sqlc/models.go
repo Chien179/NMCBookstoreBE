@@ -11,12 +11,12 @@ import (
 )
 
 type Address struct {
-	ID        int64     `json:"id"`
-	Address   string    `json:"address"`
-	Username  string    `json:"username"`
-	District  string    `json:"district"`
-	City      string    `json:"city"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         int64     `json:"id"`
+	Address    string    `json:"address"`
+	Username   string    `json:"username"`
+	CityID     int64     `json:"city_id"`
+	DistrictID int64     `json:"district_id"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
 type Book struct {
@@ -53,6 +53,19 @@ type Cart struct {
 	CreatedAt time.Time `json:"created_at"`
 	Amount    int32     `json:"amount"`
 	Total     float64   `json:"total"`
+}
+
+type City struct {
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type District struct {
+	ID        int64     `json:"id"`
+	CityID    int64     `json:"city_id"`
+	Name      string    `json:"name"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Genre struct {

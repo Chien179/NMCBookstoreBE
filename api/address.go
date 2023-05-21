@@ -12,9 +12,9 @@ import (
 )
 
 type createAddressRequest struct {
-	Address  string `json:"address" binding:"required"`
-	District string `json:"district" binding:"required"`
-	City     string `json:"city" binding:"required"`
+	Address    string `json:"address" binding:"required"`
+	DistrictID int64  `json:"district_id" binding:"required"`
+	CityID     int64  `json:"city_id" binding:"required"`
 }
 
 // @Summary      Create address
@@ -37,10 +37,10 @@ func (server *Server) createAddress(ctx *gin.Context) {
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.CreateAddressParams{
-		Username: authPayLoad.Username,
-		Address:  req.Address,
-		District: req.District,
-		City:     req.City,
+		Username:   authPayLoad.Username,
+		Address:    req.Address,
+		DistrictID: req.DistrictID,
+		CityID:     req.CityID,
 	}
 
 	address, err := server.store.CreateAddress(ctx, arg)
@@ -104,9 +104,9 @@ func (server *Server) getAddress(ctx *gin.Context) {
 }
 
 type updateAddressData struct {
-	Address  string `json:"address"`
-	District string `json:"district"`
-	City     string `json:"city"`
+	Address    string `json:"address"`
+	DistrictID int64  `json:"district_id" binding:"required"`
+	CityID     int64  `json:"city_id" binding:"required"`
 }
 
 type updateAddressRequest struct {
@@ -162,13 +162,13 @@ func (server *Server) updateAddress(ctx *gin.Context) {
 			String: req.updateAddressData.Address,
 			Valid:  req.updateAddressData.Address != "",
 		},
-		District: sql.NullString{
-			String: req.updateAddressData.District,
-			Valid:  req.updateAddressData.District != "",
+		DistrictID: sql.NullInt64{
+			Int64: req.updateAddressData.DistrictID,
+			Valid: req.updateAddressData.DistrictID != address.DistrictID,
 		},
-		City: sql.NullString{
-			String: req.updateAddressData.City,
-			Valid:  req.updateAddressData.District != "",
+		CityID: sql.NullInt64{
+			Int64: req.updateAddressData.CityID,
+			Valid: req.updateAddressData.CityID != address.CityID,
 		},
 	}
 

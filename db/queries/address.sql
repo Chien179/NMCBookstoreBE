@@ -7,8 +7,6 @@ WHERE id = $1 LIMIT 1;
     ('id',id,
     'address',address,
     'username',username,
-    'district',district,
-    'city',city,
     'created_at',created_at)
     ) AS addresses
 	FROM (
@@ -26,8 +24,8 @@ WHERE id = $1 LIMIT 1;
 INSERT INTO address (
   username,
   address,
-  district,
-  city
+  district_id,
+  city_id
 ) VALUES (
   $1, $2, $3, $4
 )
@@ -40,7 +38,7 @@ WHERE id = $1;
 -- name: UpdateAddress :one
 UPDATE address
 SET  address = COALESCE(sqlc.narg(address), address),
-  district = COALESCE(sqlc.narg(district), district),
-  city = COALESCE(sqlc.narg(city), city)
+  district_id = COALESCE(sqlc.narg(district_id), district_id),
+  city_id = COALESCE(sqlc.narg(city_id), city_id)
 WHERE id = sqlc.arg(id)
 RETURNING *;

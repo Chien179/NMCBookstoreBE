@@ -11,12 +11,8 @@ import (
 )
 
 const createSubgenre = `-- name: CreateSubgenre :one
-INSERT INTO subgenres (
-    genres_id,
-    name
-) VALUES (
-  $1, $2
-)
+INSERT INTO subgenres (genres_id, name)
+VALUES ($1, $2)
 RETURNING id, genres_id, name, created_at
 `
 
@@ -48,8 +44,10 @@ func (q *Queries) DeleteSubgenre(ctx context.Context, id int64) error {
 }
 
 const getSubgenre = `-- name: GetSubgenre :one
-SELECT id, genres_id, name, created_at FROM subgenres
-WHERE id = $1 LIMIT 1
+SELECT id, genres_id, name, created_at
+FROM subgenres
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetSubgenre(ctx context.Context, id int64) (Subgenre, error) {
@@ -65,7 +63,8 @@ func (q *Queries) GetSubgenre(ctx context.Context, id int64) (Subgenre, error) {
 }
 
 const listSubgenres = `-- name: ListSubgenres :many
-SELECT id, genres_id, name, created_at FROM subgenres
+SELECT id, genres_id, name, created_at
+FROM subgenres
 WHERE genres_id = $1
 ORDER BY id
 `
@@ -98,10 +97,56 @@ func (q *Queries) ListSubgenres(ctx context.Context, genresID int64) ([]Subgenre
 	return items, nil
 }
 
+const listSubgenresNoticeable = `-- name: ListSubgenresNoticeable :many
+SELECT subgenres.id,
+  subgenres.name,
+  subgenres.genres_id,
+  COUNT(subgenres.id) AS amount
+FROM subgenres
+  INNER JOIN books_subgenres ON subgenres.id = books_subgenres.subgenres_id
+GROUP BY subgenres.id
+ORDER BY amount DESC
+LIMIT 6
+`
+
+type ListSubgenresNoticeableRow struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	GenresID int64  `json:"genres_id"`
+	Amount   int64  `json:"amount"`
+}
+
+func (q *Queries) ListSubgenresNoticeable(ctx context.Context) ([]ListSubgenresNoticeableRow, error) {
+	rows, err := q.db.QueryContext(ctx, listSubgenresNoticeable)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListSubgenresNoticeableRow{}
+	for rows.Next() {
+		var i ListSubgenresNoticeableRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.GenresID,
+			&i.Amount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateSubgenre = `-- name: UpdateSubgenre :one
 UPDATE subgenres
-SET 
-  genres_id = COALESCE($1, genres_id),
+SET genres_id = COALESCE($1, genres_id),
   name = COALESCE($2, name)
 WHERE id = $3
 RETURNING id, genres_id, name, created_at

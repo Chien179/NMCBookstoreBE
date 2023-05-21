@@ -12,10 +12,10 @@ import (
 
 func createRandomAddress(t *testing.T, user User) Address {
 	arg := CreateAddressParams{
-		Username: user.Username,
-		Address:  util.RandomString(15),
-		District: util.RandomString(6),
-		City:     util.RandomString(6),
+		Username:   user.Username,
+		Address:    util.RandomString(15),
+		DistrictID: util.RandomInt64(1, 10),
+		CityID:     util.RandomInt64(1, 10),
 	}
 
 	address, err := testQueries.CreateAddress(context.Background(), arg)
@@ -24,8 +24,8 @@ func createRandomAddress(t *testing.T, user User) Address {
 
 	require.Equal(t, arg.Username, address.Username)
 	require.Equal(t, arg.Address, address.Address)
-	require.Equal(t, arg.District, address.District)
-	require.Equal(t, arg.City, address.City)
+	require.Equal(t, arg.DistrictID, address.DistrictID)
+	require.Equal(t, arg.CityID, address.CityID)
 
 	require.NotZero(t, address.ID)
 	require.NotZero(t, address.CreatedAt)
@@ -49,8 +49,8 @@ func TestGetAddress(t *testing.T) {
 	require.Equal(t, address1.ID, address2.ID)
 	require.Equal(t, address1.Username, address2.Username)
 	require.Equal(t, address1.Address, address2.Address)
-	require.Equal(t, address1.District, address2.District)
-	require.Equal(t, address1.City, address2.City)
+	require.Equal(t, address1.DistrictID, address2.DistrictID)
+	require.Equal(t, address1.CityID, address2.CityID)
 
 	require.WithinDuration(t, address1.CreatedAt, address2.CreatedAt, time.Second)
 }
@@ -73,8 +73,8 @@ func TestUpdateAddress(t *testing.T) {
 	oldAddress := createRandomAddress(t, user)
 
 	newAddress := util.RandomString(6)
-	newDistrict := util.RandomString(6)
-	newCity := util.RandomString(6)
+	newDistrictID := util.RandomInt64(1, 10)
+	newCityID := util.RandomInt64(1, 10)
 
 	arg := UpdateAddressParams{
 		ID: oldAddress.ID,
@@ -82,13 +82,13 @@ func TestUpdateAddress(t *testing.T) {
 			String: newAddress,
 			Valid:  true,
 		},
-		District: sql.NullString{
-			String: newDistrict,
-			Valid:  true,
+		DistrictID: sql.NullInt64{
+			Int64: newDistrictID,
+			Valid: true,
 		},
-		City: sql.NullString{
-			String: newCity,
-			Valid:  true,
+		CityID: sql.NullInt64{
+			Int64: newCityID,
+			Valid: true,
 		},
 	}
 
@@ -100,10 +100,10 @@ func TestUpdateAddress(t *testing.T) {
 	require.Equal(t, oldAddress.Username, updateAddress.Username)
 	require.Equal(t, newAddress, updateAddress.Address)
 	require.NotEqual(t, oldAddress.Address, updateAddress.Address)
-	require.Equal(t, newDistrict, updateAddress.District)
-	require.NotEqual(t, oldAddress.District, updateAddress.District)
-	require.Equal(t, newCity, updateAddress.City)
-	require.NotEqual(t, oldAddress.City, updateAddress.City)
+	require.Equal(t, newDistrictID, updateAddress.DistrictID)
+	require.NotEqual(t, oldAddress.DistrictID, updateAddress.DistrictID)
+	require.Equal(t, newCityID, updateAddress.CityID)
+	require.NotEqual(t, oldAddress.CityID, updateAddress.CityID)
 }
 
 func TestListAddresses(t *testing.T) {

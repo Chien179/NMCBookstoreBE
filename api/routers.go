@@ -47,6 +47,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 
 	subgenreRoutes := router.Group("/subgenres")
 	subgenreRoutes.GET("/:genre_id", server.listSubgenre)
+	subgenreRoutes.GET("/noticeable", server.listSubgenresNoticeable)
 
 	reviewRoutes := router.Group("/reviews")
 	reviewRoutes.GET("/:book_id", server.listReview)
@@ -77,6 +78,10 @@ func (server *Server) userAuth(router *gin.Engine) {
 	addressRoutes.GET("/", server.listAddress)
 	addressRoutes.PUT("/:id", server.updateAddress)
 	addressRoutes.DELETE("/:id", server.deleteAddress)
+	addressRoutes.GET("/cities/:id", server.getCity)
+	addressRoutes.GET("/cities", server.listCities)
+	addressRoutes.GET("/districts/:id", server.getDistrict)
+	addressRoutes.GET("/districts", server.listDistricts)
 
 	reviewRoutes := usersRoutes.Group("/reviews").Use(authMiddleware(server.tokenMaker))
 	reviewRoutes.POST("/:book_id", server.createReview)
