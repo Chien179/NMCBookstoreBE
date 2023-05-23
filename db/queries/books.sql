@@ -28,15 +28,15 @@ SELECT t.total_page, JSON_AGG(json_build_object
 SELECT * FROM books
 ORDER BY id;
 
--- name: ListTop10TheBestBooks :many
+-- name: ListTheBestBooks :many
 SELECT * FROM books
 ORDER BY rating DESC
-LIMIT 10;
+LIMIT 20;
 
--- name: ListTop10NewestBooks :many
+-- name: ListNewestBooks :many
 SELECT * FROM books
 ORDER BY created_at DESC
-LIMIT 10;
+LIMIT 20;
 
 -- name: CreateBook :one
 INSERT INTO books (

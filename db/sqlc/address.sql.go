@@ -8,18 +8,16 @@ package db
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 )
 
 const createAddress = `-- name: CreateAddress :one
 INSERT INTO address (
-  username,
-  address,
-  district_id,
-  city_id
-) VALUES (
-  $1, $2, $3, $4
-)
+    username,
+    address,
+    district_id,
+    city_id
+  )
+VALUES ($1, $2, $3, $4)
 RETURNING id, address, username, city_id, district_id, created_at
 `
 
@@ -60,8 +58,10 @@ func (q *Queries) DeleteAddress(ctx context.Context, id int64) error {
 }
 
 const getAddress = `-- name: GetAddress :one
-SELECT id, address, username, city_id, district_id, created_at FROM address
-WHERE id = $1 LIMIT 1
+SELECT id, address, username, city_id, district_id, created_at
+FROM address
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
@@ -78,46 +78,56 @@ func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
 	return i, err
 }
 
-const listAddresses = `-- name: ListAddresses :one
-(SELECT t.total_page, JSON_AGG(json_build_object
-    ('id',id,
-    'address',address,
-    'username',username,
-    'created_at',created_at)
-    ) AS addresses
-	FROM (
-      SELECT 
-        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$2) AS total_page, id, address, username, city_id, district_id, created_at 
-      FROM address
-      WHERE address.username = $1
-      ORDER BY id
-      LIMIT $2
-      OFFSET $3
-    ) AS t
-    GROUP BY t.total_page)
+const listAddresses = `-- name: ListAddresses :many
+SELECT address.id AS id,
+  address.address AS address,
+  districts.name AS district,
+  cities.name AS city
+FROM address
+  INNER JOIN cities ON cities.id = address.city_id
+  INNER JOIN districts ON districts.id = address.district_id
+WHERE address.username = $1
+ORDER BY address.id
 `
 
-type ListAddressesParams struct {
-	Username string `json:"username"`
-	Limit    int32  `json:"limit"`
-	Offset   int32  `json:"offset"`
-}
-
 type ListAddressesRow struct {
-	TotalPage float64         `json:"total_page"`
-	Addresses json.RawMessage `json:"addresses"`
+	ID       int64  `json:"id"`
+	Address  string `json:"address"`
+	District string `json:"district"`
+	City     string `json:"city"`
 }
 
-func (q *Queries) ListAddresses(ctx context.Context, arg ListAddressesParams) (ListAddressesRow, error) {
-	row := q.db.QueryRowContext(ctx, listAddresses, arg.Username, arg.Limit, arg.Offset)
-	var i ListAddressesRow
-	err := row.Scan(&i.TotalPage, &i.Addresses)
-	return i, err
+func (q *Queries) ListAddresses(ctx context.Context, username string) ([]ListAddressesRow, error) {
+	rows, err := q.db.QueryContext(ctx, listAddresses, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListAddressesRow{}
+	for rows.Next() {
+		var i ListAddressesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Address,
+			&i.District,
+			&i.City,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const updateAddress = `-- name: UpdateAddress :one
 UPDATE address
-SET  address = COALESCE($1, address),
+SET address = COALESCE($1, address),
   district_id = COALESCE($2, district_id),
   city_id = COALESCE($3, city_id)
 WHERE id = $4

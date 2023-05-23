@@ -11,18 +11,20 @@ import (
 
 const createPayment = `-- name: CreatePayment :one
 INSERT INTO payments (
+  id,
   username,
   order_id,
   shipping_id,
   subtotal,
   status
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
 RETURNING id, username, order_id, shipping_id, subtotal, status, created_at
 `
 
 type CreatePaymentParams struct {
+	ID         string  `json:"id"`
 	Username   string  `json:"username"`
 	OrderID    int64   `json:"order_id"`
 	ShippingID int64   `json:"shipping_id"`
@@ -32,6 +34,7 @@ type CreatePaymentParams struct {
 
 func (q *Queries) CreatePayment(ctx context.Context, arg CreatePaymentParams) (Payment, error) {
 	row := q.db.QueryRowContext(ctx, createPayment,
+		arg.ID,
 		arg.Username,
 		arg.OrderID,
 		arg.ShippingID,

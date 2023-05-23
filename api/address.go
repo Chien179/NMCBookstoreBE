@@ -186,7 +186,7 @@ func (server *Server) updateAddress(ctx *gin.Context) {
 }
 
 type deleteAddressRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
+	IDs []int64 `form:"ids" binding:"required"`
 }
 
 // @Summary      Delete address
@@ -208,74 +208,49 @@ func (server *Server) deleteAddress(ctx *gin.Context) {
 		return
 	}
 
-	address, err := server.store.GetAddress(ctx, req.ID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
+	for _, addressID := range req.IDs {
+		address, err := server.store.GetAddress(ctx, addressID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
 
-	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	if address.Username != authPayLoad.Username {
-		err := errors.New("account doesn't belong to the authenticated user")
-		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
-		return
-	}
-
-	err = server.store.DeleteAddress(ctx, req.ID)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
+		authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+		if address.Username != authPayLoad.Username {
+			err := errors.New("account doesn't belong to the authenticated user")
+			ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
+
+		err = server.store.DeleteAddress(ctx, addressID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
 	}
 
-	ctx.JSON(http.StatusOK, "Address deleted successfully")
+	ctx.JSON(http.StatusOK, "Addresses deleted successfully")
 }
 
-type listAddressRequest struct {
-	PageID   int32 `form:"page_id" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
-}
-
-// @Summary      List address
-// @Description  Use this API to list address
-// @Tags         Addresses
-// @Accept       json
-// @Produce      json
-// @Param        Query query listAddressRequest  true  "List address"
-// @Success      200 {object}  []db.Address
-// @failure	 	 400
-// @failure		 401
-// @failure		 404
-// @failure		 500
-// @Router       /users/addresses [get]
 func (server *Server) listAddress(ctx *gin.Context) {
-	var req listAddressRequest
-	if err := ctx.ShouldBindQuery(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
-	arg := db.ListAddressesParams{
-		Username: authPayLoad.Username,
-		Limit:    req.PageSize,
-		Offset:   (req.PageID - 1) * req.PageSize,
-	}
 
-	addresses, err := server.store.ListAddresses(ctx, arg)
+	addresses, err := server.store.ListAddresses(ctx, authPayLoad.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
-		if addresses.Addresses == nil {
+		if addresses == nil {
 			ctx.JSON(http.StatusOK, addresses)
 			return
 		}

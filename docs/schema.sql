@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-05-21T07:53:09.264Z
+-- Generated at: 2023-05-21T12:27:31.578Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY NOT NULL,
@@ -177,7 +177,6 @@ CREATE TABLE "payments" (
 
 CREATE TABLE "shippings" (
   "id" bigserial PRIMARY KEY,
-  "from_address" varchar NOT NULL,
   "to_address" varchar NOT NULL,
   "total" float NOT NULL DEFAULT 0
 );

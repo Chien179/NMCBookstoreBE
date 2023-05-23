@@ -16,9 +16,8 @@ INSERT INTO reviews (
     books_id,
     comments,
     rating
-) VALUES (
-  $1, $2, $3, $4
-)
+  )
+VALUES ($1, $2, $3, $4)
 RETURNING id, username, books_id, comments, rating, created_at
 `
 
@@ -59,8 +58,10 @@ func (q *Queries) DeleteReview(ctx context.Context, id int64) error {
 }
 
 const getReview = `-- name: GetReview :one
-SELECT id, username, books_id, comments, rating, created_at FROM reviews
-WHERE id = $1 LIMIT 1
+SELECT id, username, books_id, comments, rating, created_at
+FROM reviews
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
@@ -78,24 +79,43 @@ func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
 }
 
 const listReviewsByBookID = `-- name: ListReviewsByBookID :one
-SELECT t.total_page, JSON_AGG(json_build_object
-    ('id',id,
-    'username',username,
-    'books_id',books_id,
-    'comments',comments,
-    'rating',rating,
-    'created_at',created_at)
-    ) AS reviews
-	FROM (
-      SELECT 
-        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$2) AS total_page, id, username, books_id, comments, rating, created_at 
-      FROM reviews
-      WHERE reviews.books_id = $1
-      ORDER BY id
-      LIMIT $2
-      OFFSET $3
-    ) AS t
-    GROUP BY t.total_page
+SELECT t.total_page,
+  JSON_AGG(
+    json_build_object (
+      'id',
+      id,
+      'username',
+      username,
+      'image',
+      image,
+      'books_id',
+      books_id,
+      'comments',
+      comments,
+      'rating',
+      rating,
+      'created_at',
+      created_at
+    )
+  ) AS reviews
+FROM (
+    SELECT reviews.id,
+      CEILING(
+        CAST(COUNT(id) OVER () AS FLOAT) / $2
+      ) AS total_page,
+      users.username AS username,
+      users.image AS image,
+      reviews.books_id AS books_id,
+      reviews."comments" AS "comments",
+      reviews.rating AS rating,
+      reviews.created_at AS created_at
+    FROM reviews
+      INNER JOIN users ON reviews.username = users.username
+    WHERE reviews.books_id = $1
+    ORDER BY id
+    LIMIT $2 OFFSET $3
+  ) AS t
+GROUP BY t.total_page
 `
 
 type ListReviewsByBookIDParams struct {

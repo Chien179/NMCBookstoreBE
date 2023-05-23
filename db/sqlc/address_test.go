@@ -112,18 +112,12 @@ func TestListAddresses(t *testing.T) {
 		createRandomAddress(t, user)
 	}
 
-	arg := ListAddressesParams{
-		Username: user.Username,
-		Limit:    5,
-		Offset:   0,
-	}
-
-	addresss, err := testQueries.ListAddresses(context.Background(), arg)
+	addresss, err := testQueries.ListAddresses(context.Background(), user.Username)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, addresss)
 
-	for _, address := range addresss.Addresses {
+	for _, address := range addresss {
 		require.NotEmpty(t, address)
 	}
 }

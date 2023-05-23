@@ -11,29 +11,22 @@ import (
 
 const createShipping = `-- name: CreateShipping :one
 INSERT INTO shippings (
-  from_address,
   to_address,
   total
 ) VALUES (
-  $1, $2, $3
+$1, $2
 )
-RETURNING id, from_address, to_address, total
+RETURNING id, to_address, total
 `
 
 type CreateShippingParams struct {
-	FromAddress string  `json:"from_address"`
-	ToAddress   string  `json:"to_address"`
-	Total       float64 `json:"total"`
+	ToAddress string  `json:"to_address"`
+	Total     float64 `json:"total"`
 }
 
 func (q *Queries) CreateShipping(ctx context.Context, arg CreateShippingParams) (Shipping, error) {
-	row := q.db.QueryRowContext(ctx, createShipping, arg.FromAddress, arg.ToAddress, arg.Total)
+	row := q.db.QueryRowContext(ctx, createShipping, arg.ToAddress, arg.Total)
 	var i Shipping
-	err := row.Scan(
-		&i.ID,
-		&i.FromAddress,
-		&i.ToAddress,
-		&i.Total,
-	)
+	err := row.Scan(&i.ID, &i.ToAddress, &i.Total)
 	return i, err
 }

@@ -84,7 +84,7 @@ type Order struct {
 }
 
 type Payment struct {
-	ID         int64     `json:"id"`
+	ID         string    `json:"id"`
 	Username   string    `json:"username"`
 	OrderID    int64     `json:"order_id"`
 	ShippingID int64     `json:"shipping_id"`
@@ -139,10 +139,9 @@ type Session struct {
 }
 
 type Shipping struct {
-	ID          int64   `json:"id"`
-	FromAddress string  `json:"from_address"`
-	ToAddress   string  `json:"to_address"`
-	Total       float64 `json:"total"`
+	ID        int64   `json:"id"`
+	ToAddress string  `json:"to_address"`
+	Total     float64 `json:"total"`
 }
 
 type Subgenre struct {

@@ -39,31 +39,18 @@ func (server *Server) forgotPassword(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, "sending")
-}
-
-type resetPasswordQuery struct {
-	ID        int64  `form:"id" binding:"required,min=1"`
-	ResetCode string `form:"reset_code" binding:"required"`
-}
-
-type resetPasswordData struct {
-	Password string `json:"password" binding:"required,min=8"`
+	ctx.JSON(http.StatusOK, "send email after 10 seconds")
 }
 
 type resetPasswordRequest struct {
-	resetPasswordQuery
-	resetPasswordData
+	ID        int64  `json:"id" binding:"required,min=1"`
+	ResetCode string `json:"reset_code" binding:"required"`
+	Password  string `json:"password" binding:"required,min=8"`
 }
 
 func (server *Server) resetPassword(ctx *gin.Context) {
 	var req resetPasswordRequest
-	if err := ctx.ShouldBindQuery(&req.resetPasswordQuery); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
-	if err := ctx.ShouldBindJSON(&req.resetPasswordData); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}

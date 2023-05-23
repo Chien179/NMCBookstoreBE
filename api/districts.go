@@ -18,7 +18,7 @@ func (server *Server) getDistrict(ctx *gin.Context) {
 		return
 	}
 
-	city, err := server.store.GetCity(ctx, req.ID)
+	city, err := server.store.GetDistrict(ctx, req.ID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -31,8 +31,18 @@ func (server *Server) getDistrict(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, city)
 }
 
+type listDistrictsRequest struct {
+	CityID int64 `uri:"city_id" binding:"required,min=1"`
+}
+
 func (server *Server) listDistricts(ctx *gin.Context) {
-	cities, err := server.store.ListDistricts(ctx)
+	var req listDistrictsRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	cities, err := server.store.ListDistricts(ctx, req.CityID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

@@ -10,8 +10,10 @@ import (
 )
 
 const getDistrict = `-- name: GetDistrict :one
-SELECT id, city_id, name, created_at FROM districts
-WHERE id = $1 LIMIT 1
+SELECT id, city_id, name, created_at
+FROM districts
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetDistrict(ctx context.Context, id int64) (District, error) {
@@ -27,12 +29,14 @@ func (q *Queries) GetDistrict(ctx context.Context, id int64) (District, error) {
 }
 
 const listDistricts = `-- name: ListDistricts :many
-SELECT id, city_id, name, created_at FROM districts
+SELECT id, city_id, name, created_at
+FROM districts
+WHERE city_id = $1
 ORDER BY id
 `
 
-func (q *Queries) ListDistricts(ctx context.Context) ([]District, error) {
-	rows, err := q.db.QueryContext(ctx, listDistricts)
+func (q *Queries) ListDistricts(ctx context.Context, cityID int64) ([]District, error) {
+	rows, err := q.db.QueryContext(ctx, listDistricts, cityID)
 	if err != nil {
 		return nil, err
 	}

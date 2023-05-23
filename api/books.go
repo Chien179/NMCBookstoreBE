@@ -18,6 +18,8 @@ type createBookRequest struct {
 	Author      string                 `form:"author" binding:"required"`
 	Publisher   string                 `form:"publisher" binding:"required"`
 	Quantity    int32                  `form:"quantity" binding:"required"`
+	GenresID    int64                  `form:"genres_id" binding:"required"`
+	SubgenresID int64                  `form:"subgenres_id" binding:"required"`
 }
 
 // @Summary      Create book
@@ -59,6 +61,28 @@ func (server *Server) createBook(ctx *gin.Context) {
 	}
 
 	book, err := server.store.CreateBook(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	argBG := db.CreateBookGenreParams{
+		BooksID:  book.ID,
+		GenresID: req.GenresID,
+	}
+
+	_, err = server.store.CreateBookGenre(ctx, argBG)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	argBS := db.CreateBookSubgenreParams{
+		BooksID:     book.ID,
+		SubgenresID: req.SubgenresID,
+	}
+
+	_, err = server.store.CreateBookSubgenre(ctx, argBS)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -290,8 +314,8 @@ func (server *Server) listBook(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, books)
 }
 
-func (server *Server) listTop10TheBestBook(ctx *gin.Context) {
-	books, err := server.store.ListTop10TheBestBooks(ctx)
+func (server *Server) listTheBestBook(ctx *gin.Context) {
+	books, err := server.store.ListTheBestBooks(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -304,8 +328,8 @@ func (server *Server) listTop10TheBestBook(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, books)
 }
 
-func (server *Server) listTop10NewestBook(ctx *gin.Context) {
-	books, err := server.store.ListTop10NewestBooks(ctx)
+func (server *Server) listNewestBook(ctx *gin.Context) {
+	books, err := server.store.ListNewestBooks(ctx)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))

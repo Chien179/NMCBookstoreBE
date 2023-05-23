@@ -176,14 +176,14 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) (ListBooks
 	return i, err
 }
 
-const listTop10NewestBooks = `-- name: ListTop10NewestBooks :many
+const listNewestBooks = `-- name: ListNewestBooks :many
 SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
 ORDER BY created_at DESC
-LIMIT 10
+LIMIT 20
 `
 
-func (q *Queries) ListTop10NewestBooks(ctx context.Context) ([]Book, error) {
-	rows, err := q.db.QueryContext(ctx, listTop10NewestBooks)
+func (q *Queries) ListNewestBooks(ctx context.Context) ([]Book, error) {
+	rows, err := q.db.QueryContext(ctx, listNewestBooks)
 	if err != nil {
 		return nil, err
 	}
@@ -216,14 +216,14 @@ func (q *Queries) ListTop10NewestBooks(ctx context.Context) ([]Book, error) {
 	return items, nil
 }
 
-const listTop10TheBestBooks = `-- name: ListTop10TheBestBooks :many
+const listTheBestBooks = `-- name: ListTheBestBooks :many
 SELECT id, name, price, image, description, author, publisher, quantity, created_at, rating FROM books
 ORDER BY rating DESC
-LIMIT 10
+LIMIT 20
 `
 
-func (q *Queries) ListTop10TheBestBooks(ctx context.Context) ([]Book, error) {
-	rows, err := q.db.QueryContext(ctx, listTop10TheBestBooks)
+func (q *Queries) ListTheBestBooks(ctx context.Context) ([]Book, error) {
+	rows, err := q.db.QueryContext(ctx, listTheBestBooks)
 	if err != nil {
 		return nil, err
 	}

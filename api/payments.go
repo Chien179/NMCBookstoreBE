@@ -9,30 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CreatePaymentRequest struct {
-	FromAddress   string  `json:"from_address" binding:"required"`
-	ToAddress     string  `json:"to_address" binding:"required"`
-	TotalShipping float64 `json:"total_shipping" binding:"required,min=1000,max=100000000"`
-	SubTotal      float64 `json:"sub_total" binding:"required,min=1000,max=100000000"`
-	Status        string  `json:"status" binding:"required"`
-}
-
-func (server *Server) createPayment(ctx *gin.Context) {
-	var req CreatePaymentRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-
+func (server *Server) createPayment(ctx *gin.Context, PaymentID string, OrderID int64, ToAddress string, TotalShipping float64, SubTotal float64, Status string) {
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
-	shipping, err := server.createShipping(ctx, req.FromAddress, req.ToAddress, req.TotalShipping)
+	shipping, err := server.createShipping(ctx, ToAddress, TotalShipping)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	order, err := server.store.GetOrderToPayment(ctx, authPayLoad.Username)
+	order, err := server.store.GetOrder(ctx, OrderID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -42,7 +28,7 @@ func (server *Server) createPayment(ctx *gin.Context) {
 		return
 	}
 
-	if req.Status != "failed" {
+	if Status != "failed" {
 		arg := db.UpdateOrderParams{
 			ID: order.ID,
 			Status: sql.NullString{
@@ -56,63 +42,20 @@ func (server *Server) createPayment(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-
-		carts, err := server.store.ListCartsByUsername(ctx, order.Username)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-
-		for _, cart := range carts {
-			book, err := server.store.GetBook(ctx, cart.BooksID)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					ctx.JSON(http.StatusNotFound, errorResponse(err))
-					return
-				}
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-				return
-			}
-
-			arg := db.UpdateBookParams{
-				Quantity: sql.NullInt32{
-					Int32: book.Quantity - 1,
-					Valid: true,
-				},
-				Image: book.Image,
-			}
-			_, err = server.store.UpdateBook(ctx, arg)
-			if err != nil {
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-				return
-			}
-
-			argCart := db.DeleteCartParams{
-				ID:       cart.ID,
-				Username: authPayLoad.Username,
-			}
-
-			err = server.store.DeleteCart(ctx, argCart)
-			if err != nil {
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-				return
-			}
-		}
 	}
 
 	arg := db.CreatePaymentParams{
+		ID:         PaymentID,
 		Username:   authPayLoad.Username,
 		OrderID:    order.ID,
 		ShippingID: shipping.ID,
 		Subtotal:   order.SubTotal,
-		Status:     req.Status,
+		Status:     Status,
 	}
 
-	payment, err := server.store.CreatePayment(ctx, arg)
+	_, err = server.store.CreatePayment(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	ctx.JSON(http.StatusOK, payment)
 }

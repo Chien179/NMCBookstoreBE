@@ -242,7 +242,6 @@ Table payments as P{
 
 Table shippings as S {
   id bigserial [pk]
-  from_address varchar [not null]
   to_address varchar [not null]
   total float [not null, default:0]
 }

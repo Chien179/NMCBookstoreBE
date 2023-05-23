@@ -11,7 +11,11 @@ import (
 )
 
 type createOrderRequest struct {
-	CartIDs []int64 `json:"cart_ids" binding:"required"`
+	PaymentID     string  `json:"payment_id" binding:"required"`
+	CartIDs       []int64 `json:"cart_ids" binding:"required"`
+	ToAddress     string  `json:"to_address" binding:"required"`
+	TotalShipping float64 `json:"total_shipping" binding:"required,min=1000,max=100000000"`
+	Status        string  `json:"status" binding:"required"`
 }
 
 // @Summary      Create order
@@ -28,6 +32,11 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	var req createOrderRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if req.Status == "failed" {
+		ctx.JSON(http.StatusInternalServerError, "Payment failed")
 		return
 	}
 
@@ -64,6 +73,41 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		}
 
 		subTotal += cart.Total
+
+		book, err := server.store.GetBook(ctx, cart.BooksID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		argBook := db.UpdateBookParams{
+			ID: book.ID,
+			Quantity: sql.NullInt32{
+				Int32: book.Quantity - 1,
+				Valid: true,
+			},
+			Image: book.Image,
+		}
+		_, err = server.store.UpdateBook(ctx, argBook)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		argCart := db.DeleteCartParams{
+			ID:       cart.ID,
+			Username: authPayLoad.Username,
+		}
+
+		err = server.store.DeleteCart(ctx, argCart)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
 	}
 
 	arg := db.UpdateOrderParams{
@@ -83,6 +127,8 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+
+	server.createPayment(ctx, req.PaymentID, order.ID, req.ToAddress, req.TotalShipping, subTotal, req.Status)
 
 	ctx.JSON(http.StatusOK, order)
 }

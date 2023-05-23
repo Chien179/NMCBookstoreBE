@@ -63,11 +63,12 @@ func (processor *RedisTaskProcessor) ProcessTaskSendResetPassword(ctx context.Co
 	}
 
 	subject := "Welcome to NMC Bookstore"
-	resetPasswordUrl := fmt.Sprintf("http://localhost:8080/reset_password?id=%d&reset_code=%s",
+	resetPasswordUrl := fmt.Sprintf("http://localhost:3006/reset_password?id=%d&reset_code=%s",
 		resetPassword.ID, resetPassword.ResetCode)
 	content := fmt.Sprintf(`Hello %s,<br/>
-	Thank you for registering with us!<br/>
-	Please <a href="%s">click here</a> to verify your email address.<br/>
+	We received a request to reset your password!<br/>
+	Please use the link below to set up a new password for your account. If you did not request to reset your password, ignore this email.</br>
+	<a href="%s">SET NEW PASSWORD</a>
 	`, user.FullName, resetPasswordUrl)
 	to := []string{user.Email}
 

@@ -550,6 +550,36 @@ func (mr *MockStoreMockRecorder) GetCart(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCart", reflect.TypeOf((*MockStore)(nil).GetCart), arg0, arg1)
 }
 
+// GetCity mocks base method.
+func (m *MockStore) GetCity(arg0 context.Context, arg1 int64) (db.City, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCity", arg0, arg1)
+	ret0, _ := ret[0].(db.City)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCity indicates an expected call of GetCity.
+func (mr *MockStoreMockRecorder) GetCity(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCity", reflect.TypeOf((*MockStore)(nil).GetCity), arg0, arg1)
+}
+
+// GetDistrict mocks base method.
+func (m *MockStore) GetDistrict(arg0 context.Context, arg1 int64) (db.District, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDistrict", arg0, arg1)
+	ret0, _ := ret[0].(db.District)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDistrict indicates an expected call of GetDistrict.
+func (mr *MockStoreMockRecorder) GetDistrict(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDistrict", reflect.TypeOf((*MockStore)(nil).GetDistrict), arg0, arg1)
+}
+
 // GetGenre mocks base method.
 func (m *MockStore) GetGenre(arg0 context.Context, arg1 int64) (db.Genre, error) {
 	m.ctrl.T.Helper()
@@ -701,10 +731,10 @@ func (mr *MockStoreMockRecorder) GetWishlist(arg0, arg1 interface{}) *gomock.Cal
 }
 
 // ListAddresses mocks base method.
-func (m *MockStore) ListAddresses(arg0 context.Context, arg1 db.ListAddressesParams) (db.ListAddressesRow, error) {
+func (m *MockStore) ListAddresses(arg0 context.Context, arg1 string) ([]db.Address, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAddresses", arg0, arg1)
-	ret0, _ := ret[0].(db.ListAddressesRow)
+	ret0, _ := ret[0].([]db.Address)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -820,6 +850,36 @@ func (mr *MockStoreMockRecorder) ListCartsByUsername(arg0, arg1 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCartsByUsername", reflect.TypeOf((*MockStore)(nil).ListCartsByUsername), arg0, arg1)
 }
 
+// ListCities mocks base method.
+func (m *MockStore) ListCities(arg0 context.Context) ([]db.City, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListCities", arg0)
+	ret0, _ := ret[0].([]db.City)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListCities indicates an expected call of ListCities.
+func (mr *MockStoreMockRecorder) ListCities(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCities", reflect.TypeOf((*MockStore)(nil).ListCities), arg0)
+}
+
+// ListDistricts mocks base method.
+func (m *MockStore) ListDistricts(arg0 context.Context, arg1 int64) ([]db.District, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListDistricts", arg0, arg1)
+	ret0, _ := ret[0].([]db.District)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListDistricts indicates an expected call of ListDistricts.
+func (mr *MockStoreMockRecorder) ListDistricts(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListDistricts", reflect.TypeOf((*MockStore)(nil).ListDistricts), arg0, arg1)
+}
+
 // ListGenres mocks base method.
 func (m *MockStore) ListGenres(arg0 context.Context) ([]db.Genre, error) {
 	m.ctrl.T.Helper()
@@ -893,6 +953,21 @@ func (m *MockStore) ListSubgenres(arg0 context.Context, arg1 int64) ([]db.Subgen
 func (mr *MockStoreMockRecorder) ListSubgenres(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSubgenres", reflect.TypeOf((*MockStore)(nil).ListSubgenres), arg0, arg1)
+}
+
+// ListSubgenresNoticeable mocks base method.
+func (m *MockStore) ListSubgenresNoticeable(arg0 context.Context) ([]db.ListSubgenresNoticeableRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListSubgenresNoticeable", arg0)
+	ret0, _ := ret[0].([]db.ListSubgenresNoticeableRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListSubgenresNoticeable indicates an expected call of ListSubgenresNoticeable.
+func (mr *MockStoreMockRecorder) ListSubgenresNoticeable(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSubgenresNoticeable", reflect.TypeOf((*MockStore)(nil).ListSubgenresNoticeable), arg0)
 }
 
 // ListTop10NewestBooks mocks base method.

@@ -1,5 +1,5 @@
 CREATE TABLE "payments" (
-  "id" bigserial PRIMARY KEY,
+  "id" varchar PRIMARY KEY,
   "username" varchar NOT NULL,
   "order_id" bigserial NOT NULL,
   "shipping_id" bigserial NOT NULL,
@@ -10,7 +10,6 @@ CREATE TABLE "payments" (
 
 CREATE TABLE "shippings" (
   "id" bigserial PRIMARY KEY,
-  "from_address" varchar NOT NULL,
   "to_address" varchar NOT NULL,
   "total" float NOT NULL DEFAULT 0
 );

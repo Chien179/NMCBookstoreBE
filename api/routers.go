@@ -30,16 +30,16 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	router.POST("/tokens/renew_access", server.renewAccessToken)
 
 	router.GET("/verify_email", server.verifyEmail)
-	router.GET("/forgot_password", server.forgotPassword)
-	router.GET("/reset_password", server.resetPassword)
+	router.POST("/forgot_password", server.forgotPassword)
+	router.PUT("/reset_password", server.resetPassword)
 
 	router.GET("/searchs", server.fullSearch)
 
 	bookRoutes := router.Group("/books")
 	bookRoutes.GET("/:id", server.getBook)
 	bookRoutes.GET("/", server.listBook)
-	bookRoutes.GET("/the_best", server.listTop10TheBestBook)
-	bookRoutes.GET("/newest", server.listTop10NewestBook)
+	bookRoutes.GET("/the_best", server.listTheBestBook)
+	bookRoutes.GET("/newest", server.listNewestBook)
 
 	genreRoutes := router.Group("/genres")
 	genreRoutes.GET("/:id", server.getGenre)
@@ -80,8 +80,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	addressRoutes.DELETE("/:id", server.deleteAddress)
 	addressRoutes.GET("/cities/:id", server.getCity)
 	addressRoutes.GET("/cities", server.listCities)
-	addressRoutes.GET("/districts/:id", server.getDistrict)
-	addressRoutes.GET("/districts", server.listDistricts)
+	addressRoutes.GET("/districts/:city_id", server.listDistricts)
 
 	reviewRoutes := usersRoutes.Group("/reviews").Use(authMiddleware(server.tokenMaker))
 	reviewRoutes.POST("/:book_id", server.createReview)
@@ -94,9 +93,6 @@ func (server *Server) userAuth(router *gin.Engine) {
 	orderRoutes.GET("/cancelled", server.listOrderCancelled)
 	orderRoutes.PUT("/:id", server.cancelOrder)
 	orderRoutes.DELETE("/:id", server.deleteOrder)
-
-	paymentRoutes := usersRoutes.Group("/payments").Use(authMiddleware(server.tokenMaker))
-	paymentRoutes.POST("/", server.createPayment)
 }
 
 func (server *Server) adminAuth(router *gin.Engine) {
