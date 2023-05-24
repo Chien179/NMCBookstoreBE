@@ -46,6 +46,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	genreRoutes.GET("/", server.listGenre)
 
 	subgenreRoutes := router.Group("/subgenres")
+	subgenreRoutes.GET("/one/:id", server.getSubgenre)
 	subgenreRoutes.GET("/:genre_id", server.listSubgenre)
 	subgenreRoutes.GET("/noticeable", server.listSubgenresNoticeable)
 
@@ -115,9 +116,9 @@ func (server *Server) adminAuth(router *gin.Engine) {
 	subgenreRoutes.DELETE("/:id", server.deleteSubgenre)
 
 	revenueRoutes := adminRoutes.Group("/revenues").Use(authMiddleware(server.tokenMaker), isAdmin())
-	revenueRoutes.GET("/hours", server.revenueHours)
 	revenueRoutes.GET("/days", server.revenueDays)
 	revenueRoutes.GET("/months", server.revenueMonths)
+	revenueRoutes.GET("/quarters", server.revenueQuarters)
 	revenueRoutes.GET("/years", server.revenueYears)
 
 	orderRoutes := adminRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))

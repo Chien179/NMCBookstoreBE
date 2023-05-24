@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-05-21T12:27:31.578Z
+-- Generated at: 2023-05-24T09:34:49.458Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "verify_emails" (
-  "id" bigserial PRIMARY KEY,
+  "id" BIGSERIAL PRIMARY KEY,
   "username" varchar NOT NULL,
   "email" varchar NOT NULL,
   "secret_code" varchar NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE "verify_emails" (
 );
 
 CREATE TABLE "reset_passwords" (
-  "id" bigserial PRIMARY KEY,
+  "id" BIGSERIAL PRIMARY KEY,
   "username" varchar NOT NULL,
   "reset_code" varchar NOT NULL,
   "is_used" bool NOT NULL DEFAULT false,
@@ -46,13 +46,13 @@ CREATE TABLE "address" (
 );
 
 CREATE TABLE "cities" (
-  "id" bigserial PRIMARY KEY,
+  "id" BIGSERIAL PRIMARY KEY,
   "name" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "districts" (
-  "id" bigserial PRIMARY KEY,
+  "id" BIGSERIAL PRIMARY KEY,
   "city_id" bigserial NOT NULL,
   "name" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
@@ -142,7 +142,7 @@ CREATE TABLE "wishlists" (
 );
 
 CREATE TABLE "sessions" (
-  "id" uuid PRIMARY KEY,
+  "id" SERIAL PRIMARY KEY,
   "username" varchar NOT NULL,
   "refresh_token" varchar NOT NULL,
   "user_agent" varchar NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE "sessions" (
 );
 
 CREATE TABLE "searchs" (
-  "id" bigserial PRIMARY KEY,
+  "id" BIGSERIAL PRIMARY KEY,
   "book_name" varchar NOT NULL,
   "price" float NOT NULL,
   "author" varchar NOT NULL,
@@ -165,7 +165,7 @@ CREATE TABLE "searchs" (
 );
 
 CREATE TABLE "payments" (
-  "id" bigserial PRIMARY KEY,
+  "id" BIGSERIAL PRIMARY KEY,
   "username" varchar NOT NULL,
   "order_id" bigserial NOT NULL,
   "shipping_id" bigserial NOT NULL,
@@ -176,7 +176,7 @@ CREATE TABLE "payments" (
 );
 
 CREATE TABLE "shippings" (
-  "id" bigserial PRIMARY KEY,
+  "id" BIGSERIAL PRIMARY KEY,
   "to_address" varchar NOT NULL,
   "total" float NOT NULL DEFAULT 0
 );

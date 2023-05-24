@@ -22,7 +22,7 @@ Table users as U {
 }
 
 Table verify_emails {
-  id bigserial [pk]
+  id bigserial [pk, increment]
   username varchar [ref: > U.username, not null]
   email varchar [not null]
   secret_code varchar [not null]
@@ -32,7 +32,7 @@ Table verify_emails {
 }
 
 Table reset_passwords {
-  id bigserial [pk]
+  id bigserial [pk, increment]
   username varchar [ref: > U.username, not null]
   reset_code varchar [not null]
   is_used bool [not null, default: false]
@@ -57,13 +57,13 @@ Table address as A{
 }
 
 Table cities as C {
-  id bigserial [pk]
+  id bigserial [pk, increment]
   name varchar [not null]
   created_at timestamptz [not null, default:"now()"]
 }
 
 Table districts as D {
-  id bigserial [pk]
+  id bigserial [pk, increment]
   city_id bigserial [ref: > C.id, not null]
   name varchar [not null]
   created_at timestamptz [not null, default:"now()"]
@@ -200,7 +200,7 @@ Table wishlists as BW{
 }
 
 Table sessions {
-    id uuid [pk]
+    id uuid [pk, increment]
     username varchar [ref: > U.username, not null]
     refresh_token varchar [not null]
     user_agent varchar [not null]
@@ -211,7 +211,7 @@ Table sessions {
 }
 
 Table searchs {
-    id bigserial [pk]
+    id bigserial [pk, increment]
     book_name varchar [not null]
     price float [not null]
     author varchar [not null]
@@ -223,7 +223,7 @@ Table searchs {
 }
 
 Table payments as P{
-  id bigserial [pk]
+  id bigserial [pk, increment]
   username varchar [ref: > U.username, not null]
   order_id bigserial [ref: - O.id, not null]
   shipping_id bigserial [ref: - S.id, not null]
@@ -241,7 +241,7 @@ Table payments as P{
 }
 
 Table shippings as S {
-  id bigserial [pk]
+  id bigserial [pk, increment]
   to_address varchar [not null]
   total float [not null, default:0]
 }

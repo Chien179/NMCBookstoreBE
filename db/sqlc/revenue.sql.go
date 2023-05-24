@@ -7,24 +7,23 @@ package db
 
 import (
 	"context"
-	"time"
 )
 
 const revenueDays = `-- name: RevenueDays :many
 SELECT
-COALESCE(SUM(subtotal), 0) AS revenue_days,
-COALESCE(AVG(subtotal), 0) AS avg_revenue_days,  
-to_char(date(created_at),'YYYY-MM-DD') as dates
+COALESCE(SUM(subtotal), 0) AS sum_revenue,
+COALESCE(AVG(subtotal), 0) AS avg_revenue,  
+to_char(date(created_at),'DD-MM-YYYY') as time_revenue
 FROM payments
 WHERE status = 'success'
-GROUP BY dates
-ORDER BY dates
+GROUP BY time_revenue
+ORDER BY time_revenue
 `
 
 type RevenueDaysRow struct {
-	RevenueDays    interface{} `json:"revenue_days"`
-	AvgRevenueDays interface{} `json:"avg_revenue_days"`
-	Dates          string      `json:"dates"`
+	SumRevenue  interface{} `json:"sum_revenue"`
+	AvgRevenue  interface{} `json:"avg_revenue"`
+	TimeRevenue string      `json:"time_revenue"`
 }
 
 func (q *Queries) RevenueDays(ctx context.Context) ([]RevenueDaysRow, error) {
@@ -36,47 +35,7 @@ func (q *Queries) RevenueDays(ctx context.Context) ([]RevenueDaysRow, error) {
 	items := []RevenueDaysRow{}
 	for rows.Next() {
 		var i RevenueDaysRow
-		if err := rows.Scan(&i.RevenueDays, &i.AvgRevenueDays, &i.Dates); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const revenueHours = `-- name: RevenueHours :many
-SELECT
-COALESCE(SUM(subtotal), 0) AS revenue_days,
-COALESCE(AVG(subtotal), 0) AS avg_revenue_days,  
-created_at
-FROM payments
-WHERE status = 'success'
-GROUP BY created_at
-ORDER BY created_at
-`
-
-type RevenueHoursRow struct {
-	RevenueDays    interface{} `json:"revenue_days"`
-	AvgRevenueDays interface{} `json:"avg_revenue_days"`
-	CreatedAt      time.Time   `json:"created_at"`
-}
-
-func (q *Queries) RevenueHours(ctx context.Context) ([]RevenueHoursRow, error) {
-	rows, err := q.db.QueryContext(ctx, revenueHours)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []RevenueHoursRow{}
-	for rows.Next() {
-		var i RevenueHoursRow
-		if err := rows.Scan(&i.RevenueDays, &i.AvgRevenueDays, &i.CreatedAt); err != nil {
+		if err := rows.Scan(&i.SumRevenue, &i.AvgRevenue, &i.TimeRevenue); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -92,19 +51,19 @@ func (q *Queries) RevenueHours(ctx context.Context) ([]RevenueHoursRow, error) {
 
 const revenueMonths = `-- name: RevenueMonths :many
 SELECT
-COALESCE(SUM(subtotal), 0) AS revenue_months,
-COALESCE(AVG(subtotal), 0) AS avg_revenue_months,
-to_char(date(created_at),'YYYY-MM') as year_months
+COALESCE(SUM(subtotal), 0) AS sum_revenue,
+COALESCE(AVG(subtotal), 0) AS avg_revenue,
+to_char(date(created_at),'MM-YYYY') as time_revenue
 FROM payments
 WHERE status = 'success'
-GROUP BY year_months
-ORDER BY year_months
+GROUP BY time_revenue
+ORDER BY time_revenue
 `
 
 type RevenueMonthsRow struct {
-	RevenueMonths    interface{} `json:"revenue_months"`
-	AvgRevenueMonths interface{} `json:"avg_revenue_months"`
-	YearMonths       string      `json:"year_months"`
+	SumRevenue  interface{} `json:"sum_revenue"`
+	AvgRevenue  interface{} `json:"avg_revenue"`
+	TimeRevenue string      `json:"time_revenue"`
 }
 
 func (q *Queries) RevenueMonths(ctx context.Context) ([]RevenueMonthsRow, error) {
@@ -116,7 +75,7 @@ func (q *Queries) RevenueMonths(ctx context.Context) ([]RevenueMonthsRow, error)
 	items := []RevenueMonthsRow{}
 	for rows.Next() {
 		var i RevenueMonthsRow
-		if err := rows.Scan(&i.RevenueMonths, &i.AvgRevenueMonths, &i.YearMonths); err != nil {
+		if err := rows.Scan(&i.SumRevenue, &i.AvgRevenue, &i.TimeRevenue); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -132,19 +91,19 @@ func (q *Queries) RevenueMonths(ctx context.Context) ([]RevenueMonthsRow, error)
 
 const revenueQuarters = `-- name: RevenueQuarters :many
 SELECT
-COALESCE(SUM(subtotal), 0) AS revenue_quarters,
-COALESCE(AVG(subtotal), 0) AS avg_revenue_quarters,
-to_char(date(created_at),'YYYY-Q') as year_quarters
+COALESCE(SUM(subtotal), 0) AS sum_revenue,
+COALESCE(AVG(subtotal), 0) AS avg_revenue,
+to_char(date(created_at),'Q-YYYY') as time_revenue
 FROM payments
 WHERE status = 'success'
-GROUP BY year_quarters
-ORDER BY year_quarters
+GROUP BY time_revenue
+ORDER BY time_revenue
 `
 
 type RevenueQuartersRow struct {
-	RevenueQuarters    interface{} `json:"revenue_quarters"`
-	AvgRevenueQuarters interface{} `json:"avg_revenue_quarters"`
-	YearQuarters       string      `json:"year_quarters"`
+	SumRevenue  interface{} `json:"sum_revenue"`
+	AvgRevenue  interface{} `json:"avg_revenue"`
+	TimeRevenue string      `json:"time_revenue"`
 }
 
 func (q *Queries) RevenueQuarters(ctx context.Context) ([]RevenueQuartersRow, error) {
@@ -156,7 +115,7 @@ func (q *Queries) RevenueQuarters(ctx context.Context) ([]RevenueQuartersRow, er
 	items := []RevenueQuartersRow{}
 	for rows.Next() {
 		var i RevenueQuartersRow
-		if err := rows.Scan(&i.RevenueQuarters, &i.AvgRevenueQuarters, &i.YearQuarters); err != nil {
+		if err := rows.Scan(&i.SumRevenue, &i.AvgRevenue, &i.TimeRevenue); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -172,19 +131,19 @@ func (q *Queries) RevenueQuarters(ctx context.Context) ([]RevenueQuartersRow, er
 
 const revenueYears = `-- name: RevenueYears :many
 SELECT
-COALESCE(SUM(subtotal), 0) AS revenue_years,
-COALESCE(AVG(subtotal), 0) AS avg_revenue_years,
-to_char(date(created_at),'YYYY') as years
+COALESCE(SUM(subtotal), 0) AS sum_revenue,
+COALESCE(AVG(subtotal), 0) AS avg_revenue,
+to_char(date(created_at),'YYYY') as time_revenue
 FROM payments
 WHERE status = 'success'
-GROUP BY years
-ORDER BY years
+GROUP BY time_revenue
+ORDER BY time_revenue
 `
 
 type RevenueYearsRow struct {
-	RevenueYears    interface{} `json:"revenue_years"`
-	AvgRevenueYears interface{} `json:"avg_revenue_years"`
-	Years           string      `json:"years"`
+	SumRevenue  interface{} `json:"sum_revenue"`
+	AvgRevenue  interface{} `json:"avg_revenue"`
+	TimeRevenue string      `json:"time_revenue"`
 }
 
 func (q *Queries) RevenueYears(ctx context.Context) ([]RevenueYearsRow, error) {
@@ -196,7 +155,7 @@ func (q *Queries) RevenueYears(ctx context.Context) ([]RevenueYearsRow, error) {
 	items := []RevenueYearsRow{}
 	for rows.Next() {
 		var i RevenueYearsRow
-		if err := rows.Scan(&i.RevenueYears, &i.AvgRevenueYears, &i.Years); err != nil {
+		if err := rows.Scan(&i.SumRevenue, &i.AvgRevenue, &i.TimeRevenue); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

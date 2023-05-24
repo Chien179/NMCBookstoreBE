@@ -79,7 +79,6 @@ type Querier interface {
 	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	ListWishlistsByUsername(ctx context.Context, username string) ([]Wishlist, error)
 	RevenueDays(ctx context.Context) ([]RevenueDaysRow, error)
-	RevenueHours(ctx context.Context) ([]RevenueHoursRow, error)
 	RevenueMonths(ctx context.Context) ([]RevenueMonthsRow, error)
 	RevenueQuarters(ctx context.Context) ([]RevenueQuartersRow, error)
 	RevenueYears(ctx context.Context) ([]RevenueYearsRow, error)

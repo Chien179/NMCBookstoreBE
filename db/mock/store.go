@@ -731,10 +731,10 @@ func (mr *MockStoreMockRecorder) GetWishlist(arg0, arg1 interface{}) *gomock.Cal
 }
 
 // ListAddresses mocks base method.
-func (m *MockStore) ListAddresses(arg0 context.Context, arg1 string) ([]db.Address, error) {
+func (m *MockStore) ListAddresses(arg0 context.Context, arg1 string) ([]db.ListAddressesRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListAddresses", arg0, arg1)
-	ret0, _ := ret[0].([]db.Address)
+	ret0, _ := ret[0].([]db.ListAddressesRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -895,6 +895,21 @@ func (mr *MockStoreMockRecorder) ListGenres(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGenres", reflect.TypeOf((*MockStore)(nil).ListGenres), arg0)
 }
 
+// ListNewestBooks mocks base method.
+func (m *MockStore) ListNewestBooks(arg0 context.Context) ([]db.Book, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListNewestBooks", arg0)
+	ret0, _ := ret[0].([]db.Book)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListNewestBooks indicates an expected call of ListNewestBooks.
+func (mr *MockStoreMockRecorder) ListNewestBooks(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListNewestBooks", reflect.TypeOf((*MockStore)(nil).ListNewestBooks), arg0)
+}
+
 // ListOders mocks base method.
 func (m *MockStore) ListOders(arg0 context.Context) ([]db.Order, error) {
 	m.ctrl.T.Helper()
@@ -970,34 +985,19 @@ func (mr *MockStoreMockRecorder) ListSubgenresNoticeable(arg0 interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListSubgenresNoticeable", reflect.TypeOf((*MockStore)(nil).ListSubgenresNoticeable), arg0)
 }
 
-// ListTop10NewestBooks mocks base method.
-func (m *MockStore) ListTop10NewestBooks(arg0 context.Context) ([]db.Book, error) {
+// ListTheBestBooks mocks base method.
+func (m *MockStore) ListTheBestBooks(arg0 context.Context) ([]db.Book, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListTop10NewestBooks", arg0)
+	ret := m.ctrl.Call(m, "ListTheBestBooks", arg0)
 	ret0, _ := ret[0].([]db.Book)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// ListTop10NewestBooks indicates an expected call of ListTop10NewestBooks.
-func (mr *MockStoreMockRecorder) ListTop10NewestBooks(arg0 interface{}) *gomock.Call {
+// ListTheBestBooks indicates an expected call of ListTheBestBooks.
+func (mr *MockStoreMockRecorder) ListTheBestBooks(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTop10NewestBooks", reflect.TypeOf((*MockStore)(nil).ListTop10NewestBooks), arg0)
-}
-
-// ListTop10TheBestBooks mocks base method.
-func (m *MockStore) ListTop10TheBestBooks(arg0 context.Context) ([]db.Book, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListTop10TheBestBooks", arg0)
-	ret0, _ := ret[0].([]db.Book)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListTop10TheBestBooks indicates an expected call of ListTop10TheBestBooks.
-func (mr *MockStoreMockRecorder) ListTop10TheBestBooks(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTop10TheBestBooks", reflect.TypeOf((*MockStore)(nil).ListTop10TheBestBooks), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTheBestBooks", reflect.TypeOf((*MockStore)(nil).ListTheBestBooks), arg0)
 }
 
 // ListTransactionsByOrderID mocks base method.
@@ -1073,21 +1073,6 @@ func (m *MockStore) RevenueDays(arg0 context.Context) ([]db.RevenueDaysRow, erro
 func (mr *MockStoreMockRecorder) RevenueDays(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueDays", reflect.TypeOf((*MockStore)(nil).RevenueDays), arg0)
-}
-
-// RevenueHours mocks base method.
-func (m *MockStore) RevenueHours(arg0 context.Context) ([]db.RevenueHoursRow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RevenueHours", arg0)
-	ret0, _ := ret[0].([]db.RevenueHoursRow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RevenueHours indicates an expected call of RevenueHours.
-func (mr *MockStoreMockRecorder) RevenueHours(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RevenueHours", reflect.TypeOf((*MockStore)(nil).RevenueHours), arg0)
 }
 
 // RevenueMonths mocks base method.

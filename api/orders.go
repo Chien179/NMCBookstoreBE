@@ -224,7 +224,8 @@ func (server *Server) cancelOrder(ctx *gin.Context) {
 }
 
 type listOrderResponse struct {
-	ID           int64            `uri:"id"`
+	ID           int64            `json:"id"`
+	Username     string           `json:"username"`
 	Books        []db.Book        `json:"books"`
 	Transactions []db.Transaction `json:"transactions"`
 	Status       string           `json:"status"`
@@ -264,6 +265,7 @@ func (server *Server) listOrder(ctx *gin.Context) {
 
 		rsp = append(rsp, listOrderResponse{
 			ID:           order.ID,
+			Username:     order.Username,
 			Books:        books,
 			Transactions: transactions,
 			Status:       order.Status,
@@ -310,6 +312,7 @@ func (server *Server) listOrderPaid(ctx *gin.Context) {
 
 			rsp = append(rsp, listOrderResponse{
 				ID:           order.ID,
+				Username:     order.Username,
 				Books:        books,
 				Transactions: transactions,
 				Status:       order.Status,
@@ -361,6 +364,7 @@ func (server *Server) listOrderCancelled(ctx *gin.Context) {
 
 			rsp = append(rsp, listOrderResponse{
 				ID:           order.ID,
+				Username:     order.Username,
 				Books:        books,
 				Transactions: transactions,
 				Status:       order.Status,

@@ -18,8 +18,8 @@ type createBookRequest struct {
 	Author      string                 `form:"author" binding:"required"`
 	Publisher   string                 `form:"publisher" binding:"required"`
 	Quantity    int32                  `form:"quantity" binding:"required"`
-	GenresID    int64                  `form:"genres_id" binding:"required"`
-	SubgenresID int64                  `form:"subgenres_id" binding:"required"`
+	GenresID    []int64                `form:"genres_id" binding:"required"`
+	SubgenresID []int64                `form:"subgenres_id" binding:"required"`
 }
 
 // @Summary      Create book
@@ -66,26 +66,30 @@ func (server *Server) createBook(ctx *gin.Context) {
 		return
 	}
 
-	argBG := db.CreateBookGenreParams{
-		BooksID:  book.ID,
-		GenresID: req.GenresID,
+	for _, genreID := range req.GenresID {
+		argBG := db.CreateBookGenreParams{
+			BooksID:  book.ID,
+			GenresID: genreID,
+		}
+
+		_, err = server.store.CreateBookGenre(ctx, argBG)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
 	}
 
-	_, err = server.store.CreateBookGenre(ctx, argBG)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
+	for _, subgenreID := range req.SubgenresID {
+		argBS := db.CreateBookSubgenreParams{
+			BooksID:     book.ID,
+			SubgenresID: subgenreID,
+		}
 
-	argBS := db.CreateBookSubgenreParams{
-		BooksID:     book.ID,
-		SubgenresID: req.SubgenresID,
-	}
-
-	_, err = server.store.CreateBookSubgenre(ctx, argBS)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
+		_, err = server.store.CreateBookSubgenre(ctx, argBS)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
 	}
 
 	ctx.JSON(http.StatusOK, book)
