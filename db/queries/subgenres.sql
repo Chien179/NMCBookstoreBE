@@ -8,6 +8,10 @@ SELECT *
 FROM subgenres
 WHERE genres_id = $1
 ORDER BY id;
+-- name: ListAllSubgenres :many
+SELECT *
+FROM subgenres
+ORDER BY id;
 -- name: CreateSubgenre :one
 INSERT INTO subgenres (genres_id, name)
 VALUES ($1, $2)

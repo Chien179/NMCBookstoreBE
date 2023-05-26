@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -10,39 +9,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type createBookRequest struct {
-	Name        string                 `form:"name" binding:"required"`
-	Price       float64                `form:"price" binding:"required"`
-	Image       []multipart.FileHeader `form:"image" binding:"required"`
-	Description string                 `form:"description" binding:"required"`
-	Author      string                 `form:"author" binding:"required"`
-	Publisher   string                 `form:"publisher" binding:"required"`
-	Quantity    int32                  `form:"quantity" binding:"required"`
-	GenresID    []int64                `form:"genres_id" binding:"required"`
-	SubgenresID []int64                `form:"subgenres_id" binding:"required"`
+type bookResponse struct {
+	ID          int64         `json:"id"`
+	Name        string        `json:"name"`
+	Price       float64       `json:"price"`
+	Image       []string      `json:"image"`
+	Description string        `json:"description"`
+	Author      string        `json:"author"`
+	Publisher   string        `json:"publisher"`
+	Quantity    int32         `json:"quantity"`
+	Genres      []db.Genre    `json:"genres"`
+	Subgenres   []db.Subgenre `json:"subgenres"`
 }
 
-// @Summary      Create book
-// @Description  Use this API to create book
-// @Tags         Admin
-// @Accept       json
-// @Produce      json
-// @Param        Request body createBookRequest  true  "Create book"
-// @Success      200  {object}  db.Book
-// @failure	 	 400
-// @failure		 500
-// @Router       /admin/books [post]
 func (server *Server) createBook(ctx *gin.Context) {
-	var req createBookRequest
-	if err := ctx.ShouldBind(&req); err != nil {
+	req, err := ctx.MultipartForm()
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	var imgUrls []string
 
-	for i, img := range req.Image {
-		imgUrl, err := server.uploadFile(ctx, &img, "NMCBookstore/Image/Books/"+req.Name, req.Name+" "+strconv.Itoa(int(i)))
+	for i, img := range req.File["image"] {
+		imgUrl, err := server.uploadFile(ctx, img, "NMCBookstore/Image/Books/"+req.Value["name"][0], req.Value["name"][0]+" "+strconv.Itoa(int(i)))
 		if err != nil {
 			return
 		} else {
@@ -50,14 +40,25 @@ func (server *Server) createBook(ctx *gin.Context) {
 		}
 	}
 
+	price, err := strconv.Atoi(req.Value["price"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	quantity, err := strconv.Atoi(req.Value["quantity"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	arg := db.CreateBookParams{
-		Name:        req.Name,
-		Price:       req.Price,
+		Name:        req.Value["name"][0],
+		Price:       float64(price),
 		Image:       imgUrls,
-		Description: req.Description,
-		Author:      req.Author,
-		Publisher:   req.Publisher,
-		Quantity:    req.Quantity,
+		Description: req.Value["description"][0],
+		Author:      req.Value["author"][0],
+		Publisher:   req.Value["publisher"][0],
+		Quantity:    int32(quantity),
 	}
 
 	book, err := server.store.CreateBook(ctx, arg)
@@ -66,10 +67,17 @@ func (server *Server) createBook(ctx *gin.Context) {
 		return
 	}
 
-	for _, genreID := range req.GenresID {
+	genres := []db.Genre{}
+	for _, ID := range req.Value["genres_id"] {
+		id, err := strconv.Atoi(ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
 		argBG := db.CreateBookGenreParams{
 			BooksID:  book.ID,
-			GenresID: genreID,
+			GenresID: int64(id),
 		}
 
 		_, err = server.store.CreateBookGenre(ctx, argBG)
@@ -77,12 +85,27 @@ func (server *Server) createBook(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
+
+		genre, err := server.store.GetGenre(ctx, int64(id))
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		genres = append(genres, genre)
 	}
 
-	for _, subgenreID := range req.SubgenresID {
+	subgenres := []db.Subgenre{}
+	for _, ID := range req.Value["subgenres_id"] {
+		id, err := strconv.Atoi(ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
 		argBS := db.CreateBookSubgenreParams{
 			BooksID:     book.ID,
-			SubgenresID: subgenreID,
+			SubgenresID: int64(id),
 		}
 
 		_, err = server.store.CreateBookSubgenre(ctx, argBS)
@@ -90,26 +113,36 @@ func (server *Server) createBook(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
+
+		subgenre, err := server.store.GetSubgenre(ctx, int64(id))
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		subgenres = append(subgenres, subgenre)
 	}
 
-	ctx.JSON(http.StatusOK, book)
+	rsp := bookResponse{
+		ID:          book.ID,
+		Name:        book.Name,
+		Price:       book.Price,
+		Image:       book.Image,
+		Description: book.Description,
+		Author:      book.Author,
+		Publisher:   book.Publisher,
+		Quantity:    book.Quantity,
+		Genres:      genres,
+		Subgenres:   subgenres,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 type getBookRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
-// @Summary      Get book
-// @Description  Use this API to get book
-// @Tags         Books
-// @Accept       json
-// @Produce      json
-// @Param        id path int  true  "get book"
-// @Success      200  {object}  db.Book
-// @failure	 	 400
-// @failure	 	 404
-// @failure		 500
-// @Router       /books/{id} [get]
 func (server *Server) getBook(ctx *gin.Context) {
 	var req getBookRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
@@ -127,49 +160,69 @@ func (server *Server) getBook(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, book)
+	genresID, err := server.store.ListBooksGenresIDByBookID(ctx, book.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	subgenresID, err := server.store.ListBooksSubgenresIDByBookID(ctx, book.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	genres := []db.Genre{}
+	for _, ID := range genresID {
+		genre, err := server.store.GetGenre(ctx, ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		genres = append(genres, genre)
+	}
+
+	subgenres := []db.Subgenre{}
+	for _, ID := range subgenresID {
+		subgenre, err := server.store.GetSubgenre(ctx, ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		subgenres = append(subgenres, subgenre)
+	}
+
+	rsp := bookResponse{
+		ID:          book.ID,
+		Name:        book.Name,
+		Price:       book.Price,
+		Image:       book.Image,
+		Description: book.Description,
+		Author:      book.Author,
+		Publisher:   book.Publisher,
+		Quantity:    book.Quantity,
+		Genres:      genres,
+		Subgenres:   subgenres,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
-type updateBookData struct {
-	Name        string                 `form:"name"`
-	Price       float64                `form:"price"`
-	Image       []multipart.FileHeader `form:"image" binding:"required"`
-	Description string                 `form:"description"`
-	Author      string                 `form:"author"`
-	Publisher   string                 `form:"publisher"`
-	Quantity    int32                  `form:"quantity"`
-}
-
-type updateBookRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
-	updateBookData
-}
-
-// @Summary      Update book
-// @Description  Use this API to update book
-// @Tags         Admin
-// @Accept       json
-// @Produce      json
-// @Param        id path int  true  "Update book id"
-// @Param        Request body updateBookData  false  "Update book request"
-// @Success      200  {object}  db.Book
-// @failure	 	 400
-// @failure	 	 404
-// @failure		 500
-// @Router       /admin/books/update/{id} [put]
 func (server *Server) updateBook(ctx *gin.Context) {
-	var req updateBookRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
+	req, err := ctx.MultipartForm()
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if err := ctx.ShouldBind(&req.updateBookData); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	id, err := strconv.Atoi(req.Value["id"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	book, err := server.store.GetBook(ctx, req.ID)
+	book, err := server.store.GetBook(ctx, int64(id))
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -179,43 +232,56 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		return
 	}
 
-	var imgUrls []string
+	imgUrls := req.Value["image"]
 
-	for i, img := range req.Image {
-		imgUrl, err := server.uploadFile(ctx, &img, "NMCBookstore/Image/Books/"+req.Name, req.Name+" "+strconv.Itoa(int(i)))
-		if err != nil {
-			return
-		} else {
-			imgUrls = append(imgUrls, imgUrl)
+	if req.File["files"] != nil {
+		for i, img := range req.File["files"] {
+			imgUrl, err := server.uploadFile(ctx, img, "NMCBookstore/Image/Books/"+req.Value["name"][0], req.Value["name"][0]+" "+strconv.Itoa(int(i)))
+			if err != nil {
+				return
+			} else {
+				imgUrls = append(imgUrls, imgUrl)
+			}
 		}
+	}
+
+	price, err := strconv.Atoi(req.Value["price"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	quantity, err := strconv.Atoi(req.Value["quantity"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	arg := db.UpdateBookParams{
 		ID: book.ID,
 		Name: sql.NullString{
-			String: req.updateBookData.Name,
-			Valid:  req.updateBookData.Name != "",
+			String: req.Value["name"][0],
+			Valid:  req.Value["name"][0] != "",
 		},
 		Price: sql.NullFloat64{
-			Float64: req.updateBookData.Price,
-			Valid:   req.updateBookData.Price > -1,
+			Float64: float64(price),
+			Valid:   price > 0,
 		},
 		Image: imgUrls,
 		Description: sql.NullString{
-			String: req.updateBookData.Description,
-			Valid:  req.updateBookData.Description != "",
+			String: req.Value["description"][0],
+			Valid:  req.Value["description"][0] != "",
 		},
 		Author: sql.NullString{
-			String: req.updateBookData.Author,
-			Valid:  req.updateBookData.Author != "",
+			String: req.Value["author"][0],
+			Valid:  req.Value["author"][0] != "",
 		},
 		Publisher: sql.NullString{
-			String: req.updateBookData.Publisher,
-			Valid:  req.updateBookData.Publisher != "",
+			String: req.Value["publisher"][0],
+			Valid:  req.Value["publisher"][0] != "",
 		},
 		Quantity: sql.NullInt32{
-			Int32: req.updateBookData.Quantity,
-			Valid: req.updateBookData.Quantity > 0,
+			Int32: int32(quantity),
+			Valid: quantity > 0,
 		},
 	}
 
@@ -225,7 +291,87 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, updatedBook)
+	err = server.store.DeleteBookGenreByBooksID(ctx, book.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = server.store.DeleteBookSubgenreByBooksID(ctx, book.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	genres := []db.Genre{}
+	for _, ID := range req.Value["genres_id"] {
+		id, err := strconv.Atoi(ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		argBG := db.CreateBookGenreParams{
+			BooksID:  book.ID,
+			GenresID: int64(id),
+		}
+
+		_, err = server.store.CreateBookGenre(ctx, argBG)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		genre, err := server.store.GetGenre(ctx, int64(id))
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		genres = append(genres, genre)
+	}
+
+	subgenres := []db.Subgenre{}
+	for _, ID := range req.Value["subgenres_id"] {
+		id, err := strconv.Atoi(ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		argBS := db.CreateBookSubgenreParams{
+			BooksID:     book.ID,
+			SubgenresID: int64(id),
+		}
+
+		_, err = server.store.CreateBookSubgenre(ctx, argBS)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		subgenre, err := server.store.GetSubgenre(ctx, int64(id))
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		subgenres = append(subgenres, subgenre)
+	}
+
+	rsp := bookResponse{
+		ID:          updatedBook.ID,
+		Name:        updatedBook.Name,
+		Price:       updatedBook.Price,
+		Image:       updatedBook.Image,
+		Description: updatedBook.Description,
+		Author:      updatedBook.Author,
+		Publisher:   updatedBook.Publisher,
+		Quantity:    updatedBook.Quantity,
+		Genres:      genres,
+		Subgenres:   subgenres,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 type deleteBookRequest struct {

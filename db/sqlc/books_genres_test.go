@@ -38,7 +38,7 @@ func TestDeleteBookGenre(t *testing.T) {
 	genre := createRandomGenre(t)
 	bookGenre1 := createRandomBookGenre(t, book, genre)
 
-	err := testQueries.DeleteBookGenre(context.Background(), bookGenre1.ID)
+	err := testQueries.DeleteBookGenreByBooksID(context.Background(), book.ID)
 	require.NoError(t, err)
 
 	bookGenre2, err := testQueries.GetBookGenre(context.Background(), bookGenre1.ID)

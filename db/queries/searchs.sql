@@ -31,6 +31,19 @@ SELECT t.total_page, JSON_AGG(json_build_object
             AND (searchs.rating >= sqlc.narg(rating) OR sqlc.narg(rating) IS NULL)
             AND (searchs.genres_id = sqlc.narg(genres_id) OR sqlc.narg(genres_id) IS NULL)
             AND (searchs.subgenres_id = sqlc.narg(subgenres_id) OR sqlc.narg(subgenres_id) IS NULL)
+        GROUP BY 
+        	id,
+            name,
+            price,
+            image,
+            description,
+            author,
+            publisher,
+            quantity,
+            rating,
+            genres_id,
+            created_at,
+            ts_rank
         ORDER BY ts_rank DESC
         LIMIT sqlc.arg('limit')
         OFFSET sqlc.arg('offset')

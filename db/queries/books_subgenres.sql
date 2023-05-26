@@ -12,6 +12,11 @@ SELECT * FROM books_subgenres
 WHERE books_id = $1
 ORDER BY id;
 
+-- name: ListBooksSubgenresIDByBookID :many
+SELECT subgenres_id FROM books_subgenres
+WHERE books_id = $1
+ORDER BY id;
+
 -- name: CreateBookSubgenre :one
 INSERT INTO books_subgenres (
   books_id,
@@ -21,6 +26,6 @@ INSERT INTO books_subgenres (
 )
 RETURNING *;
 
--- name: DeleteBookSubgenre :exec
+-- name: DeleteBookSubgenreByBooksID :exec
 DELETE FROM books_subgenres
-WHERE id = $1;
+WHERE books_id = $1;

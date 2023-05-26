@@ -44,6 +44,19 @@ SELECT t.total_page, JSON_AGG(json_build_object
             AND (searchs.rating >= $5 OR $5 IS NULL)
             AND (searchs.genres_id = $6 OR $6 IS NULL)
             AND (searchs.subgenres_id = $7 OR $7 IS NULL)
+        GROUP BY 
+        	id,
+            name,
+            price,
+            image,
+            description,
+            author,
+            publisher,
+            quantity,
+            rating,
+            genres_id,
+            created_at,
+            ts_rank
         ORDER BY ts_rank DESC
         LIMIT $1
         OFFSET $8

@@ -334,32 +334,32 @@ func (mr *MockStoreMockRecorder) DeleteBook(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBook", reflect.TypeOf((*MockStore)(nil).DeleteBook), arg0, arg1)
 }
 
-// DeleteBookGenre mocks base method.
-func (m *MockStore) DeleteBookGenre(arg0 context.Context, arg1 int64) error {
+// DeleteBookGenreByBooksID mocks base method.
+func (m *MockStore) DeleteBookGenreByBooksID(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteBookGenre", arg0, arg1)
+	ret := m.ctrl.Call(m, "DeleteBookGenreByBooksID", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteBookGenre indicates an expected call of DeleteBookGenre.
-func (mr *MockStoreMockRecorder) DeleteBookGenre(arg0, arg1 interface{}) *gomock.Call {
+// DeleteBookGenreByBooksID indicates an expected call of DeleteBookGenreByBooksID.
+func (mr *MockStoreMockRecorder) DeleteBookGenreByBooksID(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBookGenre", reflect.TypeOf((*MockStore)(nil).DeleteBookGenre), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBookGenreByBooksID", reflect.TypeOf((*MockStore)(nil).DeleteBookGenreByBooksID), arg0, arg1)
 }
 
-// DeleteBookSubgenre mocks base method.
-func (m *MockStore) DeleteBookSubgenre(arg0 context.Context, arg1 int64) error {
+// DeleteBookSubgenreByBooksID mocks base method.
+func (m *MockStore) DeleteBookSubgenreByBooksID(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteBookSubgenre", arg0, arg1)
+	ret := m.ctrl.Call(m, "DeleteBookSubgenreByBooksID", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteBookSubgenre indicates an expected call of DeleteBookSubgenre.
-func (mr *MockStoreMockRecorder) DeleteBookSubgenre(arg0, arg1 interface{}) *gomock.Call {
+// DeleteBookSubgenreByBooksID indicates an expected call of DeleteBookSubgenreByBooksID.
+func (mr *MockStoreMockRecorder) DeleteBookSubgenreByBooksID(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBookSubgenre", reflect.TypeOf((*MockStore)(nil).DeleteBookSubgenre), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteBookSubgenreByBooksID", reflect.TypeOf((*MockStore)(nil).DeleteBookSubgenreByBooksID), arg0, arg1)
 }
 
 // DeleteCart mocks base method.

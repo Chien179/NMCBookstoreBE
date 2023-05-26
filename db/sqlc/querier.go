@@ -30,8 +30,8 @@ type Querier interface {
 	CreateWishlist(ctx context.Context, arg CreateWishlistParams) (Wishlist, error)
 	DeleteAddress(ctx context.Context, id int64) error
 	DeleteBook(ctx context.Context, id int64) error
-	DeleteBookGenre(ctx context.Context, id int64) error
-	DeleteBookSubgenre(ctx context.Context, id int64) error
+	DeleteBookGenreByBooksID(ctx context.Context, booksID int64) error
+	DeleteBookSubgenreByBooksID(ctx context.Context, booksID int64) error
 	DeleteCart(ctx context.Context, arg DeleteCartParams) error
 	DeleteGenre(ctx context.Context, id int64) error
 	DeleteOrder(ctx context.Context, id int64) error
@@ -59,11 +59,14 @@ type Querier interface {
 	GetWishlist(ctx context.Context, id int64) (Wishlist, error)
 	ListAddresses(ctx context.Context, username string) ([]ListAddressesRow, error)
 	ListAllBooks(ctx context.Context) ([]Book, error)
+	ListAllSubgenres(ctx context.Context) ([]Subgenre, error)
 	ListBooks(ctx context.Context, arg ListBooksParams) (ListBooksRow, error)
 	ListBooksGenresByBookID(ctx context.Context, booksID int64) ([]BooksGenre, error)
 	ListBooksGenresByGenreID(ctx context.Context, genresID int64) ([]BooksGenre, error)
+	ListBooksGenresIDByBookID(ctx context.Context, booksID int64) ([]int64, error)
 	ListBooksSubgenresByBookID(ctx context.Context, booksID int64) ([]BooksSubgenre, error)
 	ListBooksSubgenresBySubgenreID(ctx context.Context, subgenresID int64) ([]BooksSubgenre, error)
+	ListBooksSubgenresIDByBookID(ctx context.Context, booksID int64) ([]int64, error)
 	ListCartsByUsername(ctx context.Context, username string) ([]Cart, error)
 	ListCities(ctx context.Context) ([]City, error)
 	ListDistricts(ctx context.Context, cityID int64) ([]District, error)

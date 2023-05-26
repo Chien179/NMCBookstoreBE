@@ -62,6 +62,40 @@ func (q *Queries) GetSubgenre(ctx context.Context, id int64) (Subgenre, error) {
 	return i, err
 }
 
+const listAllSubgenres = `-- name: ListAllSubgenres :many
+SELECT id, genres_id, name, created_at
+FROM subgenres
+ORDER BY id
+`
+
+func (q *Queries) ListAllSubgenres(ctx context.Context) ([]Subgenre, error) {
+	rows, err := q.db.QueryContext(ctx, listAllSubgenres)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Subgenre{}
+	for rows.Next() {
+		var i Subgenre
+		if err := rows.Scan(
+			&i.ID,
+			&i.GenresID,
+			&i.Name,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listSubgenres = `-- name: ListSubgenres :many
 SELECT id, genres_id, name, created_at
 FROM subgenres

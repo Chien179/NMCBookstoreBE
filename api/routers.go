@@ -48,6 +48,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	subgenreRoutes := router.Group("/subgenres")
 	subgenreRoutes.GET("/one/:id", server.getSubgenre)
 	subgenreRoutes.GET("/:genre_id", server.listSubgenre)
+	subgenreRoutes.GET("/", server.listAllSubgenre)
 	subgenreRoutes.GET("/noticeable", server.listSubgenresNoticeable)
 
 	reviewRoutes := router.Group("/reviews")

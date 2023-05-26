@@ -36,13 +36,13 @@ func (q *Queries) CreateBookGenre(ctx context.Context, arg CreateBookGenreParams
 	return i, err
 }
 
-const deleteBookGenre = `-- name: DeleteBookGenre :exec
+const deleteBookGenreByBooksID = `-- name: DeleteBookGenreByBooksID :exec
 DELETE FROM books_genres
-WHERE id = $1
+WHERE books_id = $1
 `
 
-func (q *Queries) DeleteBookGenre(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, deleteBookGenre, id)
+func (q *Queries) DeleteBookGenreByBooksID(ctx context.Context, booksID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteBookGenreByBooksID, booksID)
 	return err
 }
 
@@ -121,6 +121,35 @@ func (q *Queries) ListBooksGenresByGenreID(ctx context.Context, genresID int64) 
 			return nil, err
 		}
 		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBooksGenresIDByBookID = `-- name: ListBooksGenresIDByBookID :many
+SELECT genres_id FROM books_genres
+WHERE books_id = $1
+ORDER BY id
+`
+
+func (q *Queries) ListBooksGenresIDByBookID(ctx context.Context, booksID int64) ([]int64, error) {
+	rows, err := q.db.QueryContext(ctx, listBooksGenresIDByBookID, booksID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []int64{}
+	for rows.Next() {
+		var genres_id int64
+		if err := rows.Scan(&genres_id); err != nil {
+			return nil, err
+		}
+		items = append(items, genres_id)
 	}
 	if err := rows.Close(); err != nil {
 		return nil, err

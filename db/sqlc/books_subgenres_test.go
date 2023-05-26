@@ -40,7 +40,7 @@ func TestDeleteBookSubgenre(t *testing.T) {
 	subgenre := createRandomSubgenre(t, genre)
 	bookSubgenre1 := createRandomBookSubgenre(t, book, subgenre)
 
-	err := testQueries.DeleteBookSubgenre(context.Background(), bookSubgenre1.ID)
+	err := testQueries.DeleteBookSubgenreByBooksID(context.Background(), book.ID)
 	require.NoError(t, err)
 
 	bookSubgenre2, err := testQueries.GetBookSubgenre(context.Background(), bookSubgenre1.ID)

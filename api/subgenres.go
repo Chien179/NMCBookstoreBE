@@ -190,10 +190,16 @@ func (server *Server) listSubgenre(ctx *gin.Context) {
 
 	subgenres, err := server.store.ListSubgenres(ctx, req.GenreID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, subgenres)
+}
+
+func (server *Server) listAllSubgenre(ctx *gin.Context) {
+	subgenres, err := server.store.ListAllSubgenres(ctx)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
