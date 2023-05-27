@@ -18,6 +18,7 @@ type bookResponse struct {
 	Author      string        `json:"author"`
 	Publisher   string        `json:"publisher"`
 	Quantity    int32         `json:"quantity"`
+	Rating      float64       `json:"rating"`
 	Genres      []db.Genre    `json:"genres"`
 	Subgenres   []db.Subgenre `json:"subgenres"`
 }
@@ -134,6 +135,7 @@ func (server *Server) createBook(ctx *gin.Context) {
 		Quantity:    book.Quantity,
 		Genres:      genres,
 		Subgenres:   subgenres,
+		Rating:      0,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -205,6 +207,7 @@ func (server *Server) getBook(ctx *gin.Context) {
 		Quantity:    book.Quantity,
 		Genres:      genres,
 		Subgenres:   subgenres,
+		Rating:      book.Rating,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -369,6 +372,7 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		Quantity:    updatedBook.Quantity,
 		Genres:      genres,
 		Subgenres:   subgenres,
+		Rating:      updatedBook.Rating,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

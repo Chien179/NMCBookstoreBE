@@ -16,7 +16,7 @@ CREATE TABLE "searchs" AS
 			s.id AS subgenres_id
 		FROM
 			books b
-			INNER JOIN books_genres bg ON b.id = bg.id
+			INNER JOIN books_genres bg ON b.id = bg.books_id
 			INNER JOIN books_subgenres bs ON b.id = bs.books_id
 			INNER JOIN genres g ON bg.genres_id = g.id
 			INNER JOIN subgenres s ON bs.subgenres_id = s.id;
@@ -44,7 +44,7 @@ BEGIN
 			s.id AS subgenres_id
 		FROM
 			books b
-			INNER JOIN books_genres bg ON b.id = bg.id
+			INNER JOIN books_genres bg ON b.id = bg.books_id
 			INNER JOIN books_subgenres bs ON b.id = bs.books_id
 			INNER JOIN genres g ON bg.genres_id = g.id
 			INNER JOIN subgenres s ON bs.subgenres_id = s.id;

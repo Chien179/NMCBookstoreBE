@@ -37,6 +37,7 @@ type UserResponse struct {
 	Sex               string    `json:"sex"`
 	PhoneNumber       string    `json:"phone_number"`
 	Role              string    `json:"role"`
+	IsEmailVerified   bool      `json:"is_email_verified"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
 }
@@ -51,6 +52,7 @@ func newUserResponse(user db.User) UserResponse {
 		Sex:               user.Sex,
 		PhoneNumber:       user.PhoneNumber,
 		Role:              user.Role,
+		IsEmailVerified:   user.IsEmailVerified,
 		PasswordChangedAt: user.PasswordChangedAt,
 		CreatedAt:         user.CreatedAt,
 	}

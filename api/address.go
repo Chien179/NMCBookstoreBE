@@ -78,7 +78,7 @@ type getAddressRequest struct {
 // @Router       /users/addresses/{id} [get]
 func (server *Server) getAddress(ctx *gin.Context) {
 	var req getAddressRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -203,7 +203,7 @@ type deleteAddressRequest struct {
 // @Router       /users/addresses/delete/{id} [delete]
 func (server *Server) deleteAddress(ctx *gin.Context) {
 	var req deleteAddressRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
