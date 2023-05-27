@@ -9,6 +9,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"time"
+
+	"github.com/lib/pq"
 )
 
 const fullSearch = `-- name: FullSearch :one
@@ -94,4 +97,163 @@ func (q *Queries) FullSearch(ctx context.Context, arg FullSearchParams) (FullSea
 	var i FullSearchRow
 	err := row.Scan(&i.TotalPage, &i.Books)
 	return i, err
+}
+
+const justForYou = `-- name: JustForYou :many
+SELECT
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+FROM searchs
+GROUP BY
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+ORDER BY random()
+LIMIT 20
+`
+
+type JustForYouRow struct {
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Price       float64   `json:"price"`
+	Image       []string  `json:"image"`
+	Description string    `json:"description"`
+	Author      string    `json:"author"`
+	Publisher   string    `json:"publisher"`
+	Quantity    int32     `json:"quantity"`
+	Rating      float64   `json:"rating"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+func (q *Queries) JustForYou(ctx context.Context) ([]JustForYouRow, error) {
+	rows, err := q.db.QueryContext(ctx, justForYou)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []JustForYouRow{}
+	for rows.Next() {
+		var i JustForYouRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			pq.Array(&i.Image),
+			&i.Description,
+			&i.Author,
+			&i.Publisher,
+			&i.Quantity,
+			&i.Rating,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const recommend = `-- name: Recommend :many
+SELECT
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+FROM searchs
+WHERE genres_id = ANY ($1::bigint[])
+	AND subgenres_id = ANY ($2::bigint[])
+    AND id <> $3
+GROUP BY
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+ORDER BY random()
+LIMIT 40
+`
+
+type RecommendParams struct {
+	GenresID    []int64 `json:"genres_id"`
+	SubgenresID []int64 `json:"subgenres_id"`
+	BooksID     int64   `json:"books_id"`
+}
+
+type RecommendRow struct {
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Price       float64   `json:"price"`
+	Image       []string  `json:"image"`
+	Description string    `json:"description"`
+	Author      string    `json:"author"`
+	Publisher   string    `json:"publisher"`
+	Quantity    int32     `json:"quantity"`
+	Rating      float64   `json:"rating"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+func (q *Queries) Recommend(ctx context.Context, arg RecommendParams) ([]RecommendRow, error) {
+	rows, err := q.db.QueryContext(ctx, recommend, pq.Array(arg.GenresID), pq.Array(arg.SubgenresID), arg.BooksID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []RecommendRow{}
+	for rows.Next() {
+		var i RecommendRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Price,
+			pq.Array(&i.Image),
+			&i.Description,
+			&i.Author,
+			&i.Publisher,
+			&i.Quantity,
+			&i.Rating,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

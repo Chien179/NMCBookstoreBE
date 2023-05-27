@@ -453,10 +453,6 @@ func (server *Server) listBook(ctx *gin.Context) {
 
 	books, err := server.store.ListBooks(ctx, arg)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
 		if books.Books == nil {
 			ctx.JSON(http.StatusOK, books)
 			return

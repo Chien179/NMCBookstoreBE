@@ -61,3 +61,41 @@ func (server *Server) fullSearch(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, results)
 }
+
+type RecommedRequest struct {
+	BookID      int64   `form:"book_id"  binding:"required"`
+	GenresID    []int64 `form:"genres_id"  binding:"required"`
+	SubgenresID []int64 `form:"subgenres_id"  binding:"required"`
+}
+
+func (server *Server) recommend(ctx *gin.Context) {
+	var req RecommedRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.RecommendParams{
+		BooksID:     req.BookID,
+		GenresID:    req.GenresID,
+		SubgenresID: req.SubgenresID,
+	}
+
+	books, err := server.store.Recommend(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, books)
+}
+
+func (server *Server) justForYou(ctx *gin.Context) {
+	books, err := server.store.JustForYou(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, books)
+}

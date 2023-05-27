@@ -49,3 +49,60 @@ SELECT t.total_page, JSON_AGG(json_build_object
         OFFSET sqlc.arg('offset')
         ) AS t
     GROUP BY t.total_page;
+
+-- name: Recommend :many
+SELECT
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+FROM searchs
+WHERE genres_id = ANY (sqlc.arg(genres_id)::bigint[])
+	AND subgenres_id = ANY (sqlc.arg(subgenres_id)::bigint[])
+    AND id <> sqlc.arg(books_id)
+GROUP BY
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+ORDER BY random()
+LIMIT 40;
+
+-- name: JustForYou :many
+SELECT
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+FROM searchs
+GROUP BY
+	id,
+	name,
+	price,
+	image,
+	description,
+	author,
+	publisher,
+	quantity,
+	rating,
+	created_at
+ORDER BY random()
+LIMIT 20;

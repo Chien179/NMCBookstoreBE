@@ -146,6 +146,7 @@ SELECT t.total_page, JSON_AGG(json_build_object
     'author',t.author,
     'publisher',t.publisher,
     'quantity',t.quantity,
+    'rating', t.rating,
     'created_at',t.created_at)
     ) AS books
 	FROM (
