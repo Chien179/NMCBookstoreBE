@@ -375,6 +375,16 @@ func (server *Server) deleteUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "User deleted successfully")
 }
 
+func (server *Server) listUser(ctx *gin.Context) {
+	users, err := server.store.ListUsers(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, users)
+}
+
 func ValidateCreateUserRequest(req *createUserRequest) (errs []errorCustom) {
 	if err := val.ValidateUsername(req.Username); err != nil {
 		errs = append(errs, errorCustom{

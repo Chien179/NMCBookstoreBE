@@ -8,9 +8,7 @@ WHERE email = $1 LIMIT 1;
 
 -- name: ListUsers :many
 SELECT * FROM users
-ORDER BY username
-LIMIT $1
-OFFSET $2;
+ORDER BY username;
 
 -- name: CreateUser :one
 INSERT INTO users (

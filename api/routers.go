@@ -105,6 +105,9 @@ func (server *Server) userAuth(router *gin.Engine) {
 func (server *Server) adminAuth(router *gin.Engine) {
 	adminRoutes := router.Group("/admin")
 
+	userRoutes := adminRoutes.Group("/users").Use(authMiddleware(server.tokenMaker), isAdmin())
+	userRoutes.GET("/", server.listUser)
+
 	bookRoutes := adminRoutes.Group("/books").Use(authMiddleware(server.tokenMaker), isAdmin())
 	bookRoutes.GET("/", server.listAllBook)
 	bookRoutes.POST("/", server.createBook)

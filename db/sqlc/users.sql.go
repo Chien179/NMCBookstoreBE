@@ -129,17 +129,10 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 const listUsers = `-- name: ListUsers :many
 SELECT username, full_name, email, password, image, phone_number, age, sex, role, password_changed_at, created_at, is_email_verified FROM users
 ORDER BY username
-LIMIT $1
-OFFSET $2
 `
 
-type ListUsersParams struct {
-	Limit  int32 `json:"limit"`
-	Offset int32 `json:"offset"`
-}
-
-func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, listUsers, arg.Limit, arg.Offset)
+func (q *Queries) ListUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, listUsers)
 	if err != nil {
 		return nil, err
 	}

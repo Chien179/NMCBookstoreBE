@@ -80,7 +80,7 @@ type Querier interface {
 	ListSubgenresNoticeable(ctx context.Context) ([]ListSubgenresNoticeableRow, error)
 	ListTheBestBooks(ctx context.Context) ([]Book, error)
 	ListTransactionsByOrderID(ctx context.Context, ordersID int64) ([]Transaction, error)
-	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
+	ListUsers(ctx context.Context) ([]User, error)
 	ListWishlistsByUsername(ctx context.Context, username string) ([]Wishlist, error)
 	Recommend(ctx context.Context, arg RecommendParams) ([]RecommendRow, error)
 	RevenueDays(ctx context.Context) ([]RevenueDaysRow, error)
