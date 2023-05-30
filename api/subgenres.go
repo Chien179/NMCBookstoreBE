@@ -6,11 +6,12 @@ import (
 
 	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type createSubgenreRequest struct {
-	GenreID int64  `json:"genre_id" binding:"required,min=1"`
-	Name    string `json:"name" binding:"required"`
+	GenresID int64  `json:"genres_id" binding:"required,min=1"`
+	Name     string `json:"name" binding:"required"`
 }
 
 // @Summary      Create subgenre
@@ -31,12 +32,19 @@ func (server *Server) createSubgenre(ctx *gin.Context) {
 	}
 
 	arg := db.CreateSubgenreParams{
-		GenresID: req.GenreID,
+		GenresID: req.GenresID,
 		Name:     req.Name,
 	}
 
 	subgenre, err := server.store.CreateSubgenre(ctx, arg)
 	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			switch pqErr.Code.Name() {
+			case "foreign_key_violation", "unique_violation":
+				ctx.JSON(http.StatusForbidden, errorResponse(err))
+				return
+			}
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
