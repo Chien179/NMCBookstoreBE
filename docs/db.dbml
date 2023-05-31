@@ -7,7 +7,7 @@ Project nmc_bookstore {
 
 
 Table users as U {
-  username varchar [not null, pk]
+  username varchar [pk]
   full_name varchar [not null]
   email varchar [not null, unique]
   password varchar [not null]
@@ -22,7 +22,7 @@ Table users as U {
 }
 
 Table verify_emails {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   username varchar [ref: > U.username, not null]
   email varchar [not null]
   secret_code varchar [not null]
@@ -32,7 +32,7 @@ Table verify_emails {
 }
 
 Table reset_passwords {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   username varchar [ref: > U.username, not null]
   reset_code varchar [not null]
   is_used bool [not null, default: false]
@@ -41,7 +41,7 @@ Table reset_passwords {
 }
 
 Table address as A{
-  id bigserial [pk, increment]
+  id bigserial [pk]
   address varchar [not null]
   username varchar [ref: > U.username, not null]
   city_id bigserial [ref: > C.id, not null]
@@ -57,13 +57,13 @@ Table address as A{
 }
 
 Table cities as C {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   name varchar [not null]
   created_at timestamptz [not null, default:"now()"]
 }
 
 Table districts as D {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   city_id bigserial [ref: > C.id, not null]
   name varchar [not null]
   created_at timestamptz [not null, default:"now()"]
@@ -73,7 +73,7 @@ Table districts as D {
 }
 
 Table books as B {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   name varchar [not null]
   price float [not null]
   image varchar[] [not null]
@@ -86,13 +86,13 @@ Table books as B {
 }
 
 Table genres as G{
-  id bigserial [pk, increment]
+  id bigserial [pk]
   name varchar [not null]
   created_at timestamptz [not null, default:"now()"]
 }
 
 Table subgenres as SG{
-  id bigserial [pk, increment]
+  id bigserial [pk]
   genres_id bigserial [ref: > G.id, not null]
   name varchar [not null]
   created_at timestamptz [not null, default:"now()"]
@@ -103,7 +103,7 @@ Table subgenres as SG{
 }
 
 Table carts as BC{
-  id bigserial [pk, increment]
+  id bigserial [pk]
   books_id bigserial [ref: > B.id, not null]
   username varchar [ref: > U.username, not null]
   amount int [not null, default: 1]
@@ -118,7 +118,7 @@ Table carts as BC{
 }
 
 Table books_genres as BG {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   books_id bigserial [ref: > B.id, not null]
   genres_id bigserial [ref: > G.id, not null]
   created_at timestamptz [not null, default:"now()"]
@@ -131,7 +131,7 @@ Table books_genres as BG {
 }
 
 Table books_subgenres as BS {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   books_id bigserial [ref: > B.id, not null]
   subgenres_id bigserial [ref: > SG.id, not null]
   created_at timestamptz [not null, default:"now()"]
@@ -144,7 +144,7 @@ Table books_subgenres as BS {
 }
 
 Table reviews as R {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   username varchar [ref: > U.username, not null]
   books_id bigserial [ref: > B.id, not null]
   comments varchar [not null]
@@ -159,7 +159,7 @@ Table reviews as R {
 }
 
 Table orders as O {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   username varchar [ref: > U.username, not null]
   status varchar [not null, default:"unpaid"]
   sub_amount int [not null, default: 1]
@@ -172,7 +172,7 @@ Table orders as O {
 }
 
 Table transactions as T {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   orders_id bigserial [ref: > O.id, not null]
   books_id bigserial [ref: > B.id, not null]
   amount int [not null, default: 1]
@@ -187,7 +187,7 @@ Table transactions as T {
 }
 
 Table wishlists as BW{
-  id bigserial [pk, increment]
+  id bigserial [pk]
   books_id bigserial [ref: > B.id, not null]
   username varchar [ref: > U.username, not null]
   created_at timestamptz [not null, default:"now()"]
@@ -200,7 +200,7 @@ Table wishlists as BW{
 }
 
 Table sessions {
-    id uuid [pk, increment]
+    id uuid [pk]
     username varchar [ref: > U.username, not null]
     refresh_token varchar [not null]
     user_agent varchar [not null]
@@ -211,7 +211,7 @@ Table sessions {
 }
 
 Table searchs {
-    id bigserial [pk, increment]
+    id bigserial [pk]
     book_name varchar [not null]
     price float [not null]
     author varchar [not null]
@@ -223,7 +223,7 @@ Table searchs {
 }
 
 Table payments as P{
-  id bigserial [pk, increment]
+  id bigserial [pk]
   username varchar [ref: > U.username, not null]
   order_id bigserial [ref: - O.id, not null]
   shipping_id bigserial [ref: - S.id, not null]
@@ -241,7 +241,7 @@ Table payments as P{
 }
 
 Table shippings as S {
-  id bigserial [pk, increment]
+  id bigserial [pk]
   to_address varchar [not null]
   total float [not null, default:0]
 }

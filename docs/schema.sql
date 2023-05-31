@@ -1,9 +1,9 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-05-30T09:54:51.622Z
+-- Generated at: 2023-05-30T15:44:11.452Z
 
 CREATE TABLE "users" (
-  "username" varchar PRIMARY KEY NOT NULL,
+  "username" varchar PRIMARY KEY,
   "full_name" varchar NOT NULL,
   "email" varchar UNIQUE NOT NULL,
   "password" varchar NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "verify_emails" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "email" varchar NOT NULL,
   "secret_code" varchar NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE "verify_emails" (
 );
 
 CREATE TABLE "reset_passwords" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "reset_code" varchar NOT NULL,
   "is_used" bool NOT NULL DEFAULT false,
@@ -37,7 +37,7 @@ CREATE TABLE "reset_passwords" (
 );
 
 CREATE TABLE "address" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "address" varchar NOT NULL,
   "username" varchar NOT NULL,
   "city_id" bigserial NOT NULL,
@@ -46,20 +46,20 @@ CREATE TABLE "address" (
 );
 
 CREATE TABLE "cities" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "districts" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "city_id" bigserial NOT NULL,
   "name" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "books" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
   "price" float NOT NULL,
   "image" varchar[] NOT NULL,
@@ -72,20 +72,20 @@ CREATE TABLE "books" (
 );
 
 CREATE TABLE "genres" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "subgenres" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "genres_id" bigserial NOT NULL,
   "name" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "carts" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "username" varchar NOT NULL,
   "amount" int NOT NULL DEFAULT 1,
@@ -94,21 +94,21 @@ CREATE TABLE "carts" (
 );
 
 CREATE TABLE "books_genres" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "genres_id" bigserial NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "books_subgenres" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "subgenres_id" bigserial NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "reviews" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "books_id" bigserial NOT NULL,
   "comments" varchar NOT NULL,
@@ -117,7 +117,7 @@ CREATE TABLE "reviews" (
 );
 
 CREATE TABLE "orders" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "status" varchar NOT NULL DEFAULT 'unpaid',
   "sub_amount" int NOT NULL DEFAULT 1,
@@ -126,7 +126,7 @@ CREATE TABLE "orders" (
 );
 
 CREATE TABLE "transactions" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "orders_id" bigserial NOT NULL,
   "books_id" bigserial NOT NULL,
   "amount" int NOT NULL DEFAULT 1,
@@ -135,14 +135,14 @@ CREATE TABLE "transactions" (
 );
 
 CREATE TABLE "wishlists" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "username" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
 CREATE TABLE "sessions" (
-  "id" SERIAL PRIMARY KEY,
+  "id" uuid PRIMARY KEY,
   "username" varchar NOT NULL,
   "refresh_token" varchar NOT NULL,
   "user_agent" varchar NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE "sessions" (
 );
 
 CREATE TABLE "searchs" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "book_name" varchar NOT NULL,
   "price" float NOT NULL,
   "author" varchar NOT NULL,
@@ -165,7 +165,7 @@ CREATE TABLE "searchs" (
 );
 
 CREATE TABLE "payments" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "order_id" bigserial NOT NULL,
   "shipping_id" bigserial NOT NULL,
@@ -176,7 +176,7 @@ CREATE TABLE "payments" (
 );
 
 CREATE TABLE "shippings" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id" bigserial PRIMARY KEY,
   "to_address" varchar NOT NULL,
   "total" float NOT NULL DEFAULT 0
 );
