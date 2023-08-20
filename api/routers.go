@@ -109,7 +109,7 @@ func (server *Server) adminAuth(router *gin.Engine) {
 	userRoutes.GET("/", server.listUser)
 
 	bookRoutes := adminRoutes.Group("/books").Use(authMiddleware(server.tokenMaker), isAdmin())
-	bookRoutes.GET("/", server.listAllBook)
+	bookRoutes.GET("/", server.listBook)
 	bookRoutes.POST("/", server.createBook)
 	bookRoutes.PUT("/:id", server.updateBook)
 	bookRoutes.DELETE("/:id", server.deleteBook)

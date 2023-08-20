@@ -3,6 +3,7 @@ SELECT *
 FROM address
 WHERE id = $1
 LIMIT 1;
+
 -- name: ListAddresses :many
 SELECT address.id AS id,
   address.address AS address,
@@ -13,6 +14,7 @@ FROM address
   INNER JOIN districts ON districts.id = address.district_id
 WHERE address.username = $1
 ORDER BY address.id;
+
 -- name: CreateAddress :one
 INSERT INTO address (
     username,
@@ -22,9 +24,11 @@ INSERT INTO address (
   )
 VALUES ($1, $2, $3, $4)
 RETURNING *;
+
 -- name: DeleteAddress :exec
 DELETE FROM address
 WHERE id = $1;
+
 -- name: UpdateAddress :one
 UPDATE address
 SET address = COALESCE(sqlc.narg(address), address),

@@ -24,9 +24,24 @@ SELECT * FROM orders
 WHERE username = $1
 ORDER BY id;
 
--- name: ListOders :many
-SELECT * FROM orders
-ORDER BY id;
+-- name: ListOders :one
+SELECT t.total_page, JSON_AGG(json_build_object
+    ('id',t.id,
+    'username',t.username,
+    'status',t.status,
+    'sub_amount',t.sub_amount,
+    'sub_total',t.sub_total,
+    'created_at',t.created_at)
+    ) AS orders
+	FROM (
+      SELECT 
+        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/sqlc.arg('limit')) AS total_page, * 
+      FROM orders
+      ORDER BY id
+      LIMIT sqlc.arg('limit')
+      OFFSET sqlc.arg('offset')
+    ) AS t
+    GROUP BY t.total_page;
 
 -- name: UpdateOrder :one
 UPDATE orders

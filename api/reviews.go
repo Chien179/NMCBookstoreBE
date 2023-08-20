@@ -44,6 +44,40 @@ func (server *Server) createReview(ctx *gin.Context) {
 	}
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
+
+	userOrders, err := server.store.ListOdersByUserName(ctx, authPayLoad.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	orderTransactions := []db.Transaction{}
+	for _, order := range userOrders {
+		orderTransactions, err = server.store.ListTransactionsByOrderID(ctx, order.ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+	}
+
+	isReviewed := false
+	for _, transaction := range orderTransactions {
+		if transaction.BooksID == req.BookID && transaction.Reviewed == false {
+			isReviewed = true
+			_, err := server.store.UpdateTransaction(ctx, transaction.ID)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+			break
+		}
+	}
+
+	if !isReviewed {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	arg := db.CreateReviewParams{
 		Username: authPayLoad.Username,
 		BooksID:  req.BookID,

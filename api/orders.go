@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -87,7 +88,7 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		argBook := db.UpdateBookParams{
 			ID: book.ID,
 			Quantity: sql.NullInt32{
-				Int32: book.Quantity - 1,
+				Int32: book.Quantity - cart.Amount,
 				Valid: true,
 			},
 			Image: book.Image,
@@ -223,6 +224,11 @@ func (server *Server) cancelOrder(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, order)
 }
 
+type listOrderRequest struct {
+	PageID   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=24,max=100"`
+}
+
 type listOrderResponse struct {
 	ID           int64            `json:"id"`
 	Username     string           `json:"username"`
@@ -234,7 +240,18 @@ type listOrderResponse struct {
 }
 
 func (server *Server) listOrder(ctx *gin.Context) {
-	orders, err := server.store.ListOders(ctx)
+	var req listOrderRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListOdersParams{
+		Limit:  req.PageSize,
+		Offset: (req.PageID - 1) * req.PageSize,
+	}
+
+	orders, err := server.store.ListOders(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -242,7 +259,10 @@ func (server *Server) listOrder(ctx *gin.Context) {
 
 	rsp := []listOrderResponse{}
 
-	for _, order := range orders {
+	listOrder := []db.Order{}
+	json.Unmarshal([]byte(orders.Orders), &listOrder)
+
+	for _, order := range listOrder {
 		transactions, err := server.store.ListTransactionsByOrderID(ctx, order.ID)
 		if err != nil {
 			if err == sql.ErrNoRows {

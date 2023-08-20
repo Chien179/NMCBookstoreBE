@@ -29,7 +29,7 @@ db_schema:
 	dbml2sql --postgres -o docs/schema.sql docs/db.dbml
 
 sqlc:
-	docker run --rm -v "C:\Users\chien\Projects\NMCBookstoreBE:/src" -w /src kjconroy/sqlc:1.16.0 generate
+	sqlc generate
 
 test:
 	go test -v -cover ./...

@@ -25,6 +25,26 @@ type bookResponse struct {
 
 func (server *Server) createBook(ctx *gin.Context) {
 	req, err := ctx.MultipartForm()
+	price, err := strconv.Atoi(req.Value["price"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	quantity, err := strconv.Atoi(req.Value["quantity"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	if price < 0 {
+		ctx.JSON(http.StatusBadRequest, "Book price must be positive")
+		return
+	}
+
+	if quantity < 1 {
+		ctx.JSON(http.StatusBadRequest, "Book quantity price must be greater than 0")
+		return
+	}
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -39,17 +59,6 @@ func (server *Server) createBook(ctx *gin.Context) {
 		} else {
 			imgUrls = append(imgUrls, imgUrl)
 		}
-	}
-
-	price, err := strconv.Atoi(req.Value["price"][0])
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-	quantity, err := strconv.Atoi(req.Value["quantity"][0])
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
 	}
 
 	arg := db.CreateBookParams{

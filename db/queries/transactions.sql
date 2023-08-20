@@ -7,6 +7,12 @@ SELECT * FROM transactions
 WHERE orders_id = $1
 ORDER BY id;
 
+-- name: UpdateTransaction :one
+UPDATE transactions
+SET reviewed = true
+WHERE id = $1
+RETURNING *;
+
 -- name: CreateTransaction :one
 INSERT INTO transactions (
     orders_id,
