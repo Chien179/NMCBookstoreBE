@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"os"
 
-	"github.com/Chien179/NMCBookstoreBE/api"
-	db "github.com/Chien179/NMCBookstoreBE/db/sqlc"
-	"github.com/Chien179/NMCBookstoreBE/mail"
-	"github.com/Chien179/NMCBookstoreBE/util"
-	"github.com/Chien179/NMCBookstoreBE/worker"
+	"github.com/Chien179/NMCBookstoreBE/src/api"
+	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
+	"github.com/Chien179/NMCBookstoreBE/src/mail"
+	"github.com/Chien179/NMCBookstoreBE/src/util"
+	"github.com/Chien179/NMCBookstoreBE/src/worker"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -19,25 +19,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// @title           NMC Bookstore
-// @version         1.0
-// @description     API document for NMC bookstore e-commerce website
-// @termsOfService  http://swagger.io/terms/
-
-// @contact.name   Nguyen Minh Chien
-// @contact.url    https://github.com/Chien179
-// @contact.email  chiennm456@gmail.com
-
-// @license.name  Apache 2.0
-// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
-
-// @host      localhost:8080
-// @BasePath  /
-
-// @schemes  http
-
-// @externalDocs.description  OpenAPI
-// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	config, err := util.LoadConfig(".")
 	if err != nil {
