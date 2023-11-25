@@ -1,4 +1,11 @@
 version: "3.9"
+
+networks:
+  default:
+    external: true
+    name: elastic
+
+
 services:
   postgres:
     image: postgres:14-alpine
@@ -6,6 +13,9 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=123456
       - POSTGRES_DB=nmc_bookstore
+    # networks:
+    #   default:
+    #     ipv4_address: 172.18.0.2
     ports:
       - "5432:5432"
   redis:
