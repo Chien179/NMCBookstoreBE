@@ -47,6 +47,24 @@ func main() {
 	runGinServer(config, store, taskDistributor)
 }
 
+// func CheckElasticSearchConnection() {
+// 	es, err := elastic.GetElasticSearch()
+// 	if err != nil {
+// 		fmt.Println("Failed to connect:", err)
+// 	}
+
+// 	res, err := es.Ping()
+// 	if err != nil {
+// 		fmt.Println("Failed to ping Elasticsearch:", err)
+// 	}
+
+// 	if res.IsError() {
+// 		fmt.Println("Elasticsearch returned an error:", res.String())
+// 	} else {
+// 		fmt.Println("Connected to Elasticsearch")
+// 	}
+// }
+
 func runDBMigration(migrationURL string, dbSource string) {
 	migration, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
