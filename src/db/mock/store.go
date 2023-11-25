@@ -460,21 +460,6 @@ func (mr *MockStoreMockRecorder) DeleteWishlist(arg0, arg1 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteWishlist", reflect.TypeOf((*MockStore)(nil).DeleteWishlist), arg0, arg1)
 }
 
-// FullSearch mocks base method.
-func (m *MockStore) FullSearch(arg0 context.Context, arg1 db.FullSearchParams) (db.FullSearchRow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FullSearch", arg0, arg1)
-	ret0, _ := ret[0].(db.FullSearchRow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// FullSearch indicates an expected call of FullSearch.
-func (mr *MockStoreMockRecorder) FullSearch(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FullSearch", reflect.TypeOf((*MockStore)(nil).FullSearch), arg0, arg1)
-}
-
 // GetAddress mocks base method.
 func (m *MockStore) GetAddress(arg0 context.Context, arg1 int64) (db.Address, error) {
 	m.ctrl.T.Helper()
@@ -728,21 +713,6 @@ func (m *MockStore) GetWishlist(arg0 context.Context, arg1 int64) (db.Wishlist, 
 func (mr *MockStoreMockRecorder) GetWishlist(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWishlist", reflect.TypeOf((*MockStore)(nil).GetWishlist), arg0, arg1)
-}
-
-// JustForYou mocks base method.
-func (m *MockStore) JustForYou(arg0 context.Context) ([]db.JustForYouRow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "JustForYou", arg0)
-	ret0, _ := ret[0].([]db.JustForYouRow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// JustForYou indicates an expected call of JustForYou.
-func (mr *MockStoreMockRecorder) JustForYou(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "JustForYou", reflect.TypeOf((*MockStore)(nil).JustForYou), arg0)
 }
 
 // ListAddresses mocks base method.
@@ -1103,21 +1073,6 @@ func (m *MockStore) ListWishlistsByUsername(arg0 context.Context, arg1 string) (
 func (mr *MockStoreMockRecorder) ListWishlistsByUsername(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListWishlistsByUsername", reflect.TypeOf((*MockStore)(nil).ListWishlistsByUsername), arg0, arg1)
-}
-
-// Recommend mocks base method.
-func (m *MockStore) Recommend(arg0 context.Context, arg1 db.RecommendParams) ([]db.RecommendRow, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Recommend", arg0, arg1)
-	ret0, _ := ret[0].([]db.RecommendRow)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Recommend indicates an expected call of Recommend.
-func (mr *MockStoreMockRecorder) Recommend(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recommend", reflect.TypeOf((*MockStore)(nil).Recommend), arg0, arg1)
 }
 
 // ResetPasswordTx mocks base method.
