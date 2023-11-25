@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
@@ -13,15 +14,20 @@ import (
 
 func (server *Server) addToCart(ctx *gin.Context) {
 	var req models.AddToCartRequest
-	if err := ctx.ShouldBindJSON(&req.Amount); err != nil {
+
+	if err := ctx.ShouldBindJSON(&req.AmountData); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if err := ctx.ShouldBindUri(&req.ID); err != nil {
+	log.Default().Println(req)
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
+
+	log.Default().Println(req)
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
@@ -78,7 +84,8 @@ func (server *Server) addToCart(ctx *gin.Context) {
 
 func (server *Server) upatdeAmountCart(ctx *gin.Context) {
 	var req models.UpdateAmountCartRequest
-	if err := ctx.ShouldBindJSON(&req.Amount); err != nil {
+
+	if err := ctx.ShouldBindJSON(&req.AmountData); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}

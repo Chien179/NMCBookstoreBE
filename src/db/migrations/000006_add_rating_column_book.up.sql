@@ -16,19 +16,6 @@ BEGIN
 	FROM rating_avg
 	WHERE books.id = rating_avg.id;
 	
-	WITH rating_avg AS (
-        SELECT b.id, COALESCE(AVG(r.rating), 0)::NUMERIC(10,1) AS ravg
-		FROM books b
-		INNER JOIN reviews r
-		ON r.books_id = b.id
-		GROUP BY b.id
-    )
-	
-	UPDATE "searchs"
-	SET rating = rating_avg.ravg
-	FROM rating_avg
-	WHERE searchs.id = rating_avg.id;
-	
 	RETURN NEW;
 END $$;
 

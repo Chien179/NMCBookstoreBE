@@ -1,13 +1,17 @@
 package models
 
-type AddToCartRequest struct {
-	ID     int64 `uri:"id" binding:"required,min=1"`
+type AmountData struct {
 	Amount int32 `json:"amount" binding:"required,min=1"`
 }
 
+type AddToCartRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+	AmountData
+}
+
 type UpdateAmountCartRequest struct {
-	ID     int64 `uri:"id" binding:"required,min=1"`
-	Amount int32 `json:"amount" binding:"required,min=1"`
+	ID int64 `uri:"id" binding:"required,min=1"`
+	AmountData
 }
 
 type DeleteMultiBookInCartRequest struct {

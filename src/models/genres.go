@@ -9,8 +9,8 @@ type CreateGenreRequest struct {
 }
 
 type UpdateGenreRequest struct {
-	ID   int64  `uri:"id" binding:"required,min=1"`
-	Name string `json:"name" binding:"required"`
+	ID int64 `uri:"id" binding:"required,min=1"`
+	CreateGenreRequest
 }
 
 type DeleteGenreRequest struct {
