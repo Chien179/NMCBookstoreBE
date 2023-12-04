@@ -2,7 +2,7 @@ postgres:
 	docker run --name postgres14 -p 5432:5432 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=123456 -d postgres:14-alpine
 	
 createdb:
-	docker exec -it postgres createdb --username=root --owner=root nmc_bookstore
+	docker exec -it postgres14 createdb --username=root --owner=root nmc_bookstore
 
 dropdb:
 	docker exec -it postgres14 dropdb nmc_bookstore
@@ -40,4 +40,9 @@ server:
 mock:
 	mockgen -build_flags=--mod=mod -package mockdb -destination src/db/mock/store.go github.com/Chien179/NMCBookstoreBE/src/db/sqlc Store
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock
+proto:
+	protoc --proto_path=src/proto --go_out=src/pb --go_opt=paths=source_relative \
+	--go-grpc_out=src/pb --go-grpc_opt=paths=source_relative \
+	src/proto/*.proto
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock proto

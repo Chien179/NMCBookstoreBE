@@ -40,6 +40,7 @@ type Querier interface {
 	DeleteUser(ctx context.Context, username string) error
 	DeleteWishlist(ctx context.Context, arg DeleteWishlistParams) error
 	GetAddress(ctx context.Context, id int64) (Address, error)
+	GetBestBookByUser(ctx context.Context, username string) (GetBestBookByUserRow, error)
 	GetBook(ctx context.Context, id int64) (Book, error)
 	GetBookGenre(ctx context.Context, id int64) (BooksGenre, error)
 	GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre, error)

@@ -28,11 +28,10 @@ func (server *Server) publicRouter(router *gin.Engine) {
 
 	router.GET("/searchs", server.fullSearch)
 
-	router.GET("/recommend", server.recommend)
-
-	router.GET("/just-for-you", server.justForYou)
+	router.GET("/just_for_you", server.justForYou)
 
 	bookRoutes := router.Group("/books")
+	bookRoutes.GET("/recommend", server.recommend)
 	bookRoutes.GET("/:id", server.getBook)
 	bookRoutes.GET("/", server.listBook)
 	bookRoutes.GET("/the_best", server.listTheBestBook)

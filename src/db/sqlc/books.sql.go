@@ -15,16 +15,15 @@ import (
 
 const createBook = `-- name: CreateBook :one
 INSERT INTO books (
-  name,
-  price,
-  image,
-  description,
-  author,
-  publisher,
-  quantity
-) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
-)
+    name,
+    price,
+    image,
+    description,
+    author,
+    publisher,
+    quantity
+  )
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
 `
 
@@ -78,9 +77,38 @@ func (q *Queries) DeleteBook(ctx context.Context, id int64) error {
 	return err
 }
 
+const getBestBookByUser = `-- name: GetBestBookByUser :one
+select b.id,
+  b.name,
+  r.rating
+from reviews as r
+  inner join books as b on r.books_id = b.id
+where r.username = $1
+group by b.id,
+  b.name,
+  r.rating
+order by r.rating desc
+limit 1
+`
+
+type GetBestBookByUserRow struct {
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Rating int32  `json:"rating"`
+}
+
+func (q *Queries) GetBestBookByUser(ctx context.Context, username string) (GetBestBookByUserRow, error) {
+	row := q.db.QueryRowContext(ctx, getBestBookByUser, username)
+	var i GetBestBookByUserRow
+	err := row.Scan(&i.ID, &i.Name, &i.Rating)
+	return i, err
+}
+
 const getBook = `-- name: GetBook :one
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating FROM books
-WHERE id = $1 LIMIT 1
+SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+FROM books
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
@@ -106,7 +134,8 @@ func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
 }
 
 const listAllBooks = `-- name: ListAllBooks :many
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating FROM books
+SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+FROM books
 ORDER BY id
 `
 
@@ -149,27 +178,41 @@ func (q *Queries) ListAllBooks(ctx context.Context) ([]Book, error) {
 }
 
 const listBooks = `-- name: ListBooks :one
-SELECT t.total_page, JSON_AGG(json_build_object
-    ('id',t.id,
-    'name',t.name,
-    'price',t.price,
-    'image',t.image,
-    'description',t.description,
-    'author',t.author,
-    'publisher',t.publisher,
-    'quantity',t.quantity,
-    'rating', t.rating,
-    'created_at',t.created_at)
-    ) AS books
-	FROM (
-      SELECT 
-        CEILING(CAST(COUNT(id) OVER () AS FLOAT)/$1) AS total_page, id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating 
-      FROM books
-      ORDER BY id
-      LIMIT $1
-      OFFSET $2
-    ) AS t
-    GROUP BY t.total_page
+SELECT t.total_page,
+  JSON_AGG(
+    json_build_object (
+      'id',
+      t.id,
+      'name',
+      t.name,
+      'price',
+      t.price,
+      'image',
+      t.image,
+      'description',
+      t.description,
+      'author',
+      t.author,
+      'publisher',
+      t.publisher,
+      'quantity',
+      t.quantity,
+      'rating',
+      t.rating,
+      'created_at',
+      t.created_at
+    )
+  ) AS books
+FROM (
+    SELECT CEILING(
+        CAST(COUNT(id) OVER () AS FLOAT) / $1
+      ) AS total_page,
+      id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+    FROM books
+    ORDER BY id
+    LIMIT $1 OFFSET $2
+  ) AS t
+GROUP BY t.total_page
 `
 
 type ListBooksParams struct {
@@ -190,7 +233,8 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) (ListBooks
 }
 
 const listNewestBooks = `-- name: ListNewestBooks :many
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating FROM books
+SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+FROM books
 ORDER BY created_at DESC
 LIMIT 20
 `
@@ -234,7 +278,8 @@ func (q *Queries) ListNewestBooks(ctx context.Context) ([]Book, error) {
 }
 
 const listTheBestBooks = `-- name: ListTheBestBooks :many
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating FROM books
+SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+FROM books
 ORDER BY rating DESC
 LIMIT 20
 `

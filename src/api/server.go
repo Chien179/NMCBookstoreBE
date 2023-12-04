@@ -7,6 +7,7 @@ import (
 	"github.com/Chien179/NMCBookstoreBE/src/token"
 	"github.com/Chien179/NMCBookstoreBE/src/util"
 	"github.com/Chien179/NMCBookstoreBE/src/worker"
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,12 +17,13 @@ type Server struct {
 	store           db.Store
 	tokenMaker      token.Maker
 	router          *gin.Engine
+	elastic         *elasticsearch.Client
 	taskDistributor worker.TaskDistributor
 	uploader        util.MediaUpload
 }
 
 // NewServer creates a new HTTP server and setup routing.
-func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
+func NewServer(config util.Config, store db.Store, elastic *elasticsearch.Client, taskDistributor worker.TaskDistributor) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetrictKey)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
@@ -31,6 +33,7 @@ func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDi
 		config:          config,
 		store:           store,
 		tokenMaker:      tokenMaker,
+		elastic:         elastic,
 		taskDistributor: taskDistributor,
 		uploader:        util.NewMediaUpload(&config),
 	}

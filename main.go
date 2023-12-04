@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"os"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/Chien179/NMCBookstoreBE/src/mail"
 	"github.com/Chien179/NMCBookstoreBE/src/util"
 	"github.com/Chien179/NMCBookstoreBE/src/worker"
+	"github.com/elastic/go-elasticsearch/v7"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -34,36 +36,19 @@ func main() {
 		log.Fatal().Err(err).Msg("cannot connect to db")
 	}
 
-	runDBMigration(config.MigrationURL, config.DBSource)
-
 	store := db.NewStore(conn)
 
 	redisOpt := asynq.RedisClientOpt{
-		Addr: config.RedisAddress,
+		Addr:      config.RedisAddress,
+		Username:  "red-clmdiicjtl8s73aiv8tg",
+		Password:  "iKGnFsunMjhr8iQQl4In5A98RjxjRlEK",
+		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12},
 	}
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 	go runTaskProcessor(config, redisOpt, store)
 	runGinServer(config, store, taskDistributor)
 }
-
-// func CheckElasticSearchConnection() {
-// 	es, err := elastic.GetElasticSearch()
-// 	if err != nil {
-// 		fmt.Println("Failed to connect:", err)
-// 	}
-
-// 	res, err := es.Ping()
-// 	if err != nil {
-// 		fmt.Println("Failed to ping Elasticsearch:", err)
-// 	}
-
-// 	if res.IsError() {
-// 		fmt.Println("Elasticsearch returned an error:", res.String())
-// 	} else {
-// 		fmt.Println("Connected to Elasticsearch")
-// 	}
-// }
 
 func runDBMigration(migrationURL string, dbSource string) {
 	migration, err := migrate.New(migrationURL, dbSource)
@@ -88,8 +73,23 @@ func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store d
 	}
 }
 
+func connectElasticSearch(config util.Config) (*elasticsearch.Client, error) {
+	cfg := elasticsearch.Config{
+		Addresses: []string{config.ELASTIC_ADDRESS},
+	}
+	es, err := elasticsearch.NewClient(cfg)
+	log.Info().Msg("start elastic search")
+
+	return es, err
+}
+
 func runGinServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
-	server, err := api.NewServer(config, store, taskDistributor)
+	elastic, err := connectElasticSearch(config)
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot connect to elastic")
+	}
+
+	server, err := api.NewServer(config, store, elastic, taskDistributor)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create server")
 	}

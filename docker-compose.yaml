@@ -1,22 +1,12 @@
 version: "3.9"
 
+
 networks:
   default:
     external: true
-    name: elastic
-
+    name: nmc_bookstore
 
 services:
-  postgres:
-    image: postgres:14-alpine
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=123456
-      - POSTGRES_DB=nmc_bookstore
-    restart: 
-      always
-    ports:
-      - "5432:5432"
   redis:
     image: redis:7.0-alpine
     restart: 
