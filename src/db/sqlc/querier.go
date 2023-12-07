@@ -17,6 +17,7 @@ type Querier interface {
 	CreateBookSubgenre(ctx context.Context, arg CreateBookSubgenreParams) (BooksSubgenre, error)
 	CreateCart(ctx context.Context, arg CreateCartParams) (Cart, error)
 	CreateGenre(ctx context.Context, name string) (Genre, error)
+	CreateLike(ctx context.Context, arg CreateLikeParams) (Like, error)
 	CreateOrder(ctx context.Context, username string) (Order, error)
 	CreatePayment(ctx context.Context, arg CreatePaymentParams) (Payment, error)
 	CreateResetPassword(ctx context.Context, arg CreateResetPasswordParams) (ResetPassword, error)
@@ -28,6 +29,7 @@ type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
 	CreateWishlist(ctx context.Context, arg CreateWishlistParams) (Wishlist, error)
+	CreatedDislike(ctx context.Context, arg CreatedDislikeParams) (Dislike, error)
 	DeleteAddress(ctx context.Context, id int64) error
 	DeleteBook(ctx context.Context, id int64) error
 	DeleteBookGenreByBooksID(ctx context.Context, booksID int64) error
@@ -46,8 +48,10 @@ type Querier interface {
 	GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre, error)
 	GetCart(ctx context.Context, id int64) (Cart, error)
 	GetCity(ctx context.Context, id int64) (City, error)
+	GetDislike(ctx context.Context, arg GetDislikeParams) (Dislike, error)
 	GetDistrict(ctx context.Context, id int64) (District, error)
 	GetGenre(ctx context.Context, id int64) (Genre, error)
+	GetLike(ctx context.Context, arg GetLikeParams) (Like, error)
 	GetOrder(ctx context.Context, id int64) (Order, error)
 	GetOrderToPayment(ctx context.Context, username string) (Order, error)
 	GetReview(ctx context.Context, id int64) (Review, error)
@@ -93,7 +97,9 @@ type Querier interface {
 	UpdateAddress(ctx context.Context, arg UpdateAddressParams) (Address, error)
 	UpdateAmount(ctx context.Context, arg UpdateAmountParams) (Cart, error)
 	UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, error)
+	UpdateDislike(ctx context.Context, arg UpdateDislikeParams) (Dislike, error)
 	UpdateGenre(ctx context.Context, arg UpdateGenreParams) (Genre, error)
+	UpdateLike(ctx context.Context, arg UpdateLikeParams) (Like, error)
 	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
 	UpdateResetPassword(ctx context.Context, arg UpdateResetPasswordParams) (ResetPassword, error)
 	UpdateReview(ctx context.Context, arg UpdateReviewParams) (Review, error)

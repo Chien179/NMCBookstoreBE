@@ -65,6 +65,13 @@ type City struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Dislike struct {
+	ID        int64  `json:"id"`
+	Username  string `json:"username"`
+	ReviewID  int64  `json:"review_id"`
+	IsDislike bool   `json:"is_dislike"`
+}
+
 type District struct {
 	ID        int64     `json:"id"`
 	CityID    int64     `json:"city_id"`
@@ -77,6 +84,13 @@ type Genre struct {
 	Name      string    `json:"name"`
 	IsDeleted bool      `json:"is_deleted"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type Like struct {
+	ID       int64  `json:"id"`
+	Username string `json:"username"`
+	ReviewID int64  `json:"review_id"`
+	IsLike   bool   `json:"is_like"`
 }
 
 type Order struct {

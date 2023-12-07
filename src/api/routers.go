@@ -20,7 +20,7 @@ func (server *Server) setupRouter() {
 func (server *Server) publicRouter(router *gin.Engine) {
 	router.POST("/signup", server.createUser)
 	router.POST("/login", server.loginUser)
-	router.POST("/login/oauth/google", server.GoogleOAuth)
+	router.GET("/login/oauth/google", server.GoogleOAuth)
 	router.POST("/tokens/renew_access", server.renewAccessToken)
 
 	router.GET("/verify_email", server.verifyEmail)
@@ -83,6 +83,10 @@ func (server *Server) userAuth(router *gin.Engine) {
 	addressRoutes.GET("/districts/:city_id", server.listDistricts)
 
 	reviewRoutes := usersRoutes.Group("/reviews").Use(authMiddleware(server.tokenMaker))
+	reviewRoutes.GET("/like", server.getLikeReview)
+	reviewRoutes.GET("/action/like", server.likeReview)
+	reviewRoutes.GET("/action/dislike", server.dislikeReview)
+	reviewRoutes.GET("/dislike", server.getDislikeReview)
 	reviewRoutes.POST("/:book_id", server.createReview)
 	reviewRoutes.DELETE("/:id", server.deleteReview)
 

@@ -158,6 +158,32 @@ Table reviews as R {
   }
 }
 
+Table like as L {
+  id bigserial [pk]
+  username varchar [ref: > U.username, not null]
+  review_id bigserial [ref: > R.id, not null]
+  is_like boolean [not null, default:false]
+  
+  indexes{
+    username
+    review_id
+    (username, books_id)
+  }
+}
+
+Table dislike as D {
+  id bigserial [pk]
+  username varchar [ref: > U.username, not null]
+  review_id bigserial [ref: > R.id, not null]
+  is_dislike boolean [not null, default:false]
+  
+  indexes{
+    username
+    review_id
+    (username, books_id)
+  }
+}
+
 Table orders as O {
   id bigserial [pk]
   username varchar [ref: > U.username, not null]

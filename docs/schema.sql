@@ -141,6 +141,20 @@ CREATE TABLE "wishlists" (
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
+CREATE TABLE "like"(
+  id bigserial PRIMARY KEY,
+  username varchar NOT NULL,
+  review_id bigserial NOT NULL,
+  is_like boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE "dislike"(
+  id bigserial PRIMARY KEY,
+  username varchar NOT NULL,
+  review_id bigserial NOT NULL,
+  is_dislike boolean NOT NULL DEFAULT false
+);
+
 CREATE TABLE "sessions" (
   "id" uuid PRIMARY KEY,
   "username" varchar NOT NULL,
@@ -217,6 +231,10 @@ CREATE INDEX ON "reviews" ("books_id");
 
 CREATE INDEX ON "reviews" ("username", "books_id");
 
+CREATE INDEX ON "like" ("username", "review_id");
+
+CREATE INDEX ON "dislike" ("username", "review_id");
+
 CREATE INDEX ON "orders" ("username");
 
 CREATE INDEX ON "transactions" ("books_id");
@@ -268,6 +286,14 @@ ALTER TABLE "books_subgenres" ADD FOREIGN KEY ("subgenres_id") REFERENCES "subge
 ALTER TABLE "reviews" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
 ALTER TABLE "reviews" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
+
+ALTER TABLE "like" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
+ALTER TABLE "like" ADD FOREIGN KEY ("review_id") REFERENCES "reviews" ("id");
+
+ALTER TABLE "dislike" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
+
+ALTER TABLE "dislike" ADD FOREIGN KEY ("review_id") REFERENCES "reviews" ("id");
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
