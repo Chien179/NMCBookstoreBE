@@ -25,4 +25,5 @@ type ListBooksInCartRespone struct {
 	Image    string  `json:"image"`
 	Price    float64 `json:"price"`
 	Amount   int32   `json:"amount"`
+	Author   string  `json:"author"`
 }

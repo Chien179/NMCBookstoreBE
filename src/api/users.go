@@ -55,23 +55,16 @@ func (server *Server) createUser(ctx *gin.Context) {
 
 	imgUrl := "https://res.cloudinary.com/doqhasjec/image/upload/v1681990980/samples/NMC%20Bookstore/Default_ct9xzk.png"
 
-	if req.Image != nil {
-		imgUrl, err = server.uploadFile(ctx, req.Image, "NMCBookstore/Image/Users", req.Username)
-		if err != nil {
-			return
-		}
-	}
-
 	arg := db.CreateUserTxParams{
 		CreateUserParams: db.CreateUserParams{
 			Username:    req.Username,
 			Password:    hashedPassword,
-			FullName:    req.Fullname,
+			FullName:    "",
 			Email:       req.Email,
 			Image:       imgUrl,
-			Age:         req.Age,
-			Sex:         req.Sex,
-			PhoneNumber: req.PhoneNumber,
+			Age:         0,
+			Sex:         "",
+			PhoneNumber: "",
 		},
 		AfterCreate: func(user db.User) error {
 			taskPayload := &worker.PayloadSendVerifyEmail{
@@ -303,23 +296,9 @@ func ValidateCreateUserRequest(req *models.CreateUserRequest) (errs []helper.Err
 		})
 	}
 
-	if err := val.ValidateFullName(req.Fullname); err != nil {
-		errs = append(errs, helper.ErrorCustom{
-			Field:   "full_name",
-			Message: errorResponse(err),
-		})
-	}
-
 	if err := val.ValidateEmail(req.Email); err != nil {
 		errs = append(errs, helper.ErrorCustom{
 			Field:   "email",
-			Message: errorResponse(err),
-		})
-	}
-
-	if err := val.ValidatePhoneNumber(req.PhoneNumber); err != nil {
-		errs = append(errs, helper.ErrorCustom{
-			Field:   "phone_number",
 			Message: errorResponse(err),
 		})
 	}

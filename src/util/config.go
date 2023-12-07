@@ -13,6 +13,7 @@ type Config struct {
 	DBSource             string        `mapstructure:"DB_SOURCE"`
 	DBSourceTest         string        `mapstructure:"DB_SOURCE_TEST"`
 	ServerAddress        string        `mapstructure:"SERVER_ADDRESS"`
+	GRPCAddress          string        `mapstructure:"GRPC_ADDRESS"`
 	ELASTIC_ADDRESS      string        `mapstructure:"ELASTIC_ADDRESS"`
 	TokenSymmetrictKey   string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`

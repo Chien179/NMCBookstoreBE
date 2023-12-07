@@ -5,14 +5,8 @@ networks:
   default:
     external: true
     name: nmc_bookstore
-
+    
 services:
-  redis:
-    image: redis:7.0-alpine
-    restart: 
-      always
-    ports:
-      - "6379:6379"
   api:
     build:
       context: .
@@ -22,7 +16,5 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_SOURCE=postgresql://root:123456@postgres:5432/nmc_bookstore?sslmode=disable
-    depends_on:
-      - postgres
-    entrypoint: ["sh", "/app/wait-for", "postgres:5432", "--", "/app/main"]
+      - DB_SOURCE=${DB_SOURCE}
+    entrypoint: ["/app/main"]

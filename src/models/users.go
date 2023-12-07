@@ -8,14 +8,9 @@ import (
 )
 
 type CreateUserRequest struct {
-	Username    string                `form:"username" binding:"required,alphanum"`
-	Password    string                `form:"password" binding:"required,min=8"`
-	Fullname    string                `form:"full_name" binding:"required"`
-	Email       string                `form:"email" binding:"required,email"`
-	Image       *multipart.FileHeader `form:"image"`
-	Age         int32                 `form:"age" binding:"required"`
-	Sex         string                `form:"sex" binding:"required"`
-	PhoneNumber string                `form:"phone_number" binding:"required"`
+	Username string `form:"username" binding:"required,alphanum"`
+	Password string `form:"password" binding:"required,min=8"`
+	Email    string `form:"email" binding:"required,email"`
 }
 
 type UserResponse struct {

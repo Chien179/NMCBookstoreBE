@@ -214,6 +214,7 @@ func (server *Server) listBookInCart(ctx *gin.Context) {
 			Image:    book.Image[0],
 			Price:    book.Price,
 			Amount:   cart.Amount,
+			Author:   book.Author,
 		})
 	}
 

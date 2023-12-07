@@ -3,13 +3,18 @@ package pb
 import (
 	"context"
 
+	"github.com/Chien179/NMCBookstoreBE/src/util"
 	"github.com/rs/zerolog/log"
 	grpc "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func GRPCGetRCM(ctx context.Context, bookRequest *BookRequest) (*BookResponse, error) {
-	conn, err := grpc.Dial("127.0.0.1:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot load config")
+	}
+	conn, err := grpc.Dial(config.GRPCAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Logger.Error().Msgf("did not connect: %v", err)
 	}
