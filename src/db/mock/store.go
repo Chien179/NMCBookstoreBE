@@ -126,6 +126,21 @@ func (mr *MockStoreMockRecorder) CreateGenre(arg0, arg1 interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGenre", reflect.TypeOf((*MockStore)(nil).CreateGenre), arg0, arg1)
 }
 
+// CreateLike mocks base method.
+func (m *MockStore) CreateLike(arg0 context.Context, arg1 db.CreateLikeParams) (db.Like, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateLike", arg0, arg1)
+	ret0, _ := ret[0].(db.Like)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateLike indicates an expected call of CreateLike.
+func (mr *MockStoreMockRecorder) CreateLike(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateLike", reflect.TypeOf((*MockStore)(nil).CreateLike), arg0, arg1)
+}
+
 // CreateOrder mocks base method.
 func (m *MockStore) CreateOrder(arg0 context.Context, arg1 string) (db.Order, error) {
 	m.ctrl.T.Helper()
@@ -306,6 +321,21 @@ func (mr *MockStoreMockRecorder) CreateWishlist(arg0, arg1 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateWishlist", reflect.TypeOf((*MockStore)(nil).CreateWishlist), arg0, arg1)
 }
 
+// CreatedDislike mocks base method.
+func (m *MockStore) CreatedDislike(arg0 context.Context, arg1 db.CreatedDislikeParams) (db.Dislike, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreatedDislike", arg0, arg1)
+	ret0, _ := ret[0].(db.Dislike)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreatedDislike indicates an expected call of CreatedDislike.
+func (mr *MockStoreMockRecorder) CreatedDislike(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreatedDislike", reflect.TypeOf((*MockStore)(nil).CreatedDislike), arg0, arg1)
+}
+
 // DeleteAddress mocks base method.
 func (m *MockStore) DeleteAddress(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
@@ -475,6 +505,21 @@ func (mr *MockStoreMockRecorder) GetAddress(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAddress", reflect.TypeOf((*MockStore)(nil).GetAddress), arg0, arg1)
 }
 
+// GetBestBookByUser mocks base method.
+func (m *MockStore) GetBestBookByUser(arg0 context.Context, arg1 string) (db.GetBestBookByUserRow, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetBestBookByUser", arg0, arg1)
+	ret0, _ := ret[0].(db.GetBestBookByUserRow)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetBestBookByUser indicates an expected call of GetBestBookByUser.
+func (mr *MockStoreMockRecorder) GetBestBookByUser(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBestBookByUser", reflect.TypeOf((*MockStore)(nil).GetBestBookByUser), arg0, arg1)
+}
+
 // GetBook mocks base method.
 func (m *MockStore) GetBook(arg0 context.Context, arg1 int64) (db.Book, error) {
 	m.ctrl.T.Helper()
@@ -550,6 +595,21 @@ func (mr *MockStoreMockRecorder) GetCity(arg0, arg1 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCity", reflect.TypeOf((*MockStore)(nil).GetCity), arg0, arg1)
 }
 
+// GetDislike mocks base method.
+func (m *MockStore) GetDislike(arg0 context.Context, arg1 db.GetDislikeParams) (db.Dislike, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDislike", arg0, arg1)
+	ret0, _ := ret[0].(db.Dislike)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDislike indicates an expected call of GetDislike.
+func (mr *MockStoreMockRecorder) GetDislike(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDislike", reflect.TypeOf((*MockStore)(nil).GetDislike), arg0, arg1)
+}
+
 // GetDistrict mocks base method.
 func (m *MockStore) GetDistrict(arg0 context.Context, arg1 int64) (db.District, error) {
 	m.ctrl.T.Helper()
@@ -578,6 +638,21 @@ func (m *MockStore) GetGenre(arg0 context.Context, arg1 int64) (db.Genre, error)
 func (mr *MockStoreMockRecorder) GetGenre(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGenre", reflect.TypeOf((*MockStore)(nil).GetGenre), arg0, arg1)
+}
+
+// GetLike mocks base method.
+func (m *MockStore) GetLike(arg0 context.Context, arg1 db.GetLikeParams) (db.Like, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLike", arg0, arg1)
+	ret0, _ := ret[0].(db.Like)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLike indicates an expected call of GetLike.
+func (mr *MockStoreMockRecorder) GetLike(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLike", reflect.TypeOf((*MockStore)(nil).GetLike), arg0, arg1)
 }
 
 // GetOrder mocks base method.
@@ -1270,6 +1345,21 @@ func (mr *MockStoreMockRecorder) UpdateBook(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBook", reflect.TypeOf((*MockStore)(nil).UpdateBook), arg0, arg1)
 }
 
+// UpdateDislike mocks base method.
+func (m *MockStore) UpdateDislike(arg0 context.Context, arg1 db.UpdateDislikeParams) (db.Dislike, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDislike", arg0, arg1)
+	ret0, _ := ret[0].(db.Dislike)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDislike indicates an expected call of UpdateDislike.
+func (mr *MockStoreMockRecorder) UpdateDislike(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDislike", reflect.TypeOf((*MockStore)(nil).UpdateDislike), arg0, arg1)
+}
+
 // UpdateGenre mocks base method.
 func (m *MockStore) UpdateGenre(arg0 context.Context, arg1 db.UpdateGenreParams) (db.Genre, error) {
 	m.ctrl.T.Helper()
@@ -1283,6 +1373,21 @@ func (m *MockStore) UpdateGenre(arg0 context.Context, arg1 db.UpdateGenreParams)
 func (mr *MockStoreMockRecorder) UpdateGenre(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateGenre", reflect.TypeOf((*MockStore)(nil).UpdateGenre), arg0, arg1)
+}
+
+// UpdateLike mocks base method.
+func (m *MockStore) UpdateLike(arg0 context.Context, arg1 db.UpdateLikeParams) (db.Like, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateLike", arg0, arg1)
+	ret0, _ := ret[0].(db.Like)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateLike indicates an expected call of UpdateLike.
+func (mr *MockStoreMockRecorder) UpdateLike(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateLike", reflect.TypeOf((*MockStore)(nil).UpdateLike), arg0, arg1)
 }
 
 // UpdateOrder mocks base method.

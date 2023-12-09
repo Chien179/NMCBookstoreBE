@@ -60,6 +60,10 @@ func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
 		return nil, err
 	}
 
+	fmt.Println(query)
+
+	fmt.Println(res.StatusCode)
+
 	if res.StatusCode != http.StatusOK {
 		return nil, errors.New("could not retrieve token")
 	}

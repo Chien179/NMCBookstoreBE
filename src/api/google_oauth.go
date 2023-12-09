@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -16,14 +17,20 @@ import (
 )
 
 func (server *Server) GoogleOAuth(ctx *gin.Context) {
-	code := ctx.Query("code")
+	var code models.GoogleOauthRequest
+	if err := ctx.ShouldBindQuery(&code); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-	if code == "" {
+	if code.Code == "" {
 		ctx.JSON(http.StatusUnauthorized, errorResponse(errors.New("Authorization code not provided!")))
 		return
 	}
 
-	tokenRes, err := util.GetGoogleOauthToken(code)
+	tokenRes, err := util.GetGoogleOauthToken(code.Code)
+
+	fmt.Println(tokenRes)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, errorResponse(err))
