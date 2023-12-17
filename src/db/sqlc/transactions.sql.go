@@ -15,9 +15,8 @@ INSERT INTO transactions (
     books_id,
     amount,
     total
-) VALUES (
-  $1, $2, $3, $4
-)
+  )
+VALUES ($1, $2, $3, $4)
 RETURNING id, orders_id, books_id, created_at, amount, total, reviewed
 `
 
@@ -49,8 +48,10 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 }
 
 const getTransaction = `-- name: GetTransaction :one
-SELECT id, orders_id, books_id, created_at, amount, total, reviewed FROM transactions
-WHERE id = $1 LIMIT 1
+SELECT id, orders_id, books_id, created_at, amount, total, reviewed
+FROM transactions
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetTransaction(ctx context.Context, id int64) (Transaction, error) {
@@ -69,7 +70,8 @@ func (q *Queries) GetTransaction(ctx context.Context, id int64) (Transaction, er
 }
 
 const listTransactionsByOrderID = `-- name: ListTransactionsByOrderID :many
-SELECT id, orders_id, books_id, created_at, amount, total, reviewed FROM transactions
+SELECT id, orders_id, books_id, created_at, amount, total, reviewed
+FROM transactions
 WHERE orders_id = $1
 ORDER BY id
 `

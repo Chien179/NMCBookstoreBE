@@ -32,7 +32,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	router.POST("/forgot_password", server.forgotPassword)
 	router.PUT("/reset_password", server.resetPassword)
 
-	router.GET("/searchs", server.fullSearch)
+	router.GET("/searchs", server.elasticSearch)
 
 	router.GET("/just_for_you", server.justForYou)
 

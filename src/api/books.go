@@ -17,6 +17,10 @@ func (server *Server) createBook(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	sale, err := strconv.Atoi(req.Value["sale"][0])
+	if err != nil {
+		sale = 0
+	}
 	quantity, err := strconv.Atoi(req.Value["quantity"][0])
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -51,6 +55,7 @@ func (server *Server) createBook(ctx *gin.Context) {
 	arg := db.CreateBookParams{
 		Name:        req.Value["name"][0],
 		Price:       float64(price),
+		Sale:        float64(sale),
 		Image:       imgUrls,
 		Description: req.Value["description"][0],
 		Author:      req.Value["author"][0],
@@ -124,6 +129,7 @@ func (server *Server) createBook(ctx *gin.Context) {
 		ID:          book.ID,
 		Name:        book.Name,
 		Price:       book.Price,
+		Sale:        float64(book.Sale),
 		Image:       book.Image,
 		Description: book.Description,
 		Author:      book.Author,
@@ -192,6 +198,7 @@ func (server *Server) getBook(ctx *gin.Context) {
 		ID:          book.ID,
 		Name:        book.Name,
 		Price:       book.Price,
+		Sale:        float64(book.Sale),
 		Image:       book.Image,
 		Description: book.Description,
 		Author:      book.Author,
@@ -245,6 +252,11 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	sale, err := strconv.Atoi(req.Value["sale"][0])
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 	quantity, err := strconv.Atoi(req.Value["quantity"][0])
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -260,6 +272,10 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		Price: sql.NullFloat64{
 			Float64: float64(price),
 			Valid:   price > 0,
+		},
+		Sale: sql.NullFloat64{
+			Float64: book.Sale,
+			Valid:   sale >= 0,
 		},
 		Image: imgUrls,
 		Description: sql.NullString{

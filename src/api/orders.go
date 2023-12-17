@@ -32,6 +32,7 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	}
 
 	subTotal := 0.0
+	sale := float64(0)
 	for _, cartID := range req.CartIDs {
 		cart, err := server.store.GetCart(ctx, cartID)
 		if err != nil {
@@ -68,6 +69,8 @@ func (server *Server) createOrder(ctx *gin.Context) {
 			return
 		}
 
+		sale += book.Sale
+
 		argBook := db.UpdateBookParams{
 			ID: book.ID,
 			Quantity: sql.NullInt32{
@@ -103,6 +106,10 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		SubTotal: sql.NullFloat64{
 			Float64: subTotal,
 			Valid:   subTotal > 0,
+		},
+		Sale: sql.NullFloat64{
+			Float64: sale,
+			Valid:   true,
 		},
 		Status: sql.NullString{
 			String: req.Status,
@@ -246,6 +253,7 @@ func (server *Server) listOrder(ctx *gin.Context) {
 			Transactions: transactions,
 			Status:       order.Status,
 			SubTotal:     order.SubTotal,
+			Sale:         float64(order.Sale),
 			SubAmount:    order.SubAmount,
 		})
 	}
@@ -293,6 +301,7 @@ func (server *Server) listOrderPaid(ctx *gin.Context) {
 				Transactions: transactions,
 				Status:       order.Status,
 				SubTotal:     order.SubTotal,
+				Sale:         float64(order.Sale),
 				SubAmount:    order.SubAmount,
 			})
 		}
@@ -345,6 +354,7 @@ func (server *Server) listOrderCancelled(ctx *gin.Context) {
 				Transactions: transactions,
 				Status:       order.Status,
 				SubTotal:     order.SubTotal,
+				Sale:         float64(order.Sale),
 				SubAmount:    order.SubAmount,
 			})
 		}

@@ -6,6 +6,7 @@ type BookResponse struct {
 	ID          int64         `json:"id"`
 	Name        string        `json:"name"`
 	Price       float64       `json:"price"`
+	Sale        float64       `json:"sale"`
 	Image       []string      `json:"image"`
 	Description string        `json:"description"`
 	Author      string        `json:"author"`

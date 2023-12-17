@@ -26,5 +26,6 @@ type ListOrderResponse struct {
 	Transactions []db.Transaction `json:"transactions"`
 	Status       string           `json:"status"`
 	SubTotal     float64          `json:"sub_total"`
+	Sale         float64          `json:"sale"`
 	SubAmount    int32            `json:"sub_amount"`
 }

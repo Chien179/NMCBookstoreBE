@@ -24,6 +24,7 @@ type ListBooksInCartRespone struct {
 	BookName string  `json:"book_name"`
 	Image    string  `json:"image"`
 	Price    float64 `json:"price"`
+	Sale     float64 `json:"sale"`
 	Amount   int32   `json:"amount"`
 	Author   string  `json:"author"`
 }

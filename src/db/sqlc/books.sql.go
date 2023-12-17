@@ -17,19 +17,21 @@ const createBook = `-- name: CreateBook :one
 INSERT INTO books (
     name,
     price,
+    sale,
     image,
     description,
     author,
     publisher,
     quantity
   )
-VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+RETURNING id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
 `
 
 type CreateBookParams struct {
 	Name        string   `json:"name"`
 	Price       float64  `json:"price"`
+	Sale        float64  `json:"sale"`
 	Image       []string `json:"image"`
 	Description string   `json:"description"`
 	Author      string   `json:"author"`
@@ -41,6 +43,7 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 	row := q.db.QueryRowContext(ctx, createBook,
 		arg.Name,
 		arg.Price,
+		arg.Sale,
 		pq.Array(arg.Image),
 		arg.Description,
 		arg.Author,
@@ -56,9 +59,7 @@ func (q *Queries) CreateBook(ctx context.Context, arg CreateBookParams) (Book, e
 		&i.Description,
 		&i.Author,
 		&i.Publisher,
-		&i.PublicationDate,
-		&i.Page,
-		&i.ProductDimensions,
+		&i.Sale,
 		&i.Quantity,
 		&i.IsDeleted,
 		&i.CreatedAt,
@@ -105,7 +106,7 @@ func (q *Queries) GetBestBookByUser(ctx context.Context, username string) (GetBe
 }
 
 const getBook = `-- name: GetBook :one
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+SELECT id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
 FROM books
 WHERE id = $1
 LIMIT 1
@@ -122,9 +123,7 @@ func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
 		&i.Description,
 		&i.Author,
 		&i.Publisher,
-		&i.PublicationDate,
-		&i.Page,
-		&i.ProductDimensions,
+		&i.Sale,
 		&i.Quantity,
 		&i.IsDeleted,
 		&i.CreatedAt,
@@ -134,7 +133,7 @@ func (q *Queries) GetBook(ctx context.Context, id int64) (Book, error) {
 }
 
 const listAllBooks = `-- name: ListAllBooks :many
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+SELECT id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
 FROM books
 ORDER BY id
 `
@@ -156,12 +155,77 @@ func (q *Queries) ListAllBooks(ctx context.Context) ([]Book, error) {
 			&i.Description,
 			&i.Author,
 			&i.Publisher,
-			&i.PublicationDate,
-			&i.Page,
-			&i.ProductDimensions,
+			&i.Sale,
 			&i.Quantity,
 			&i.IsDeleted,
 			&i.CreatedAt,
+			&i.Rating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listBookFollowGenre = `-- name: ListBookFollowGenre :many
+SELECT DISTINCT b.id,
+  b."name",
+  b.description,
+  b.price,
+  b.sale,
+  b.sale,
+  b.rating
+FROM books AS b
+  INNER JOIN books_genres AS bg ON b.id = bg.books_id
+  INNER JOIN genres AS g ON bg.genres_id = g.id
+WHERE g.id = $1
+ORDER BY b.id,
+  b."name",
+  b.description,
+  b.price,
+  b.sale,
+  b.rating
+LIMIT $2
+`
+
+type ListBookFollowGenreParams struct {
+	ID    int64 `json:"id"`
+	Limit int32 `json:"limit"`
+}
+
+type ListBookFollowGenreRow struct {
+	ID          int64   `json:"id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       float64 `json:"price"`
+	Sale        float64 `json:"sale"`
+	Sale_2      float64 `json:"sale_2"`
+	Rating      float64 `json:"rating"`
+}
+
+func (q *Queries) ListBookFollowGenre(ctx context.Context, arg ListBookFollowGenreParams) ([]ListBookFollowGenreRow, error) {
+	rows, err := q.db.QueryContext(ctx, listBookFollowGenre, arg.ID, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListBookFollowGenreRow{}
+	for rows.Next() {
+		var i ListBookFollowGenreRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Price,
+			&i.Sale,
+			&i.Sale_2,
 			&i.Rating,
 		); err != nil {
 			return nil, err
@@ -187,6 +251,8 @@ SELECT t.total_page,
       t.name,
       'price',
       t.price,
+      'sale',
+      t.sale,
       'image',
       t.image,
       'description',
@@ -207,7 +273,7 @@ FROM (
     SELECT CEILING(
         CAST(COUNT(id) OVER () AS FLOAT) / $1
       ) AS total_page,
-      id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+      id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
     FROM books
     ORDER BY id
     LIMIT $1 OFFSET $2
@@ -233,7 +299,7 @@ func (q *Queries) ListBooks(ctx context.Context, arg ListBooksParams) (ListBooks
 }
 
 const listNewestBooks = `-- name: ListNewestBooks :many
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+SELECT id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
 FROM books
 ORDER BY created_at DESC
 LIMIT 20
@@ -256,9 +322,7 @@ func (q *Queries) ListNewestBooks(ctx context.Context) ([]Book, error) {
 			&i.Description,
 			&i.Author,
 			&i.Publisher,
-			&i.PublicationDate,
-			&i.Page,
-			&i.ProductDimensions,
+			&i.Sale,
 			&i.Quantity,
 			&i.IsDeleted,
 			&i.CreatedAt,
@@ -278,7 +342,7 @@ func (q *Queries) ListNewestBooks(ctx context.Context) ([]Book, error) {
 }
 
 const listTheBestBooks = `-- name: ListTheBestBooks :many
-SELECT id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+SELECT id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
 FROM books
 ORDER BY rating DESC
 LIMIT 20
@@ -301,9 +365,7 @@ func (q *Queries) ListTheBestBooks(ctx context.Context) ([]Book, error) {
 			&i.Description,
 			&i.Author,
 			&i.Publisher,
-			&i.PublicationDate,
-			&i.Page,
-			&i.ProductDimensions,
+			&i.Sale,
 			&i.Quantity,
 			&i.IsDeleted,
 			&i.CreatedAt,
@@ -326,7 +388,7 @@ const softDeleteBook = `-- name: SoftDeleteBook :one
 UPDATE books
 SET is_deleted = true
 WHERE id = $1
-RETURNING id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+RETURNING id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
 `
 
 func (q *Queries) SoftDeleteBook(ctx context.Context, id int64) (Book, error) {
@@ -340,9 +402,7 @@ func (q *Queries) SoftDeleteBook(ctx context.Context, id int64) (Book, error) {
 		&i.Description,
 		&i.Author,
 		&i.Publisher,
-		&i.PublicationDate,
-		&i.Page,
-		&i.ProductDimensions,
+		&i.Sale,
 		&i.Quantity,
 		&i.IsDeleted,
 		&i.CreatedAt,
@@ -355,18 +415,20 @@ const updateBook = `-- name: UpdateBook :one
 UPDATE books
 SET name = COALESCE($1, name),
   price = COALESCE($2, price),
-  image = COALESCE($3, image),
-  description = COALESCE($4, description),
-  author = COALESCE($5, author),
-  publisher = COALESCE($6, publisher),
-  quantity = COALESCE($7, quantity)
-WHERE id = $8
-RETURNING id, name, price, image, description, author, publisher, publication_date, page, product_dimensions, quantity, is_deleted, created_at, rating
+  sale = COALESCE($3, sale),
+  image = COALESCE($4, image),
+  description = COALESCE($5, description),
+  author = COALESCE($6, author),
+  publisher = COALESCE($7, publisher),
+  quantity = COALESCE($8, quantity)
+WHERE id = $9
+RETURNING id, name, price, image, description, author, publisher, sale, quantity, is_deleted, created_at, rating
 `
 
 type UpdateBookParams struct {
 	Name        sql.NullString  `json:"name"`
 	Price       sql.NullFloat64 `json:"price"`
+	Sale        sql.NullFloat64 `json:"sale"`
 	Image       []string        `json:"image"`
 	Description sql.NullString  `json:"description"`
 	Author      sql.NullString  `json:"author"`
@@ -379,6 +441,7 @@ func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, e
 	row := q.db.QueryRowContext(ctx, updateBook,
 		arg.Name,
 		arg.Price,
+		arg.Sale,
 		pq.Array(arg.Image),
 		arg.Description,
 		arg.Author,
@@ -395,9 +458,7 @@ func (q *Queries) UpdateBook(ctx context.Context, arg UpdateBookParams) (Book, e
 		&i.Description,
 		&i.Author,
 		&i.Publisher,
-		&i.PublicationDate,
-		&i.Page,
-		&i.ProductDimensions,
+		&i.Sale,
 		&i.Quantity,
 		&i.IsDeleted,
 		&i.CreatedAt,

@@ -39,7 +39,7 @@ CREATE TABLE "books" (
   "description" varchar NOT NULL,
   "author" varchar NOT NULL,
   "publisher" varchar NOT NULL,
-  "sale" int NOT NULL DEFAULT 0,
+  "sale" float NOT NULL DEFAULT 0,
   "quantity" int NOT NULL,
   "is_deleted" boolean NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'

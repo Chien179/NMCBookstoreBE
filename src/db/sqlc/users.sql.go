@@ -12,17 +12,16 @@ import (
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-  username,
-  full_name,
-  email,
-  password,
-  age,
-  sex,
-  image,
-  phone_number
-) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8
-)
+    username,
+    full_name,
+    email,
+    password,
+    age,
+    sex,
+    image,
+    phone_number
+  )
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified
 `
 
@@ -78,8 +77,10 @@ func (q *Queries) DeleteUser(ctx context.Context, username string) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified FROM users
-WHERE username = $1 LIMIT 1
+SELECT username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified
+FROM users
+WHERE username = $1
+LIMIT 1
 `
 
 func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
@@ -104,8 +105,10 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified FROM users
-WHERE email = $1 LIMIT 1
+SELECT username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified
+FROM users
+WHERE email = $1
+LIMIT 1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -130,7 +133,8 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified FROM users
+SELECT username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified
+FROM users
 ORDER BY username
 `
 
@@ -202,16 +206,18 @@ func (q *Queries) SoftDeleteUser(ctx context.Context, id string) (User, error) {
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET full_name = COALESCE($1, full_name),
-    email = COALESCE($2, email),
-    image = COALESCE($3, image),
-    phone_number = COALESCE($4, phone_number),
-    age = COALESCE($5, age),
-    sex = COALESCE($6, sex),
-    password = COALESCE($7, password),
-    password_changed_at = COALESCE($8, password_changed_at),
-    is_email_verified = COALESCE($9, is_email_verified)
-WHERE 
-  username = $10
+  email = COALESCE($2, email),
+  image = COALESCE($3, image),
+  phone_number = COALESCE($4, phone_number),
+  age = COALESCE($5, age),
+  sex = COALESCE($6, sex),
+  password = COALESCE($7, password),
+  password_changed_at = COALESCE(
+    $8,
+    password_changed_at
+  ),
+  is_email_verified = COALESCE($9, is_email_verified)
+WHERE username = $10
 RETURNING username, full_name, email, password, image, phone_number, age, sex, role, is_deleted, password_changed_at, created_at, is_email_verified
 `
 

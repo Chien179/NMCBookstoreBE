@@ -42,7 +42,7 @@ func (server *Server) createReview(ctx *gin.Context) {
 
 	isReviewed := false
 	for _, transaction := range orderTransactions {
-		if transaction.BooksID == req.BookID && transaction.Reviewed == false {
+		if transaction.BooksID == req.BookID && !transaction.Reviewed {
 			isReviewed = true
 			_, err := server.store.UpdateTransaction(ctx, transaction.ID)
 			if err != nil {

@@ -66,7 +66,7 @@ INSERT INTO books (
     publisher,
     quantity
   )
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 -- name: DeleteBook :exec
 DELETE FROM books
@@ -106,6 +106,7 @@ SELECT DISTINCT b.id,
   b.description,
   b.price,
   b.sale,
+  b.sale,
   b.rating
 FROM books AS b
   INNER JOIN books_genres AS bg ON b.id = bg.books_id
@@ -115,5 +116,6 @@ ORDER BY b.id,
   b."name",
   b.description,
   b.price,
+  b.sale,
   b.rating
 LIMIT $2;

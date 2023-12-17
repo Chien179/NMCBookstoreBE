@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
@@ -20,14 +19,10 @@ func (server *Server) addToCart(ctx *gin.Context) {
 		return
 	}
 
-	log.Default().Println(req)
-
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
-	log.Default().Println(req)
 
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
@@ -66,11 +61,16 @@ func (server *Server) addToCart(ctx *gin.Context) {
 		}
 	}
 
+	sale := 1
+	if book.Sale > 0 {
+		sale = (100 - int(book.Sale)) / 100
+	}
+
 	arg := db.CreateCartParams{
 		BooksID:  book.ID,
 		Username: authPayLoad.Username,
 		Amount:   req.Amount,
-		Total:    book.Price * float64(req.Amount),
+		Total:    book.Price * float64(req.Amount) * float64(sale),
 	}
 
 	bookCart, err := server.store.CreateCart(ctx, arg)
@@ -213,6 +213,7 @@ func (server *Server) listBookInCart(ctx *gin.Context) {
 			BookName: book.Name,
 			Image:    book.Image[0],
 			Price:    book.Price,
+			Sale:     float64(book.Sale),
 			Amount:   cart.Amount,
 			Author:   book.Author,
 		})

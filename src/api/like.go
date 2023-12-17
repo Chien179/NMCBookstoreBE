@@ -80,7 +80,7 @@ func (server *Server) likeReview(ctx *gin.Context) {
 	}
 
 	likeAmount := 1
-	if like.IsLike != true {
+	if !like.IsLike {
 		likeAmount = -1
 	}
 

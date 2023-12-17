@@ -20,20 +20,18 @@ type Address struct {
 }
 
 type Book struct {
-	ID                int64     `json:"id"`
-	Name              string    `json:"name"`
-	Price             float64   `json:"price"`
-	Image             []string  `json:"image"`
-	Description       string    `json:"description"`
-	Author            string    `json:"author"`
-	Publisher         string    `json:"publisher"`
-	PublicationDate   string    `json:"publication_date"`
-	Page              string    `json:"page"`
-	ProductDimensions string    `json:"product_dimensions"`
-	Quantity          int32     `json:"quantity"`
-	IsDeleted         bool      `json:"is_deleted"`
-	CreatedAt         time.Time `json:"created_at"`
-	Rating            float64   `json:"rating"`
+	ID          int64     `json:"id"`
+	Name        string    `json:"name"`
+	Price       float64   `json:"price"`
+	Image       []string  `json:"image"`
+	Description string    `json:"description"`
+	Author      string    `json:"author"`
+	Publisher   string    `json:"publisher"`
+	Sale        float64   `json:"sale"`
+	Quantity    int32     `json:"quantity"`
+	IsDeleted   bool      `json:"is_deleted"`
+	CreatedAt   time.Time `json:"created_at"`
+	Rating      float64   `json:"rating"`
 }
 
 type BooksGenre struct {
@@ -100,6 +98,7 @@ type Order struct {
 	Status    string    `json:"status"`
 	SubAmount int32     `json:"sub_amount"`
 	SubTotal  float64   `json:"sub_total"`
+	Sale      float64   `json:"sale"`
 }
 
 type Payment struct {

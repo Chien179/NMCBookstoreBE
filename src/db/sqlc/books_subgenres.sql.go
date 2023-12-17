@@ -10,12 +10,8 @@ import (
 )
 
 const createBookSubgenre = `-- name: CreateBookSubgenre :one
-INSERT INTO books_subgenres (
-  books_id,
-  subgenres_id
-) VALUES (
-  $1, $2
-)
+INSERT INTO books_subgenres (books_id, subgenres_id)
+VALUES ($1, $2)
 RETURNING id, books_id, subgenres_id, created_at
 `
 
@@ -47,8 +43,10 @@ func (q *Queries) DeleteBookSubgenreByBooksID(ctx context.Context, booksID int64
 }
 
 const getBookSubgenre = `-- name: GetBookSubgenre :one
-SELECT id, books_id, subgenres_id, created_at FROM books_subgenres
-WHERE id = $1 LIMIT 1
+SELECT id, books_id, subgenres_id, created_at
+FROM books_subgenres
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre, error) {
@@ -64,7 +62,8 @@ func (q *Queries) GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre,
 }
 
 const listBooksSubgenresByBookID = `-- name: ListBooksSubgenresByBookID :many
-SELECT id, books_id, subgenres_id, created_at FROM books_subgenres
+SELECT id, books_id, subgenres_id, created_at
+FROM books_subgenres
 WHERE books_id = $1
 ORDER BY id
 `
@@ -98,7 +97,8 @@ func (q *Queries) ListBooksSubgenresByBookID(ctx context.Context, booksID int64)
 }
 
 const listBooksSubgenresBySubgenreID = `-- name: ListBooksSubgenresBySubgenreID :many
-SELECT id, books_id, subgenres_id, created_at FROM books_subgenres
+SELECT id, books_id, subgenres_id, created_at
+FROM books_subgenres
 WHERE subgenres_id = $1
 ORDER BY id
 `
@@ -132,7 +132,8 @@ func (q *Queries) ListBooksSubgenresBySubgenreID(ctx context.Context, subgenresI
 }
 
 const listBooksSubgenresIDByBookID = `-- name: ListBooksSubgenresIDByBookID :many
-SELECT subgenres_id FROM books_subgenres
+SELECT subgenres_id
+FROM books_subgenres
 WHERE books_id = $1
 ORDER BY id
 `

@@ -10,8 +10,10 @@ import (
 )
 
 const getCity = `-- name: GetCity :one
-SELECT id, name, created_at FROM cities
-WHERE id = $1 LIMIT 1
+SELECT id, name, created_at
+FROM cities
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetCity(ctx context.Context, id int64) (City, error) {
@@ -22,7 +24,8 @@ func (q *Queries) GetCity(ctx context.Context, id int64) (City, error) {
 }
 
 const listCities = `-- name: ListCities :many
-SELECT id, name, created_at FROM cities
+SELECT id, name, created_at
+FROM cities
 ORDER BY id
 `
 

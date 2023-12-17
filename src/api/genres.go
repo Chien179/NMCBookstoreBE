@@ -132,19 +132,6 @@ func (server *Server) softDeleteGenre(ctx *gin.Context) {
 		return
 	}
 
-	subgenres, err := server.store.ListSubgenres(ctx, genre.ID)
-	for _, subgenre := range subgenres {
-		_, err := server.store.SoftDeleteSubgenre(ctx, subgenre.ID)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				ctx.JSON(http.StatusNotFound, errorResponse(err))
-				return
-			}
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-	}
-
 	_, err = server.store.SoftDeleteGenre(ctx, genre.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))

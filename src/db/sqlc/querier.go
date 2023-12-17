@@ -64,6 +64,7 @@ type Querier interface {
 	ListAddresses(ctx context.Context, username string) ([]ListAddressesRow, error)
 	ListAllBooks(ctx context.Context) ([]Book, error)
 	ListAllSubgenres(ctx context.Context) ([]Subgenre, error)
+	ListBookFollowGenre(ctx context.Context, arg ListBookFollowGenreParams) ([]ListBookFollowGenreRow, error)
 	ListBooks(ctx context.Context, arg ListBooksParams) (ListBooksRow, error)
 	ListBooksGenresByBookID(ctx context.Context, booksID int64) ([]BooksGenre, error)
 	ListBooksGenresByGenreID(ctx context.Context, genresID int64) ([]BooksGenre, error)

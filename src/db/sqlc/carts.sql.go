@@ -10,14 +10,8 @@ import (
 )
 
 const createCart = `-- name: CreateCart :one
-INSERT INTO carts (
-  books_id,
-  username,
-  amount,
-  total
-) VALUES (
-  $1, $2, $3, $4
-)
+INSERT INTO carts (books_id, username, amount, total)
+VALUES ($1, $2, $3, $4)
 RETURNING id, books_id, username, created_at, amount, total
 `
 
@@ -50,7 +44,7 @@ func (q *Queries) CreateCart(ctx context.Context, arg CreateCartParams) (Cart, e
 const deleteCart = `-- name: DeleteCart :exec
 DELETE FROM carts
 WHERE id = $1
-AND username = $2
+  AND username = $2
 `
 
 type DeleteCartParams struct {
@@ -64,8 +58,10 @@ func (q *Queries) DeleteCart(ctx context.Context, arg DeleteCartParams) error {
 }
 
 const getCart = `-- name: GetCart :one
-SELECT id, books_id, username, created_at, amount, total FROM carts
-WHERE id = $1 LIMIT 1
+SELECT id, books_id, username, created_at, amount, total
+FROM carts
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetCart(ctx context.Context, id int64) (Cart, error) {
@@ -83,7 +79,8 @@ func (q *Queries) GetCart(ctx context.Context, id int64) (Cart, error) {
 }
 
 const listCartsByUsername = `-- name: ListCartsByUsername :many
-SELECT id, books_id, username, created_at, amount, total FROM carts
+SELECT id, books_id, username, created_at, amount, total
+FROM carts
 WHERE username = $1
 ORDER BY id
 `
@@ -121,9 +118,8 @@ func (q *Queries) ListCartsByUsername(ctx context.Context, username string) ([]C
 const updateAmount = `-- name: UpdateAmount :one
 UPDATE carts
 SET amount = $2,
-    total = $3
-WHERE 
-  id = $1
+  total = $3
+WHERE id = $1
 RETURNING id, books_id, username, created_at, amount, total
 `
 

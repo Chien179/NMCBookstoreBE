@@ -10,12 +10,9 @@ import (
 )
 
 const createResetPassword = `-- name: CreateResetPassword :one
-INSERT INTO reset_passwords (
-    username,
-    reset_code
-) VALUES (
-    $1, $2
-) RETURNING id, username, reset_code, is_used, created_at, expired_at
+INSERT INTO reset_passwords (username, reset_code)
+VALUES ($1, $2)
+RETURNING id, username, reset_code, is_used, created_at, expired_at
 `
 
 type CreateResetPasswordParams struct {
@@ -39,10 +36,8 @@ func (q *Queries) CreateResetPassword(ctx context.Context, arg CreateResetPasswo
 
 const updateResetPassword = `-- name: UpdateResetPassword :one
 UPDATE reset_passwords
-SET
-    is_used = TRUE
-WHERE
-    id = $1
+SET is_used = TRUE
+WHERE id = $1
     AND reset_code = $2
     AND is_used = FALSE
     AND expired_at > now()

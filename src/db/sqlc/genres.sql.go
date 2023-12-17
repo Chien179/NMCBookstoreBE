@@ -10,11 +10,8 @@ import (
 )
 
 const createGenre = `-- name: CreateGenre :one
-INSERT INTO genres (
-  name
-) VALUES (
-  $1
-)
+INSERT INTO genres (name)
+VALUES ($1)
 RETURNING id, name, is_deleted, created_at
 `
 
@@ -41,8 +38,10 @@ func (q *Queries) DeleteGenre(ctx context.Context, id int64) error {
 }
 
 const getGenre = `-- name: GetGenre :one
-SELECT id, name, is_deleted, created_at FROM genres
-WHERE id = $1 LIMIT 1
+SELECT id, name, is_deleted, created_at
+FROM genres
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetGenre(ctx context.Context, id int64) (Genre, error) {
@@ -58,7 +57,8 @@ func (q *Queries) GetGenre(ctx context.Context, id int64) (Genre, error) {
 }
 
 const listGenres = `-- name: ListGenres :many
-SELECT id, name, is_deleted, created_at FROM genres
+SELECT id, name, is_deleted, created_at
+FROM genres
 ORDER BY id
 `
 

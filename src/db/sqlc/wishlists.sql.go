@@ -10,12 +10,8 @@ import (
 )
 
 const createWishlist = `-- name: CreateWishlist :one
-INSERT INTO wishlists (
-  books_id,
-  username
-) VALUES (
-  $1, $2
-)
+INSERT INTO wishlists (books_id, username)
+VALUES ($1, $2)
 RETURNING id, books_id, username, created_at
 `
 
@@ -39,7 +35,7 @@ func (q *Queries) CreateWishlist(ctx context.Context, arg CreateWishlistParams) 
 const deleteWishlist = `-- name: DeleteWishlist :exec
 DELETE FROM wishlists
 WHERE id = $1
-AND username = $2
+  AND username = $2
 `
 
 type DeleteWishlistParams struct {
@@ -53,8 +49,10 @@ func (q *Queries) DeleteWishlist(ctx context.Context, arg DeleteWishlistParams) 
 }
 
 const getWishlist = `-- name: GetWishlist :one
-SELECT id, books_id, username, created_at FROM wishlists
-WHERE id = $1 LIMIT 1
+SELECT id, books_id, username, created_at
+FROM wishlists
+WHERE id = $1
+LIMIT 1
 `
 
 func (q *Queries) GetWishlist(ctx context.Context, id int64) (Wishlist, error) {
@@ -70,7 +68,8 @@ func (q *Queries) GetWishlist(ctx context.Context, id int64) (Wishlist, error) {
 }
 
 const listWishlistsByUsername = `-- name: ListWishlistsByUsername :many
-SELECT id, books_id, username, created_at FROM wishlists
+SELECT id, books_id, username, created_at
+FROM wishlists
 WHERE username = $1
 ORDER BY id
 `

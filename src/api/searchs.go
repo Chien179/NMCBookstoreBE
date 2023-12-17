@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) fullSearch(ctx *gin.Context) {
+func (server *Server) elasticSearch(ctx *gin.Context) {
 	var req models.SearchRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
