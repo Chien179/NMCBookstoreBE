@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -14,6 +13,9 @@ import (
 	"github.com/Chien179/NMCBookstoreBE/src/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/hibiken/asynq"
+	"github.com/rs/zerolog/log"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func (server *Server) GoogleOAuth(ctx *gin.Context) {
@@ -29,8 +31,6 @@ func (server *Server) GoogleOAuth(ctx *gin.Context) {
 	}
 
 	tokenRes, err := util.GetGoogleOauthToken(code.Code)
-
-	fmt.Println(tokenRes)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, errorResponse(err))
@@ -132,4 +132,27 @@ func (server *Server) GoogleOAuth(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) GoogleOAuthURL(ctx *gin.Context) {
+	// Developer Console (https://console.developers.google.com).
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot load config")
+	}
+	conf := &oauth2.Config{
+		ClientID:     config.GoogleOauthClientID,
+		ClientSecret: config.GoogleOauthClientSecret,
+		RedirectURL:  config.GoogleOAuthRedirectUrl,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/bigquery",
+			"https://www.googleapis.com/auth/blogger",
+		},
+		Endpoint: google.Endpoint,
+	}
+	// Redirect user to Google's consent page to ask for permission
+	// for the scopes specified above.
+	url := conf.AuthCodeURL("state")
+
+	ctx.JSON(http.StatusOK, url)
 }

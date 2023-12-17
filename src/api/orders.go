@@ -104,6 +104,10 @@ func (server *Server) createOrder(ctx *gin.Context) {
 			Float64: subTotal,
 			Valid:   subTotal > 0,
 		},
+		Status: sql.NullString{
+			String: req.Status,
+			Valid:  true,
+		},
 	}
 
 	order, err = server.store.UpdateOrder(ctx, arg)

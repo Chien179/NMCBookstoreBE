@@ -13,14 +13,19 @@ func (server *Server) setupRouter() {
 	server.userAuth(router)
 	server.adminAuth(router)
 
-	router.Use(cors.Default())
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
+	corsConfig.AllowCredentials = true
+
+	router.Use(cors.New(corsConfig))
 	server.router = router
 }
 
 func (server *Server) publicRouter(router *gin.Engine) {
 	router.POST("/signup", server.createUser)
 	router.POST("/login", server.loginUser)
-	router.GET("/login/oauth/google", server.GoogleOAuth)
+	router.GET("/login/oauth/google", server.GoogleOAuthURL)
+	router.GET("/login/oauth/authenticate", server.GoogleOAuth)
 	router.POST("/tokens/renew_access", server.renewAccessToken)
 
 	router.GET("/verify_email", server.verifyEmail)
