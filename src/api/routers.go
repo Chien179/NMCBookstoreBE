@@ -24,8 +24,8 @@ func (server *Server) setupRouter() {
 func (server *Server) publicRouter(router *gin.Engine) {
 	router.POST("/signup", server.createUser)
 	router.POST("/login", server.loginUser)
-	router.GET("/login/oauth/google", server.GoogleOAuthURL)
-	router.GET("/login/oauth/authenticate", server.GoogleOAuth)
+	router.GET("/login/oauth/google_url", server.GoogleOAuthURL)
+	router.GET("/login/oauth/google", server.GoogleOAuth)
 	router.POST("/tokens/renew_access", server.renewAccessToken)
 
 	router.GET("/verify_email", server.verifyEmail)
