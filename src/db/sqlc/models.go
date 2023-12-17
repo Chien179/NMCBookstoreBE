@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -92,13 +93,14 @@ type Like struct {
 }
 
 type Order struct {
-	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	CreatedAt time.Time `json:"created_at"`
-	Status    string    `json:"status"`
-	SubAmount int32     `json:"sub_amount"`
-	SubTotal  float64   `json:"sub_total"`
-	Sale      float64   `json:"sale"`
+	ID        int64          `json:"id"`
+	Username  string         `json:"username"`
+	CreatedAt time.Time      `json:"created_at"`
+	Status    string         `json:"status"`
+	SubAmount int32          `json:"sub_amount"`
+	SubTotal  float64        `json:"sub_total"`
+	Sale      float64        `json:"sale"`
+	Note      sql.NullString `json:"note"`
 }
 
 type Payment struct {
@@ -109,6 +111,12 @@ type Payment struct {
 	Subtotal   float64   `json:"subtotal"`
 	Status     string    `json:"status"`
 	CreatedAt  time.Time `json:"created_at"`
+}
+
+type Rank struct {
+	ID    int64  `json:"id"`
+	Score int32  `json:"score"`
+	Name  string `json:"name"`
 }
 
 type ResetPassword struct {
@@ -178,6 +186,7 @@ type User struct {
 	Age               int32     `json:"age"`
 	Sex               string    `json:"sex"`
 	Role              string    `json:"role"`
+	Rank              int32     `json:"rank"`
 	IsDeleted         bool      `json:"is_deleted"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`

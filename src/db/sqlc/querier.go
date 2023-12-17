@@ -54,6 +54,7 @@ type Querier interface {
 	GetLike(ctx context.Context, arg GetLikeParams) (Like, error)
 	GetOrder(ctx context.Context, id int64) (Order, error)
 	GetOrderToPayment(ctx context.Context, username string) (Order, error)
+	GetRank(ctx context.Context, score int32) (GetRankRow, error)
 	GetReview(ctx context.Context, id int64) (Review, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	GetSubgenre(ctx context.Context, id int64) (Subgenre, error)

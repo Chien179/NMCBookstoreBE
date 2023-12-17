@@ -14,7 +14,7 @@ import (
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO orders (username)
 VALUES ($1)
-RETURNING id, username, created_at, status, sub_amount, sub_total, sale
+RETURNING id, username, created_at, status, sub_amount, sub_total, sale, note
 `
 
 func (q *Queries) CreateOrder(ctx context.Context, username string) (Order, error) {
@@ -28,6 +28,7 @@ func (q *Queries) CreateOrder(ctx context.Context, username string) (Order, erro
 		&i.SubAmount,
 		&i.SubTotal,
 		&i.Sale,
+		&i.Note,
 	)
 	return i, err
 }
@@ -43,7 +44,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, username, created_at, status, sub_amount, sub_total, sale
+SELECT id, username, created_at, status, sub_amount, sub_total, sale, note
 FROM orders
 WHERE id = $1
 LIMIT 1
@@ -60,12 +61,13 @@ func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 		&i.SubAmount,
 		&i.SubTotal,
 		&i.Sale,
+		&i.Note,
 	)
 	return i, err
 }
 
 const getOrderToPayment = `-- name: GetOrderToPayment :one
-SELECT id, username, created_at, status, sub_amount, sub_total, sale
+SELECT id, username, created_at, status, sub_amount, sub_total, sale, note
 FROM orders
 WHERE username = $1
 LIMIT 1
@@ -82,6 +84,7 @@ func (q *Queries) GetOrderToPayment(ctx context.Context, username string) (Order
 		&i.SubAmount,
 		&i.SubTotal,
 		&i.Sale,
+		&i.Note,
 	)
 	return i, err
 }
@@ -110,7 +113,7 @@ FROM (
     SELECT CEILING(
         CAST(COUNT(id) OVER () AS FLOAT) / $1
       ) AS total_page,
-      id, username, created_at, status, sub_amount, sub_total, sale
+      id, username, created_at, status, sub_amount, sub_total, sale, note
     FROM orders
     ORDER BY id
     LIMIT $1 OFFSET $2
@@ -136,7 +139,7 @@ func (q *Queries) ListOders(ctx context.Context, arg ListOdersParams) (ListOders
 }
 
 const listOdersByUserName = `-- name: ListOdersByUserName :many
-SELECT id, username, created_at, status, sub_amount, sub_total, sale
+SELECT id, username, created_at, status, sub_amount, sub_total, sale, note
 FROM orders
 WHERE username = $1
 ORDER BY id
@@ -159,6 +162,7 @@ func (q *Queries) ListOdersByUserName(ctx context.Context, username string) ([]O
 			&i.SubAmount,
 			&i.SubTotal,
 			&i.Sale,
+			&i.Note,
 		); err != nil {
 			return nil, err
 		}
@@ -180,7 +184,7 @@ SET status = COALESCE($1, status),
   sub_total = COALESCE($3, sub_total),
   sale = COALESCE($4, sale)
 WHERE id = $5
-RETURNING id, username, created_at, status, sub_amount, sub_total, sale
+RETURNING id, username, created_at, status, sub_amount, sub_total, sale, note
 `
 
 type UpdateOrderParams struct {
@@ -208,6 +212,7 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		&i.SubAmount,
 		&i.SubTotal,
 		&i.Sale,
+		&i.Note,
 	)
 	return i, err
 }

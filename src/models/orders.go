@@ -6,6 +6,8 @@ type CreateOrderRequest struct {
 	PaymentID     string  `json:"payment_id" binding:"required"`
 	CartIDs       []int64 `json:"cart_ids" binding:"required"`
 	ToAddress     string  `json:"to_address" binding:"required"`
+	Note          string  `json:"note"`
+	Email         string  `json:"email" binding:"required"`
 	TotalShipping float64 `json:"total_shipping" binding:"required,min=1000,max=100000000"`
 	Status        string  `json:"status" binding:"required"`
 }

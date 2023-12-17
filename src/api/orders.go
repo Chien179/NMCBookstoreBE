@@ -123,7 +123,7 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		return
 	}
 
-	server.createPayment(ctx, req.PaymentID, order.ID, req.ToAddress, req.TotalShipping, subTotal, req.Status)
+	server.createPayment(ctx, req.PaymentID, order.ID, req.ToAddress, req.TotalShipping, subTotal, req.Status, req.Email)
 
 	ctx.JSON(http.StatusOK, order)
 }

@@ -65,6 +65,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	userRoutes.PUT("/", server.updateUser)
 	userRoutes.DELETE("/", server.deleteUser)
 	usersRoutes.POST("/send_verify_email", server.sendEmailVerify)
+	userRoutes.GET("/rank", server.getRank)
 
 	cartRoutes := usersRoutes.Group("/carts").Use(authMiddleware(server.tokenMaker))
 	cartRoutes.POST("/:id", server.addToCart)
@@ -91,6 +92,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	reviewRoutes.GET("/like", server.getLikeReview)
 	reviewRoutes.GET("/action/like", server.likeReview)
 	reviewRoutes.GET("/action/dislike", server.dislikeReview)
+	reviewRoutes.POST("/action/report", server.report)
 	reviewRoutes.GET("/dislike", server.getDislikeReview)
 	reviewRoutes.POST("/:book_id", server.createReview)
 	reviewRoutes.DELETE("/:id", server.deleteReview)

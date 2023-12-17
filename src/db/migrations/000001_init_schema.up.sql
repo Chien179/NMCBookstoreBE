@@ -8,6 +8,7 @@ CREATE TABLE "users" (
   "age" int NOT NULL,
   "sex" varchar NOT NULL,
   "role" varchar NOT NULL DEFAULT 'user',
+  "rank" int NOT NULL DEFAULT 0,
   "is_deleted" boolean NOT NULL DEFAULT false,
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "created_at" timestamptz NOT NULL DEFAULT 'now()'

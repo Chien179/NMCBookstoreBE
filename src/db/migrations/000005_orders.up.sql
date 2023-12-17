@@ -16,3 +16,5 @@ ALTER TABLE "orders"
 ADD COLUMN "sub_total" float NOT NULL DEFAULT 0;
 ALTER TABLE "orders"
 ADD COLUMN "sale" float NOT NULL DEFAULT 0;
+ALTER TABLE "orders"
+ADD COLUMN "note" varchar;

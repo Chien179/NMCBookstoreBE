@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (server *Server) createPayment(ctx *gin.Context, PaymentID string, OrderID int64, ToAddress string, TotalShipping float64, SubTotal float64, Status string) {
+func (server *Server) createPayment(ctx *gin.Context, PaymentID string, OrderID int64, ToAddress string, TotalShipping float64, SubTotal float64, Status string, email string) {
 	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
 	shipping, err := server.createShipping(ctx, ToAddress, TotalShipping)
@@ -38,6 +38,25 @@ func (server *Server) createPayment(ctx *gin.Context, PaymentID string, OrderID 
 		}
 
 		_, err := server.store.UpdateOrder(ctx, arg)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		user, err := server.store.GetUserByEmail(ctx, email)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		userArg := db.UpdateUserParams{
+			Rank: sql.NullInt32{
+				Int32: user.Rank + int32(SubTotal),
+				Valid: true,
+			},
+		}
+
+		server.store.UpdateUser(ctx, userArg)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return

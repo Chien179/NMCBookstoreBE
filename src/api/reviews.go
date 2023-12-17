@@ -137,3 +137,20 @@ func (server *Server) listReview(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, reviews)
 }
+
+func (server *Server) report(ctx *gin.Context) {
+	arg := db.UpdateReviewParams{
+		Reported: sql.NullBool{
+			Bool:  true,
+			Valid: true,
+		},
+	}
+	_, err := server.store.UpdateReview(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, "Reported success")
+
+}
