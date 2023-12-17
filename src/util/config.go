@@ -28,6 +28,8 @@ type Config struct {
 	CloudinaryAPIKey        string        `mapstructure:"CLOUDINARY_API_KEY"`
 	CloudinaryAPISecret     string        `mapstructure:"CLOUDINARY_API_SECRET"`
 	GoogleOauthClientID     string        `mapstructure:"GOOGLE_OAUTH_CLIENT_ID"`
+	RedisUsername           string        `mapstructure:"REDIS_USERNAME"`
+	RedisPassword           string        `mapstructure:"REDIS_PASSWORD"`
 	GoogleOauthClientSecret string        `mapstructure:"GOOGLE_OAUTH_CLIENT_SECRET"`
 	GoogleOAuthRedirectUrl  string        `mapstructure:"GOOGLE_OAUTH_REDIRECT_URL"`
 }
