@@ -18,6 +18,7 @@ func GRPCGetRCM(ctx context.Context, bookRequest *BookRequest) (*BookResponse, e
 	if err != nil {
 		log.Logger.Error().Msgf("did not connect: %v", err)
 	}
+	log.Info().Msg("Connect GRPC recommend success")
 	defer conn.Close()
 
 	client := NewBookRecommendClient(conn)
