@@ -154,5 +154,5 @@ func (server *Server) GoogleOAuthURL(ctx *gin.Context) {
 	// for the scopes specified above.
 	url := conf.AuthCodeURL("state")
 
-	ctx.JSON(http.StatusOK, url)
+	ctx.JSON(http.StatusOK, map[string]string{"url": url})
 }
