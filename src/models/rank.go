@@ -5,5 +5,7 @@ type RankRequest struct {
 }
 
 type RankReponse struct {
-	Rank string `json:"rank"`
+	Rank    string `json:"rank"`
+	Vote    int    `josn:"vote"`
+	Reviews int    `json:"reveiws"`
 }

@@ -65,3 +65,7 @@ UPDATE reviews
 SET is_deleted = true
 WHERE id = sqlc.arg(id)
 RETURNING *;
+-- name: GetCountReviewByUser :one
+SELECT COUNT(*) AS reviews
+FROM reviews AS r
+WHERE r.username = $1;

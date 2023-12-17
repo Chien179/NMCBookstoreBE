@@ -48,6 +48,8 @@ type Querier interface {
 	GetBookSubgenre(ctx context.Context, id int64) (BooksSubgenre, error)
 	GetCart(ctx context.Context, id int64) (Cart, error)
 	GetCity(ctx context.Context, id int64) (City, error)
+	GetCountLikeByUser(ctx context.Context, username string) (int64, error)
+	GetCountReviewByUser(ctx context.Context, username string) (int64, error)
 	GetDislike(ctx context.Context, arg GetDislikeParams) (Dislike, error)
 	GetDistrict(ctx context.Context, id int64) (District, error)
 	GetGenre(ctx context.Context, id int64) (Genre, error)

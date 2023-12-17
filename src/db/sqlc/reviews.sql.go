@@ -62,6 +62,19 @@ func (q *Queries) DeleteReview(ctx context.Context, id int64) error {
 	return err
 }
 
+const getCountReviewByUser = `-- name: GetCountReviewByUser :one
+SELECT COUNT(*) AS reviews
+FROM reviews AS r
+WHERE r.username = $1
+`
+
+func (q *Queries) GetCountReviewByUser(ctx context.Context, username string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCountReviewByUser, username)
+	var reviews int64
+	err := row.Scan(&reviews)
+	return reviews, err
+}
+
 const getReview = `-- name: GetReview :one
 SELECT id, username, books_id, liked, disliked, reported, comments, is_deleted, rating, created_at
 FROM reviews

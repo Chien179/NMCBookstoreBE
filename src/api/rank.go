@@ -26,8 +26,21 @@ func (server *Server) getRank(ctx *gin.Context) {
 		return
 	}
 
+	vote, err := server.store.GetCountLikeByUser(ctx, user.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	review, err := server.store.GetCountReviewByUser(ctx, user.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	rsp := models.RankReponse{
-		Rank: rank.Name,
+		Rank:    rank.Name,
+		Vote:    int(vote),
+		Reviews: int(review),
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

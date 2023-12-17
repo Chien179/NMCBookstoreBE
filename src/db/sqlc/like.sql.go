@@ -33,6 +33,19 @@ func (q *Queries) CreateLike(ctx context.Context, arg CreateLikeParams) (Like, e
 	return i, err
 }
 
+const getCountLikeByUser = `-- name: GetCountLikeByUser :one
+SELECT COUNT(*) AS votes
+FROM "like" as l
+WHERE l.username = $1
+`
+
+func (q *Queries) GetCountLikeByUser(ctx context.Context, username string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getCountLikeByUser, username)
+	var votes int64
+	err := row.Scan(&votes)
+	return votes, err
+}
+
 const getLike = `-- name: GetLike :one
 SELECT id, username, review_id, is_like
 FROM "like"

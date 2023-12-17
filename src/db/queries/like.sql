@@ -14,3 +14,7 @@ RETURNING *;
 INSERT INTO "like" (username, review_id, is_like)
 VALUES ($1, $2, $3)
 RETURNING *;
+-- name: GetCountLikeByUser :one
+SELECT COUNT(*) AS votes
+FROM "like" as l
+WHERE l.username = $1;
