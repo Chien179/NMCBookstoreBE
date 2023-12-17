@@ -145,8 +145,8 @@ func (server *Server) GoogleOAuthURL(ctx *gin.Context) {
 		ClientSecret: config.GoogleOauthClientSecret,
 		RedirectURL:  config.GoogleOAuthRedirectUrl,
 		Scopes: []string{
-			"https://www.googleapis.com/auth/bigquery",
-			"https://www.googleapis.com/auth/blogger",
+			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/userinfo.email",
 		},
 		Endpoint: google.Endpoint,
 	}

@@ -29,7 +29,7 @@ type GoogleUserResult struct {
 	Locale         string
 }
 
-func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
+func GetGoogleOauthToken(code string) (GoogleOauthToken, error) {
 	const rootURl = "https://oauth2.googleapis.com/token"
 
 	config, err := LoadConfig(".")
@@ -47,7 +47,7 @@ func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
 
 	req, err := http.NewRequest("POST", rootURl, bytes.NewBufferString(query))
 	if err != nil {
-		return nil, err
+		return GoogleOauthToken{}, err
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -57,28 +57,30 @@ func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return GoogleOauthToken{}, err
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.New("could not retrieve token")
+		return GoogleOauthToken{}, errors.New("could not retrieve token")
 	}
 
 	var resBody bytes.Buffer
 	_, err = io.Copy(&resBody, res.Body)
 	if err != nil {
-		return nil, err
+		return GoogleOauthToken{}, err
 	}
 
 	var GoogleOauthTokenRes map[string]interface{}
 
 	if err := json.Unmarshal(resBody.Bytes(), &GoogleOauthTokenRes); err != nil {
-		return nil, err
+		return GoogleOauthToken{}, err
 	}
 
-	tokenBody := &GoogleOauthToken{
-		AccessToken: GoogleOauthTokenRes["accessToken"].(string),
-		IdToken:     GoogleOauthTokenRes["idToken"].(string),
+	fmt.Println(GoogleOauthTokenRes)
+
+	tokenBody := GoogleOauthToken{
+		AccessToken: GoogleOauthTokenRes["access_token"].(string),
+		IdToken:     GoogleOauthTokenRes["id_token"].(string),
 	}
 
 	return tokenBody, nil
