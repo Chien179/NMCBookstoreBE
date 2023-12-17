@@ -111,7 +111,7 @@ type SearchResponse struct {
 }
 
 type SearchRequest struct {
-	PageID       int32   `form:"page_id" binding:"required,min=0"`
+	PageID       int32   `form:"page_id" binding:"required,min=1"`
 	PageSize     int32   `form:"page_size" binding:"required,min=24,max=100"`
 	Text         string  `form:"text"`
 	GenresID     int64   `form:"genres_id"`

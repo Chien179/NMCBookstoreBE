@@ -68,7 +68,7 @@ func QueryElastic(search models.SearchRequest) (string, error) {
 
 	query.Sort[0].Rating.Order = arrange
 
-	query.From = search.PageID
+	query.From = search.PageID - 1
 	query.Size = search.PageSize
 
 	query.Aggs.UniqueBooks.Cardinality.Field = "id"
