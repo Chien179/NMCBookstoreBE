@@ -62,6 +62,13 @@ type QueryElastic struct {
 	Collapse struct {
 		Field string `json:"field"`
 	} `json:"collapse"`
+	Aggs struct {
+		UniqueBooks struct {
+			Cardinality struct {
+				Field string `json:"field"`
+			} `json:"cardinality"`
+		} `json:"unique_books"`
+	} `json:"aggs"`
 	From int32 `json:"from"`
 	Size int32 `json:"size"`
 }

@@ -71,6 +71,8 @@ func QueryElastic(search models.SearchRequest) (string, error) {
 	query.From = search.PageID
 	query.Size = search.PageSize
 
+	query.Aggs.UniqueBooks.Cardinality.Field = "id"
+
 	query.Collapse.Field = "id"
 
 	queryByte, err := json.Marshal(query)

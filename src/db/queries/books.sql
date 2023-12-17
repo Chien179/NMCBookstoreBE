@@ -13,6 +13,8 @@ SELECT t.total_page,
       t.name,
       'price',
       t.price,
+      'sale',
+      t.sale,
       'image',
       t.image,
       'description',
@@ -57,6 +59,7 @@ LIMIT 20;
 INSERT INTO books (
     name,
     price,
+    sale,
     image,
     description,
     author,
@@ -77,6 +80,7 @@ RETURNING *;
 UPDATE books
 SET name = COALESCE(sqlc.narg(name), name),
   price = COALESCE(sqlc.narg(price), price),
+  sale = COALESCE(sqlc.narg(sale), sale),
   image = COALESCE(sqlc.narg(image), image),
   description = COALESCE(sqlc.narg(description), description),
   author = COALESCE(sqlc.narg(author), author),
@@ -96,3 +100,20 @@ group by b.id,
   r.rating
 order by r.rating desc
 limit 1;
+-- name: ListBookFollowGenre :many
+SELECT DISTINCT b.id,
+  b."name",
+  b.description,
+  b.price,
+  b.sale,
+  b.rating
+FROM books AS b
+  INNER JOIN books_genres AS bg ON b.id = bg.books_id
+  INNER JOIN genres AS g ON bg.genres_id = g.id
+WHERE g.id = $1
+ORDER BY b.id,
+  b."name",
+  b.description,
+  b.price,
+  b.rating
+LIMIT $2;

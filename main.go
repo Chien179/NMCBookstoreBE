@@ -45,7 +45,7 @@ func main() {
 		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12},
 	}
 
-	// runDBMigration(config.MigrationURL, config.DBSource)
+	runDBMigration(config.MigrationURL, config.DBSource)
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 	go runTaskProcessor(config, redisOpt, store)

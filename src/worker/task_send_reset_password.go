@@ -63,7 +63,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendResetPassword(ctx context.Co
 	}
 
 	subject := "Welcome to NMC Bookstore"
-	resetPasswordUrl := fmt.Sprintf("http://localhost:3006/reset_password?id=%d&reset_code=%s",
+	resetPasswordUrl := fmt.Sprintf("http://localhost:3000/reset_password?id=%d&reset_code=%s",
 		resetPassword.ID, resetPassword.ResetCode)
 	content := fmt.Sprintf(`Hello %s,<br/>
 	We received a request to reset your password!<br/>
