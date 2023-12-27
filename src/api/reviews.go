@@ -148,9 +148,7 @@ func (server *Server) listReview(ctx *gin.Context) {
 
 		isLike := false
 		like, err := server.store.GetLike(ctx, arg)
-		if err == nil {
-			isLike = like.IsLike
-		}
+		isLike = like.IsLike
 		re.Islike = isLike
 
 		dislikeArg := db.GetDislikeParams{
