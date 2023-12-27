@@ -127,6 +127,7 @@ type SearchRequest struct {
 	MinPrice     float64 `form:"min_price"`
 	MaxPrice     float64 `form:"max_price"`
 	Rating       float64 `form:"rating"`
+	IsDeleted    bool    `form:"is_deleted"`
 	PriceSortAsc bool    `form:"price_sort_asc,default=true"`
 	NameSortAsc  bool    `form:"name_sort_asc,default=true"`
 }
