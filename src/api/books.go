@@ -12,7 +12,7 @@ import (
 
 func (server *Server) createBook(ctx *gin.Context) {
 	req, err := ctx.MultipartForm()
-	price, err := strconv.Atoi(req.Value["price"][0])
+	price, err := strconv.ParseFloat(req.Value["price"][0], 64)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -247,7 +247,7 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		}
 	}
 
-	price, err := strconv.Atoi(req.Value["price"][0])
+	price, err := strconv.ParseFloat(req.Value["price"][0], 64)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

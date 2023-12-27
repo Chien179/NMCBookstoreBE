@@ -3,7 +3,6 @@ package api
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
@@ -62,12 +61,10 @@ func (server *Server) addToCart(ctx *gin.Context) {
 		}
 	}
 
-	sale := 1
+	sale := float64(1)
 	if book.Sale > 0 {
-		sale = (100 - int(book.Sale)) / 100
+		sale = float64((100 - int(book.Sale))) / 100
 	}
-
-	log.Println(sale)
 
 	arg := db.CreateCartParams{
 		BooksID:  book.ID,

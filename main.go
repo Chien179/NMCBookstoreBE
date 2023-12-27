@@ -40,8 +40,8 @@ func main() {
 
 	redisOpt := asynq.RedisClientOpt{
 		Addr:      config.RedisAddress,
-		Username:  "red-clmdiicjtl8s73aiv8tg",
-		Password:  "iKGnFsunMjhr8iQQl4In5A98RjxjRlEK",
+		Username:  config.RedisUsername,
+		Password:  config.RedisPassword,
 		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12},
 	}
 

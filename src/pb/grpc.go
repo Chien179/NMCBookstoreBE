@@ -14,11 +14,11 @@ func GRPCGetRCM(ctx context.Context, bookRequest *BookRequest) (*BookResponse, e
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
-	conn, err := grpc.Dial(config.GRPCAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	conn, err := grpc.DialContext(ctx, config.GRPCAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Logger.Error().Msgf("did not connect: %v", err)
 	}
-	log.Info().Msg("Connect GRPC recommend success")
 	defer conn.Close()
 
 	client := NewBookRecommendClient(conn)
@@ -27,6 +27,7 @@ func GRPCGetRCM(ctx context.Context, bookRequest *BookRequest) (*BookResponse, e
 	if err != nil {
 		return nil, err
 	}
+	log.Info().Msg("Connect GRPC recommend success")
 
 	return books, nil
 }

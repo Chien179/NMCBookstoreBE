@@ -99,7 +99,7 @@ func (server *Server) recommend(ctx *gin.Context) {
 
 	results, err := getBookRCM(ctx, &bookRequest)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
