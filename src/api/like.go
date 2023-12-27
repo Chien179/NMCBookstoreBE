@@ -84,7 +84,8 @@ func (server *Server) likeReview(ctx *gin.Context) {
 		likeAmount = -1
 	}
 
-	review, err := server.store.GetReview(ctx, like.ReviewID)
+	review, err := server.store.GetReview(ctx, req.ReviewId)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse((err)))
@@ -99,6 +100,7 @@ func (server *Server) likeReview(ctx *gin.Context) {
 			Int32: review.Liked + int32(likeAmount),
 			Valid: true,
 		},
+		ID: req.ReviewId,
 	}
 
 	_, err = server.store.UpdateReview(ctx, rArg)

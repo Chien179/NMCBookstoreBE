@@ -9,8 +9,8 @@ FROM orders
 WHERE username = $1
 LIMIT 1;
 -- name: CreateOrder :one
-INSERT INTO orders (username)
-VALUES ($1)
+INSERT INTO orders (username, created_at)
+VALUES ($1, NOW())
 RETURNING *;
 -- name: DeleteOrder :exec
 DELETE FROM orders
