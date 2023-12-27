@@ -145,23 +145,25 @@ func (server *Server) listReview(ctx *gin.Context) {
 			ReviewID: re.Id,
 			Username: req.Username,
 		}
+
+		isLike := false
 		like, err := server.store.GetLike(ctx, arg)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
+		if err == nil {
+			isLike = like.IsLike
 		}
-		re.Islike = like.IsLike
+		re.Islike = isLike
 
 		dislikeArg := db.GetDislikeParams{
 			ReviewID: re.Id,
 			Username: req.Username,
 		}
+
+		isDislike := false
 		dislike, err := server.store.GetDislike(ctx, dislikeArg)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
+		if err == nil {
+			isDislike = dislike.IsDislike
 		}
-		re.IsDislike = dislike.IsDislike
+		re.IsDislike = isDislike
 	}
 
 	ctx.JSON(http.StatusOK, result)
