@@ -107,10 +107,13 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 			IsLike:   false,
 		}
 
-		_, err := server.store.UpdateLike(ctx, likeArg)
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
+		_, err := server.store.GetLike(ctx, db.GetLikeParams{
+			Username: req.Username,
+			ReviewID: req.ReviewId,
+		})
+
+		if err == nil {
+			server.store.UpdateLike(ctx, likeArg)
 		}
 
 	}

@@ -17,7 +17,7 @@ type DeleteReviewRequest struct {
 }
 
 type ListReviewFormdata struct {
-	Username string `form:"page_id" binding:"required"`
+	Username string `form:"username" binding:"required"`
 	PageID   int32  `form:"page_id" binding:"required,min=1"`
 	PageSize int32  `form:"page_size" binding:"required,min=5,max=10"`
 }
