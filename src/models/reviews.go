@@ -28,7 +28,7 @@ type ListReviewRequest struct {
 }
 
 type ReviewsResponse struct {
-	Id        int64     `json:"id"`
+	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
 	Image     string    `json:"image"`
 	BooksId   int64     `json:"books_id"`

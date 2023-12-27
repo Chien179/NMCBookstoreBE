@@ -142,7 +142,7 @@ func (server *Server) listReview(ctx *gin.Context) {
 
 	for _, re := range result {
 		arg := db.GetLikeParams{
-			ReviewID: re.Id,
+			ReviewID: re.ID,
 			Username: req.Username,
 		}
 
@@ -154,7 +154,7 @@ func (server *Server) listReview(ctx *gin.Context) {
 		re.Islike = isLike
 
 		dislikeArg := db.GetDislikeParams{
-			ReviewID: re.Id,
+			ReviewID: re.ID,
 			Username: req.Username,
 		}
 
