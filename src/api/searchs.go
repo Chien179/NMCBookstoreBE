@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
@@ -50,6 +51,9 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 		server.elastic.Search.WithBody(strings.NewReader(query)),
 		server.elastic.Search.WithFilterPath("aggregations"),
 	)
+	if err != nil { // Parse []byte to go struct pointer
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
 
 	body, err = io.ReadAll(res.Body)
 	var aggs models.Aggs
@@ -60,16 +64,19 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 	var books []models.BookResponse
 	for _, inf := range result.Hits.Hits {
 		source := inf.Source
+		sale, _ := strconv.ParseFloat(source.Sale, 64)
 		book := models.BookResponse{
 			ID:          source.ID,
 			Name:        source.Name,
 			Price:       source.Price,
+			Sale:        sale,
 			Image:       source.Image,
 			Description: source.Description,
 			Author:      source.Author,
 			Publisher:   source.Publisher,
 			Quantity:    source.Quantity,
 			Rating:      source.Rating,
+			IsDeleted:   source.IsDeleted,
 		}
 
 		books = append(books, book)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"net/http"
 
@@ -135,7 +136,35 @@ func (server *Server) listReview(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, reviews)
+	result := []models.ReviewsResponse{}
+	bt, _ := reviews.Reviews.MarshalJSON()
+	_ = json.Unmarshal(bt, &result)
+
+	for _, re := range result {
+		arg := db.GetLikeParams{
+			ReviewID: re.Id,
+			Username: req.Username,
+		}
+		like, err := server.store.GetLike(ctx, arg)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		re.Islike = like.IsLike
+
+		dislikeArg := db.GetDislikeParams{
+			ReviewID: re.Id,
+			Username: req.Username,
+		}
+		dislike, err := server.store.GetDislike(ctx, dislikeArg)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		re.IsDislike = dislike.IsDislike
+	}
+
+	ctx.JSON(http.StatusOK, result)
 }
 
 func (server *Server) report(ctx *gin.Context) {
@@ -152,5 +181,14 @@ func (server *Server) report(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, "Reported success")
+}
 
+func (server *Server) listAllReview(ctx *gin.Context) {
+	reviews, err := server.store.ListReviews(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, reviews)
 }

@@ -4,6 +4,11 @@ FROM "like"
 WHERE username = sqlc.arg(username)
     AND review_id = sqlc.arg(review_id)
 LIMIT 1;
+-- name: ListLike :many
+SELECT *
+FROM "like"
+WHERE username = sqlc.arg(username)
+ORDER BY review_id;
 -- name: UpdateLike :one
 UPDATE "like"
 SET is_like = sqlc.arg(is_like)

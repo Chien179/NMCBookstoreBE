@@ -71,6 +71,41 @@ func (q *Queries) GetLike(ctx context.Context, arg GetLikeParams) (Like, error) 
 	return i, err
 }
 
+const listLike = `-- name: ListLike :many
+SELECT id, username, review_id, is_like
+FROM "like"
+WHERE username = $1
+ORDER BY review_id
+`
+
+func (q *Queries) ListLike(ctx context.Context, username string) ([]Like, error) {
+	rows, err := q.db.QueryContext(ctx, listLike, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Like{}
+	for rows.Next() {
+		var i Like
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.ReviewID,
+			&i.IsLike,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateLike = `-- name: UpdateLike :one
 UPDATE "like"
 SET is_like = $1

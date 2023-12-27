@@ -138,6 +138,7 @@ func (server *Server) createBook(ctx *gin.Context) {
 		Genres:      genres,
 		Subgenres:   subgenres,
 		Rating:      0,
+		IsDeleted:   book.IsDeleted,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -207,6 +208,7 @@ func (server *Server) getBook(ctx *gin.Context) {
 		Genres:      genres,
 		Subgenres:   subgenres,
 		Rating:      book.Rating,
+		IsDeleted:   book.IsDeleted,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -381,6 +383,7 @@ func (server *Server) updateBook(ctx *gin.Context) {
 		Genres:      genres,
 		Subgenres:   subgenres,
 		Rating:      updatedBook.Rating,
+		IsDeleted:   updatedBook.IsDeleted,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -487,4 +490,25 @@ func (server *Server) softDeleteBook(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, "Book deleted successfully")
+}
+
+func (server *Server) listBookFollowGenre(ctx *gin.Context) {
+	var req models.ListBookFollowGenreRequest
+	if err := ctx.ShouldBindQuery(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListBookFollowGenreParams{
+		ID:    req.ID,
+		Limit: int32(req.Limit),
+	}
+
+	books, err := server.store.ListBookFollowGenre(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, books)
 }

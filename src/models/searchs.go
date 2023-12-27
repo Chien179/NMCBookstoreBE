@@ -1,7 +1,5 @@
 package models
 
-import "time"
-
 type Text struct {
 	MultiMatch struct {
 		Query  string   `json:"query"`
@@ -87,24 +85,18 @@ type SearchResponse struct {
 			Score   int64    `json:"_score"`
 			Ignored []string `json:"_ignored"`
 			Source  struct {
-				Numb          int64     `json:"numb"`
-				GenresID      int64     `json:"genres_id"`
-				Name          string    `json:"name"`
-				Price         float64   `json:"price"`
-				Timestamp     time.Time `json:"@timestamp"`
-				Version       string    `json:"@version"`
-				SubgenresName string    `json:"subgenres_name"`
-				GenresName    string    `json:"genres_name"`
-				IsDeleted     bool      `json:"is_deleted"`
-				Quantity      int32     `json:"quantity"`
-				Publisher     string    `json:"publisher"`
-				SubgenresID   int64     `json:"subgenres_id"`
-				Image         []string  `json:"image"`
-				Type          string    `json:"type"`
-				Description   string    `json:"description"`
-				Author        string    `json:"author"`
-				ID            int64     `json:"id"`
-				Rating        float64   `json:"rating"`
+				GenresID    int64    `json:"genres_id"`
+				Quantity    int32    `json:"quantity"`
+				Publisher   string   `json:"publisher"`
+				Image       []string `json:"image"`
+				Description string   `json:"description"`
+				Sale        string   `json:"sale"`
+				IsDeleted   bool     `json:"is_deleted"`
+				Author      string   `json:"author"`
+				Price       float64  `json:"price"`
+				Rating      float64  `json:"rating"`
+				Name        string   `json:"name"`
+				ID          int64    `json:"id"`
 			} `json:"_source"`
 		} `json:"hits"`
 	} `json:"hits"`

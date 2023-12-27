@@ -100,6 +100,46 @@ func (q *Queries) GetReview(ctx context.Context, id int64) (Review, error) {
 	return i, err
 }
 
+const listReviews = `-- name: ListReviews :many
+SELECT id, username, books_id, liked, disliked, reported, comments, is_deleted, rating, created_at
+FROM reviews
+ORDER BY id
+`
+
+func (q *Queries) ListReviews(ctx context.Context) ([]Review, error) {
+	rows, err := q.db.QueryContext(ctx, listReviews)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Review{}
+	for rows.Next() {
+		var i Review
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.BooksID,
+			&i.Liked,
+			&i.Disliked,
+			&i.Reported,
+			&i.Comments,
+			&i.IsDeleted,
+			&i.Rating,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listReviewsByBookID = `-- name: ListReviewsByBookID :one
 SELECT t.total_page,
   JSON_AGG(

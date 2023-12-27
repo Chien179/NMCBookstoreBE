@@ -15,6 +15,7 @@ type BookResponse struct {
 	Rating      float64       `json:"rating"`
 	Genres      []db.Genre    `json:"genres"`
 	Subgenres   []db.Subgenre `json:"subgenres"`
+	IsDeleted   bool          `json:"is_deleted"`
 }
 
 type GetBookRequest struct {

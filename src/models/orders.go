@@ -1,6 +1,10 @@
 package models
 
-import db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
+import (
+	"time"
+
+	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
+)
 
 type CreateOrderRequest struct {
 	PaymentID     string  `json:"payment_id" binding:"required"`
@@ -10,6 +14,18 @@ type CreateOrderRequest struct {
 	Email         string  `json:"email" binding:"required"`
 	TotalShipping float64 `json:"total_shipping" binding:"required,min=1000,max=100000000"`
 	Status        string  `json:"status" binding:"required"`
+}
+
+type OrderReponse struct {
+	ID        int64     `json:"id"`
+	Username  string    `json:"username"`
+	ToAddress string    `json:"to_address"`
+	Note      string    `json:"note"`
+	SubAmount int32     `json:"sub_amount"`
+	SubTotal  float64   `json:"sub_total"`
+	Sale      float64   `json:"sale"`
+	Status    string    `json:"status"`
+	CreateAt  time.Time `json:"create_at"`
 }
 
 type DeleteOrderRequest struct {

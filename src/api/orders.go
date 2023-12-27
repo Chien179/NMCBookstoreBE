@@ -123,9 +123,25 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		return
 	}
 
-	server.createPayment(ctx, req.PaymentID, order.ID, req.ToAddress, req.TotalShipping, subTotal, req.Status, req.Email)
+	err = server.createPayment(ctx, req.PaymentID, order.ID, req.ToAddress, req.TotalShipping, order.SubTotal, req.Status, req.Email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-	ctx.JSON(http.StatusOK, order)
+	rsp := models.OrderReponse{
+		ID:        order.ID,
+		Username:  order.Username,
+		ToAddress: req.ToAddress,
+		Note:      order.Note.String,
+		SubAmount: order.SubAmount,
+		SubTotal:  order.SubTotal,
+		Sale:      order.Sale,
+		Status:    order.Status,
+		CreateAt:  order.CreatedAt,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 func (server *Server) deleteOrder(ctx *gin.Context) {
@@ -361,4 +377,14 @@ func (server *Server) listOrderCancelled(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) listAllOrder(ctx *gin.Context) {
+	orders, err := server.store.ListAllOders(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, orders)
 }

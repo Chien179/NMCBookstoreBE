@@ -34,6 +34,22 @@ func (server *Server) getLikeReview(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, like)
 }
 
+func (server *Server) listLike(ctx *gin.Context) {
+	var req models.ListLikeRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	likes, err := server.store.ListLike(ctx, req.Username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, likes)
+}
+
 func (server *Server) likeReview(ctx *gin.Context) {
 	var req models.LikeRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -82,6 +98,21 @@ func (server *Server) likeReview(ctx *gin.Context) {
 	likeAmount := 1
 	if !like.IsLike {
 		likeAmount = -1
+	}
+
+	if likeAmount == 1 {
+		dislikeArg := db.UpdateDislikeParams{
+			Username:  req.Username,
+			ReviewID:  req.ReviewId,
+			IsDislike: false,
+		}
+
+		_, err := server.store.UpdateDislike(ctx, dislikeArg)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
 	}
 
 	review, err := server.store.GetReview(ctx, req.ReviewId)

@@ -69,3 +69,7 @@ RETURNING *;
 SELECT COUNT(*) AS reviews
 FROM reviews AS r
 WHERE r.username = $1;
+-- name: ListReviews :many
+SELECT *
+FROM reviews
+ORDER BY id;

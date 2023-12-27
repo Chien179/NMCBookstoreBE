@@ -76,8 +76,6 @@ func GetGoogleOauthToken(code string) (GoogleOauthToken, error) {
 		return GoogleOauthToken{}, err
 	}
 
-	fmt.Println(GoogleOauthTokenRes)
-
 	tokenBody := GoogleOauthToken{
 		AccessToken: GoogleOauthTokenRes["access_token"].(string),
 		IdToken:     GoogleOauthTokenRes["id_token"].(string),

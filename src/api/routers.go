@@ -42,6 +42,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	bookRoutes.GET("/", server.listBook)
 	bookRoutes.GET("/the_best", server.listTheBestBook)
 	bookRoutes.GET("/newest", server.listNewestBook)
+	bookRoutes.GET("/list_book_follow_genre", server.listBookFollowGenre)
 
 	genreRoutes := router.Group("/genres")
 	genreRoutes.GET("/:id", server.getGenre)
@@ -96,6 +97,8 @@ func (server *Server) userAuth(router *gin.Engine) {
 	reviewRoutes.GET("/dislike", server.getDislikeReview)
 	reviewRoutes.POST("/:book_id", server.createReview)
 	reviewRoutes.DELETE("/:id", server.deleteReview)
+	reviewRoutes.GET("/list_like/:username", server.listLike)
+	reviewRoutes.DELETE("/list_dislike/:username", server.listDislike)
 
 	orderRoutes := usersRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))
 	orderRoutes.POST("/", server.createOrder)
@@ -114,6 +117,7 @@ func (server *Server) adminAuth(router *gin.Engine) {
 
 	bookRoutes := adminRoutes.Group("/books").Use(authMiddleware(server.tokenMaker), isAdmin())
 	bookRoutes.GET("/", server.listBook)
+	bookRoutes.GET("/all_books", server.listAllBook)
 	bookRoutes.POST("/", server.createBook)
 	bookRoutes.PUT("/:id", server.updateBook)
 	bookRoutes.DELETE("/:id", server.deleteBook)
@@ -139,4 +143,8 @@ func (server *Server) adminAuth(router *gin.Engine) {
 
 	orderRoutes := adminRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))
 	orderRoutes.GET("/", server.listOrder)
+	orderRoutes.GET("/all_orders", server.listAllOrder)
+
+	reviewRoutes := adminRoutes.Group("/reviews").Use(authMiddleware(server.tokenMaker))
+	reviewRoutes.GET("/all_reviews", server.listAllReview)
 }

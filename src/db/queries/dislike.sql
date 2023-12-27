@@ -4,6 +4,11 @@ FROM "dislike"
 WHERE username = sqlc.arg(username)
     AND review_id = sqlc.arg(review_id)
 LIMIT 1;
+-- name: ListDislike :many
+SELECT *
+FROM "dislike"
+WHERE username = sqlc.arg(username)
+ORDER BY review_id;
 -- name: UpdateDislike :one
 UPDATE "dislike"
 SET is_dislike = sqlc.arg(is_dislike)

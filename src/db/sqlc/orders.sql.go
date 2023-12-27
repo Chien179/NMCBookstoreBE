@@ -89,6 +89,44 @@ func (q *Queries) GetOrderToPayment(ctx context.Context, username string) (Order
 	return i, err
 }
 
+const listAllOders = `-- name: ListAllOders :many
+SELECT id, username, created_at, status, sub_amount, sub_total, sale, note
+FROM orders
+ORDER BY id
+`
+
+func (q *Queries) ListAllOders(ctx context.Context) ([]Order, error) {
+	rows, err := q.db.QueryContext(ctx, listAllOders)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Order{}
+	for rows.Next() {
+		var i Order
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.CreatedAt,
+			&i.Status,
+			&i.SubAmount,
+			&i.SubTotal,
+			&i.Sale,
+			&i.Note,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listOders = `-- name: ListOders :one
 SELECT t.total_page,
   JSON_AGG(

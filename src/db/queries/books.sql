@@ -27,6 +27,8 @@ SELECT t.total_page,
       t.quantity,
       'rating',
       t.rating,
+      'is_deleted',
+      t.is_deleted,
       'created_at',
       t.created_at
     )

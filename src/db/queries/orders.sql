@@ -58,3 +58,7 @@ SET status = COALESCE(sqlc.narg(status), status),
   sale = COALESCE(sqlc.narg(sale), sale)
 WHERE id = sqlc.arg(id)
 RETURNING *;
+-- name: ListAllOders :many
+SELECT *
+FROM orders
+ORDER BY id;

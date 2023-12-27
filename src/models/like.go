@@ -11,3 +11,7 @@ type LikeRequest struct {
 	Username string `json:"username" binding:"required"`
 	ReviewId int64  `json:"review_id" binding:"required"`
 }
+
+type ListLikeRequest struct {
+	Username string `uri:"username" binding:"required"`
+}

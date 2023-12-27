@@ -2,7 +2,6 @@ package helper
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/Chien179/NMCBookstoreBE/src/models"
 )
@@ -81,7 +80,6 @@ func QueryElastic(search models.SearchRequest) (string, error) {
 		return "", err
 	}
 	result := json.RawMessage(queryByte)
-	fmt.Println(string(result))
 
 	return string(result), nil
 }

@@ -58,6 +58,41 @@ func (q *Queries) GetDislike(ctx context.Context, arg GetDislikeParams) (Dislike
 	return i, err
 }
 
+const listDislike = `-- name: ListDislike :many
+SELECT id, username, review_id, is_dislike
+FROM "dislike"
+WHERE username = $1
+ORDER BY review_id
+`
+
+func (q *Queries) ListDislike(ctx context.Context, username string) ([]Dislike, error) {
+	rows, err := q.db.QueryContext(ctx, listDislike, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Dislike{}
+	for rows.Next() {
+		var i Dislike
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.ReviewID,
+			&i.IsDislike,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateDislike = `-- name: UpdateDislike :one
 UPDATE "dislike"
 SET is_dislike = $1
