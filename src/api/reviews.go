@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
@@ -54,7 +55,7 @@ func (server *Server) createReview(ctx *gin.Context) {
 		}
 	}
 
-	if !isReviewed {
+	if !isReviewed && err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -140,28 +141,32 @@ func (server *Server) listReview(ctx *gin.Context) {
 	bt, _ := reviews.Reviews.MarshalJSON()
 	_ = json.Unmarshal(bt, &result)
 
-	for _, re := range result {
+	for i, _ := range result {
 		arg := db.GetLikeParams{
-			ReviewID: re.ID,
+			ReviewID: result[i].ID,
 			Username: req.Username,
 		}
 
 		isLike := false
 		like, err := server.store.GetLike(ctx, arg)
-		isLike = like.IsLike
-		re.Islike = isLike
+		if err == nil {
+			isLike = like.IsLike
+		}
+		result[i].Islike = isLike
 
 		dislikeArg := db.GetDislikeParams{
-			ReviewID: re.ID,
+			ReviewID: result[i].ID,
 			Username: req.Username,
 		}
+
+		fmt.Println(dislikeArg)
 
 		isDislike := false
 		dislike, err := server.store.GetDislike(ctx, dislikeArg)
 		if err == nil {
 			isDislike = dislike.IsDislike
 		}
-		re.IsDislike = isDislike
+		result[i].IsDislike = isDislike
 	}
 
 	ctx.JSON(http.StatusOK, result)
