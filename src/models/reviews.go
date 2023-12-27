@@ -31,7 +31,7 @@ type ReviewsResponse struct {
 	Id        int64     `json:"id"`
 	Username  string    `json:"username"`
 	Image     string    `json:"image"`
-	BooksId   string    `json:"books_id"`
+	BooksId   int64     `json:"books_id"`
 	Comments  string    `json:"comments"`
 	Rating    float64   `json:"rating"`
 	Islike    bool      `json:"is_like"`
