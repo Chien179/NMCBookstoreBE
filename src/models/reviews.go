@@ -33,7 +33,7 @@ type ListReviewRequest struct {
 
 type ReviewsResponse struct {
 	TotalPage int64        `json:"total_page"`
-	Data      []ReviewData `json:"books"`
+	Data      []ReviewData `json:"reviews"`
 }
 
 type ReviewData struct {
