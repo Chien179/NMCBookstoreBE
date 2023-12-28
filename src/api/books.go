@@ -256,8 +256,7 @@ func (server *Server) updateBook(ctx *gin.Context) {
 	}
 	sale, err := strconv.Atoi(req.Value["sale"][0])
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
+		sale = 0
 	}
 	quantity, err := strconv.Atoi(req.Value["quantity"][0])
 	if err != nil {
@@ -276,7 +275,7 @@ func (server *Server) updateBook(ctx *gin.Context) {
 			Valid:   price > 0,
 		},
 		Sale: sql.NullFloat64{
-			Float64: book.Sale,
+			Float64: float64(sale),
 			Valid:   sale >= 0,
 		},
 		Image: imgUrls,
