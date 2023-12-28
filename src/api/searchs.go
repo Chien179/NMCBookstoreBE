@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
@@ -67,12 +66,11 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 	var books []models.BookResponse
 	for _, inf := range result.Hits.Hits {
 		source := inf.Source
-		sale, _ := strconv.ParseFloat(source.Sale, 64)
 		book := models.BookResponse{
 			ID:          source.ID,
 			Name:        source.Name,
 			Price:       source.Price,
-			Sale:        sale,
+			Sale:        source.Sale,
 			Image:       source.Image,
 			Description: source.Description,
 			Author:      source.Author,
