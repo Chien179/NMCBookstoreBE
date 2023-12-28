@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"math"
 	"net/http"
 	"strings"
 
@@ -89,7 +90,8 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 		return
 	}
 
-	rsp := db.ListBooksRow{TotalPage: aggs.Aggregations.UniqueBooks.Value, Books: json.RawMessage(booksByte)}
+	totalPage := int(math.Round(aggs.Aggregations.UniqueBooks.Value / float64(req.PageSize)))
+	rsp := db.ListBooksRow{TotalPage: float64(totalPage), Books: json.RawMessage(booksByte)}
 
 	ctx.JSON(http.StatusOK, rsp)
 }
