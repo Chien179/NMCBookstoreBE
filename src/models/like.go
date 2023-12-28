@@ -8,8 +8,7 @@ type LikeResponse struct {
 }
 
 type LikeRequest struct {
-	Username string `json:"username" binding:"required"`
-	ReviewId int64  `json:"review_id" binding:"required"`
+	ReviewId int64 `json:"review_id" binding:"required"`
 }
 
 type ListLikeRequest struct {

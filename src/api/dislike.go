@@ -6,6 +6,7 @@ import (
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
 	"github.com/Chien179/NMCBookstoreBE/src/models"
+	"github.com/Chien179/NMCBookstoreBE/src/token"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,8 +17,9 @@ func (server *Server) getDislikeReview(ctx *gin.Context) {
 		return
 	}
 
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.GetDislikeParams{
-		Username: req.Username,
+		Username: authPayLoad.Username,
 		ReviewID: req.ReviewId,
 	}
 
@@ -57,8 +59,9 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 		return
 	}
 
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	arg := db.GetDislikeParams{
-		Username: req.Username,
+		Username: authPayLoad.Username,
 		ReviewID: req.ReviewId,
 	}
 
@@ -66,7 +69,7 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			arg := db.CreatedDislikeParams{
-				Username:  req.Username,
+				Username:  authPayLoad.Username,
 				ReviewID:  req.ReviewId,
 				IsDislike: true,
 			}
@@ -83,7 +86,7 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 		return
 	} else {
 		uArg := db.UpdateDislikeParams{
-			Username:  req.Username,
+			Username:  authPayLoad.Username,
 			ReviewID:  req.ReviewId,
 			IsDislike: !dislike.IsDislike,
 		}
@@ -102,13 +105,13 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 
 	if dislikeAmount == 1 {
 		likeArg := db.UpdateLikeParams{
-			Username: req.Username,
+			Username: authPayLoad.Username,
 			ReviewID: req.ReviewId,
 			IsLike:   false,
 		}
 
 		_, err := server.store.GetLike(ctx, db.GetLikeParams{
-			Username: req.Username,
+			Username: authPayLoad.Username,
 			ReviewID: req.ReviewId,
 		})
 
