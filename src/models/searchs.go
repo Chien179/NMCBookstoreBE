@@ -90,7 +90,7 @@ type SearchResponse struct {
 				Publisher   string   `json:"publisher"`
 				Image       []string `json:"image"`
 				Description string   `json:"description"`
-				Sale        string   `json:"sale"`
+				Sale        float64  `json:"sale"`
 				IsDeleted   bool     `json:"is_deleted"`
 				Author      string   `json:"author"`
 				Price       float64  `json:"price"`
