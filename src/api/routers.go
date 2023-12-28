@@ -93,7 +93,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	reviewRoutes.GET("/like", server.getLikeReview)
 	reviewRoutes.GET("/action/like", server.likeReview)
 	reviewRoutes.GET("/action/dislike", server.dislikeReview)
-	reviewRoutes.POST("/action/report", server.report)
+	reviewRoutes.POST("/action/report/:id", server.report)
 	reviewRoutes.GET("/dislike", server.getDislikeReview)
 	reviewRoutes.POST("/:book_id", server.createReview)
 	reviewRoutes.DELETE("/:id", server.deleteReview)

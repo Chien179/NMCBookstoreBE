@@ -16,6 +16,10 @@ type DeleteReviewRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+type ReportReviewRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
 type ListReviewFormdata struct {
 	Username string `form:"username" binding:"required"`
 	PageID   int32  `form:"page_id" binding:"required,min=1"`
