@@ -220,8 +220,9 @@ UPDATE orders
 SET status = COALESCE($1, status),
   sub_amount = COALESCE($2, sub_amount),
   sub_total = COALESCE($3, sub_total),
-  sale = COALESCE($4, sale)
-WHERE id = $5
+  sale = COALESCE($4, sale),
+  note = COALESCE($5, note)
+WHERE id = $6
 RETURNING id, username, created_at, status, sub_amount, sub_total, sale, note
 `
 
@@ -230,6 +231,7 @@ type UpdateOrderParams struct {
 	SubAmount sql.NullInt32   `json:"sub_amount"`
 	SubTotal  sql.NullFloat64 `json:"sub_total"`
 	Sale      sql.NullFloat64 `json:"sale"`
+	Note      sql.NullString  `json:"note"`
 	ID        int64           `json:"id"`
 }
 
@@ -239,6 +241,7 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		arg.SubAmount,
 		arg.SubTotal,
 		arg.Sale,
+		arg.Note,
 		arg.ID,
 	)
 	var i Order

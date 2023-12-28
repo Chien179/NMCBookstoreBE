@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
@@ -158,8 +157,6 @@ func (server *Server) listReview(ctx *gin.Context) {
 			ReviewID: result[i].ID,
 			Username: req.Username,
 		}
-
-		fmt.Println(dislikeArg)
 
 		isDislike := false
 		dislike, err := server.store.GetDislike(ctx, dislikeArg)

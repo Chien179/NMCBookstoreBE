@@ -55,7 +55,8 @@ UPDATE orders
 SET status = COALESCE(sqlc.narg(status), status),
   sub_amount = COALESCE(sqlc.narg(sub_amount), sub_amount),
   sub_total = COALESCE(sqlc.narg(sub_total), sub_total),
-  sale = COALESCE(sqlc.narg(sale), sale)
+  sale = COALESCE(sqlc.narg(sale), sale),
+  note = COALESCE(sqlc.narg(note), note)
 WHERE id = sqlc.arg(id)
 RETURNING *;
 -- name: ListAllOders :many

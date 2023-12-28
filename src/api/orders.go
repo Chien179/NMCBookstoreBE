@@ -115,6 +115,10 @@ func (server *Server) createOrder(ctx *gin.Context) {
 			String: req.Status,
 			Valid:  true,
 		},
+		Note: sql.NullString{
+			String: req.Note,
+			Valid:  req.Note != "",
+		},
 	}
 
 	order, err = server.store.UpdateOrder(ctx, arg)
