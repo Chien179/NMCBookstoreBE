@@ -44,6 +44,7 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 	var result models.SearchResponse
 	if err := json.Unmarshal(body, &result); err != nil { // Parse []byte to go struct pointer
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	res, err = server.elastic.Search(
@@ -53,12 +54,14 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 	)
 	if err != nil { // Parse []byte to go struct pointer
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	body, err = io.ReadAll(res.Body)
 	var aggs models.Aggs
 	if err := json.Unmarshal(body, &aggs); err != nil { // Parse []byte to go struct pointer
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	var books []models.BookResponse
@@ -85,6 +88,7 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 	booksByte, err := json.Marshal(books)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	rsp := db.ListBooksRow{TotalPage: aggs.Aggregations.UniqueBooks.Value, Books: json.RawMessage(booksByte)}
