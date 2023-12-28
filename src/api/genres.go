@@ -55,12 +55,12 @@ func (server *Server) createGenre(ctx *gin.Context) {
 
 func (server *Server) updateGenre(ctx *gin.Context) {
 	var req models.UpdateGenreRequest
-	if err := ctx.ShouldBindJSON(&req.Name); err != nil {
+	if err := ctx.ShouldBindJSON(&req.CreateGenreRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	if err := ctx.ShouldBindUri(&req.ID); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}

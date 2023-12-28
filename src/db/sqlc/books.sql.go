@@ -179,6 +179,9 @@ SELECT DISTINCT b.id,
   b."name",
   b.description,
   b.price,
+  b.image,
+  b.is_deleted,
+  b.author,
   b.sale,
   b.sale,
   b.rating
@@ -190,6 +193,9 @@ ORDER BY b.id,
   b."name",
   b.description,
   b.price,
+  b.image,
+  b.is_deleted,
+  b.author,
   b.sale,
   b.rating
 LIMIT $2
@@ -201,13 +207,16 @@ type ListBookFollowGenreParams struct {
 }
 
 type ListBookFollowGenreRow struct {
-	ID          int64   `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
-	Sale        float64 `json:"sale"`
-	Sale_2      float64 `json:"sale_2"`
-	Rating      float64 `json:"rating"`
+	ID          int64    `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Price       float64  `json:"price"`
+	Image       []string `json:"image"`
+	IsDeleted   bool     `json:"is_deleted"`
+	Author      string   `json:"author"`
+	Sale        float64  `json:"sale"`
+	Sale_2      float64  `json:"sale_2"`
+	Rating      float64  `json:"rating"`
 }
 
 func (q *Queries) ListBookFollowGenre(ctx context.Context, arg ListBookFollowGenreParams) ([]ListBookFollowGenreRow, error) {
@@ -224,6 +233,9 @@ func (q *Queries) ListBookFollowGenre(ctx context.Context, arg ListBookFollowGen
 			&i.Name,
 			&i.Description,
 			&i.Price,
+			pq.Array(&i.Image),
+			&i.IsDeleted,
+			&i.Author,
 			&i.Sale,
 			&i.Sale_2,
 			&i.Rating,

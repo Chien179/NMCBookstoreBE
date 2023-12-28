@@ -136,7 +136,9 @@ func (server *Server) listReview(ctx *gin.Context) {
 		return
 	}
 
-	result := []models.ReviewsResponse{}
+	rsp := models.ReviewsResponse{}
+	rsp.TotalPage = int64(reviews.TotalPage)
+	result := []models.ReviewData{}
 	bt, _ := reviews.Reviews.MarshalJSON()
 	_ = json.Unmarshal(bt, &result)
 
@@ -166,7 +168,9 @@ func (server *Server) listReview(ctx *gin.Context) {
 		result[i].IsDislike = isDislike
 	}
 
-	ctx.JSON(http.StatusOK, result)
+	rsp.Data = result
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 func (server *Server) report(ctx *gin.Context) {

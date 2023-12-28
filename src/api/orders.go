@@ -390,5 +390,40 @@ func (server *Server) listAllOrder(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, orders)
+	rsp := []models.ListOrderResponse{}
+
+	for _, order := range orders {
+		transactions, err := server.store.ListTransactionsByOrderID(ctx, order.ID)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		books, err := server.listBookByTransactions(ctx, transactions)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		rsp = append(rsp, models.ListOrderResponse{
+			ID:           order.ID,
+			Username:     order.Username,
+			Books:        books,
+			Transactions: transactions,
+			Status:       order.Status,
+			SubTotal:     order.SubTotal,
+			Sale:         float64(order.Sale),
+			SubAmount:    order.SubAmount,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }

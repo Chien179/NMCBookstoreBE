@@ -28,6 +28,11 @@ type ListReviewRequest struct {
 }
 
 type ReviewsResponse struct {
+	TotalPage int64        `json:"total_page"`
+	Data      []ReviewData `json:"books"`
+}
+
+type ReviewData struct {
 	ID        int64     `json:"id"`
 	Username  string    `json:"username"`
 	Image     string    `json:"image"`
