@@ -1,13 +1,16 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Chien179/NMCBookstoreBE/src/models"
+	"github.com/Chien179/NMCBookstoreBE/src/token"
 	"github.com/gin-gonic/gin"
 )
 
 func (server *Server) getRank(ctx *gin.Context) {
+	authPayLoad := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 	var req models.RankRequest
 	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -17,6 +20,12 @@ func (server *Server) getRank(ctx *gin.Context) {
 	user, err := server.store.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	if authPayLoad.Username != user.Username {
+		err := errors.New("account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 
