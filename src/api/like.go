@@ -98,7 +98,7 @@ func (server *Server) likeReview(ctx *gin.Context) {
 		}
 	}
 
-	dislike, err := server.store.GetDislike(ctx, db.GetDislikeParams{
+	_, err = server.store.GetDislike(ctx, db.GetDislikeParams{
 		Username: authPayLoad.Username,
 		ReviewID: req.ReviewId,
 	})
@@ -106,17 +106,14 @@ func (server *Server) likeReview(ctx *gin.Context) {
 	likeAmount := 1
 	if !like.IsLike {
 		likeAmount = -1
-	} else if dislike.IsDislike {
+	} else if err == nil {
 		dislikeArg := db.UpdateDislikeParams{
 			Username:  authPayLoad.Username,
 			ReviewID:  req.ReviewId,
 			IsDislike: false,
 		}
 
-		if err == nil {
-			server.store.UpdateDislike(ctx, dislikeArg)
-		}
-
+		server.store.UpdateDislike(ctx, dislikeArg)
 	}
 
 	review, err := server.store.GetReview(ctx, req.ReviewId)
