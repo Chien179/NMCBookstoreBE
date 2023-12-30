@@ -8,6 +8,7 @@ import (
 	"github.com/Chien179/NMCBookstoreBE/src/models"
 	"github.com/Chien179/NMCBookstoreBE/src/token"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 )
 
 func (server *Server) getLikeReview(ctx *gin.Context) {
@@ -98,10 +99,12 @@ func (server *Server) likeReview(ctx *gin.Context) {
 		}
 	}
 
-	_, err = server.store.GetDislike(ctx, db.GetDislikeParams{
+	dislike, err := server.store.GetDislike(ctx, db.GetDislikeParams{
 		Username: authPayLoad.Username,
 		ReviewID: req.ReviewId,
 	})
+
+	log.Print(dislike)
 
 	likeAmount := 1
 	if !like.IsLike {
