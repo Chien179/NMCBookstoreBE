@@ -14,7 +14,7 @@ func (server *Server) setupRouter() {
 	server.adminAuth(router)
 
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"https://nmc-bookstore-api.onrender.com"}
+	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
 	corsConfig.AllowCredentials = true
 
 	router.Use(cors.New(corsConfig))
