@@ -125,8 +125,8 @@ type SearchRequest struct {
 }
 
 type RecommedRequest struct {
-	Name string `form:"name"  binding:"required"`
-	Size int64  `form:"size"`
+	Name string `json:"name" binding:"required"`
+	Size int64  `json:"size"  binding:"required,default=6"`
 }
 
 type JustForYouRequest struct {

@@ -98,7 +98,7 @@ func (server *Server) elasticSearch(ctx *gin.Context) {
 
 func (server *Server) recommend(ctx *gin.Context) {
 	var req models.RecommedRequest
-	if err := ctx.ShouldBindQuery(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}

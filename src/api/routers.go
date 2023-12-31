@@ -14,7 +14,7 @@ func (server *Server) setupRouter() {
 	server.adminAuth(router)
 
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://localhost:3000"}
+	corsConfig.AllowOrigins = []string{"*"}
 	corsConfig.AllowCredentials = true
 
 	router.Use(cors.New(corsConfig))
@@ -147,4 +147,5 @@ func (server *Server) adminAuth(router *gin.Engine) {
 
 	reviewRoutes := adminRoutes.Group("/reviews").Use(authMiddleware(server.tokenMaker))
 	reviewRoutes.GET("/all_reviews", server.listAllReview)
+	reviewRoutes.PUT("/delete", server.softDeleteReview)
 }
