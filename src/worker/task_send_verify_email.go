@@ -44,6 +44,10 @@ func (distributior *RedisTaskDistributor) DistributeTaskSendVerifyEmail(
 }
 
 func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error {
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot load config")
+	}
 	var payload PayloadSendVerifyEmail
 	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
 		return fmt.Errorf("failed to unmarshal payload: %w", err, asynq.SkipRetry)
@@ -64,7 +68,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 	}
 
 	subject := "Welcome to NMC Bookstore"
-	verifyUrl := fmt.Sprintf("http://localhost:3000/verified_email?email_id=%d&secret_code=%s",
+	verifyUrl := fmt.Sprintf(config.CLIENT_HOST+"/verified_email?email_id=%d&secret_code=%s",
 		verifyEmail.ID, verifyEmail.SecretCode)
 	content := fmt.Sprintf(`Hello %s,<br/>
 	Thank you for registering with us!<br/>

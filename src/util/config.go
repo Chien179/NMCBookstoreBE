@@ -27,11 +27,11 @@ type Config struct {
 	CloudinaryCloudName     string        `mapstructure:"CLOUDINARY_CLOUD_NAME"`
 	CloudinaryAPIKey        string        `mapstructure:"CLOUDINARY_API_KEY"`
 	CloudinaryAPISecret     string        `mapstructure:"CLOUDINARY_API_SECRET"`
-	GoogleOauthClientID     string        `mapstructure:"GOOGLE_OAUTH_CLIENT_ID"`
 	RedisUsername           string        `mapstructure:"REDIS_USERNAME"`
 	RedisPassword           string        `mapstructure:"REDIS_PASSWORD"`
+	GoogleOauthClientID     string        `mapstructure:"GOOGLE_OAUTH_CLIENT_ID"`
 	GoogleOauthClientSecret string        `mapstructure:"GOOGLE_OAUTH_CLIENT_SECRET"`
-	GoogleOAuthRedirectUrl  string        `mapstructure:"GOOGLE_OAUTH_REDIRECT_URL"`
+	CLIENT_HOST             string        `mapstructure:"CLIENT_HOST"`
 }
 
 // LoadConfig reads configuration from file or enviroment variables.

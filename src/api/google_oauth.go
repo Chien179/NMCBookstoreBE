@@ -143,7 +143,7 @@ func (server *Server) GoogleOAuthURL(ctx *gin.Context) {
 	conf := &oauth2.Config{
 		ClientID:     config.GoogleOauthClientID,
 		ClientSecret: config.GoogleOauthClientSecret,
-		RedirectURL:  config.GoogleOAuthRedirectUrl,
+		RedirectURL:  config.CLIENT_HOST + "/login/oauth/google",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.profile",
 			"https://www.googleapis.com/auth/userinfo.email",

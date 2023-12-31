@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
 	"github.com/Chien179/NMCBookstoreBE/src/models"
 	"github.com/Chien179/NMCBookstoreBE/src/token"
+	"github.com/Chien179/NMCBookstoreBE/src/worker"
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 )
 
 func (server *Server) createReview(ctx *gin.Context) {
@@ -180,14 +183,34 @@ func (server *Server) report(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.UpdateReviewParams{
-		ID: req.ID,
-		Reported: sql.NullBool{
-			Bool:  true,
-			Valid: true,
+	review, err := server.store.GetReview(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := db.ReportReviewTxParams{
+		UpdateReviewParams: db.UpdateReviewParams{
+			Reported: sql.NullBool{
+				Bool:  true,
+				Valid: true,
+			},
+		},
+		AfterCreate: func(id int64) error {
+			taskPayload := &worker.PayloadSendReportReview{
+				Review: review,
+			}
+
+			opts := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+
+			return server.taskDistributor.DistributeTaskSendReportReview(ctx, taskPayload, opts...)
 		},
 	}
-	_, err := server.store.UpdateReview(ctx, arg)
+	err = server.store.ReportReviewTx(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

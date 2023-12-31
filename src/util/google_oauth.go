@@ -41,7 +41,7 @@ func GetGoogleOauthToken(code string) (GoogleOauthToken, error) {
 	values.Add("code", code)
 	values.Add("client_id", config.GoogleOauthClientID)
 	values.Add("client_secret", config.GoogleOauthClientSecret)
-	values.Add("redirect_uri", config.GoogleOAuthRedirectUrl)
+	values.Add("redirect_uri", config.CLIENT_HOST+"/login/oauth/google")
 
 	query := values.Encode()
 

@@ -44,6 +44,11 @@ func (distributior *RedisTaskDistributor) DistributeTaskSendResetPassword(
 }
 
 func (processor *RedisTaskProcessor) ProcessTaskSendResetPassword(ctx context.Context, task *asynq.Task) error {
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot load config")
+	}
+
 	var payload PayloadSendResetPassword
 	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
 		return fmt.Errorf("failed to unmarshal payload: %w", err, asynq.SkipRetry)
@@ -62,8 +67,8 @@ func (processor *RedisTaskProcessor) ProcessTaskSendResetPassword(ctx context.Co
 		return fmt.Errorf("failed to create verify email: %w", err)
 	}
 
-	subject := "Welcome to NMC Bookstore"
-	resetPasswordUrl := fmt.Sprintf("http://localhost:3000/reset_password?id=%d&reset_code=%s",
+	subject := "Reset password for NMC Bookstore account"
+	resetPasswordUrl := fmt.Sprintf(config.CLIENT_HOST+"/reset_password?id=%d&reset_code=%s",
 		resetPassword.ID, resetPassword.ResetCode)
 	content := fmt.Sprintf(`Hello %s,<br/>
 	We received a request to reset your password!<br/>
