@@ -19,6 +19,8 @@ SELECT t.total_page,
       comments,
       'rating',
       rating,
+      "is_deleted",
+      is_deleted,
       'created_at',
       created_at
     )
@@ -33,6 +35,7 @@ FROM (
       reviews.books_id AS books_id,
       reviews."comments" AS "comments",
       reviews.rating AS rating,
+      reviews.is_deleted AS is_deleted,
       reviews.created_at AS created_at
     FROM reviews
       INNER JOIN users ON reviews.username = users.username

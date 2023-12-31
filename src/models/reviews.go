@@ -45,5 +45,6 @@ type ReviewData struct {
 	Rating    float64   `json:"rating"`
 	Islike    bool      `json:"is_like"`
 	IsDislike bool      `json:"is_dislike"`
-	CreatedAt time.Time `json:"create_at"`
+	IsDeleted bool      `json:"is_deleted"`
+	CreatedAt time.Time `json:"created_at"`
 }
