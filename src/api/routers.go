@@ -37,7 +37,7 @@ func (server *Server) publicRouter(router *gin.Engine) {
 	router.GET("/just_for_you", server.justForYou)
 
 	bookRoutes := router.Group("/books")
-	bookRoutes.POST("/recommend", server.recommend)
+	bookRoutes.GET("/recommend", server.recommend)
 	bookRoutes.GET("/:id", server.getBook)
 	bookRoutes.GET("/", server.listBook)
 	bookRoutes.GET("/the_best", server.listTheBestBook)
