@@ -66,12 +66,13 @@ func (server *Server) likeReview(ctx *gin.Context) {
 	}
 
 	like, err := server.store.GetLike(ctx, arg)
+	isLike := true
 	if err != nil {
 		if err == sql.ErrNoRows {
 			arg := db.CreateLikeParams{
 				Username: authPayLoad.Username,
 				ReviewID: req.ReviewId,
-				IsLike:   true,
+				IsLike:   isLike,
 			}
 			_, err := server.store.CreateLike(ctx, arg)
 			if err != nil {
@@ -83,10 +84,11 @@ func (server *Server) likeReview(ctx *gin.Context) {
 			return
 		}
 	} else {
+		isLike = !like.IsLike
 		uArg := db.UpdateLikeParams{
 			Username: authPayLoad.Username,
 			ReviewID: req.ReviewId,
-			IsLike:   !like.IsLike,
+			IsLike:   isLike,
 		}
 
 		_, err := server.store.UpdateLike(ctx, uArg)
@@ -97,7 +99,7 @@ func (server *Server) likeReview(ctx *gin.Context) {
 	}
 
 	likeAmount := 1
-	if !like.IsLike {
+	if !isLike {
 		likeAmount = 0
 	} else {
 		dislikeArg := db.UpdateDislikeParams{

@@ -66,12 +66,13 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 	}
 
 	dislike, err := server.store.GetDislike(ctx, arg)
+	isDislike := true
 	if err != nil {
 		if err == sql.ErrNoRows {
 			arg := db.CreatedDislikeParams{
 				Username:  authPayLoad.Username,
 				ReviewID:  req.ReviewId,
-				IsDislike: true,
+				IsDislike: isDislike,
 			}
 			_, err := server.store.CreatedDislike(ctx, arg)
 			if err != nil {
@@ -83,10 +84,11 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 			return
 		}
 	} else {
+		isDislike = !dislike.IsDislike
 		uArg := db.UpdateDislikeParams{
 			Username:  authPayLoad.Username,
 			ReviewID:  req.ReviewId,
-			IsDislike: !dislike.IsDislike,
+			IsDislike: isDislike,
 		}
 
 		_, err := server.store.UpdateDislike(ctx, uArg)
@@ -97,7 +99,7 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 	}
 
 	dislikeAmount := 1
-	if !dislike.IsDislike {
+	if !isDislike {
 		dislikeAmount = 0
 	} else {
 		likeArg := db.UpdateLikeParams{
