@@ -73,17 +73,15 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 				ReviewID:  req.ReviewId,
 				IsDislike: true,
 			}
-			dislike, err := server.store.CreatedDislike(ctx, arg)
+			_, err := server.store.CreatedDislike(ctx, arg)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 				return
 			}
-
-			ctx.JSON(http.StatusOK, dislike)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
 	} else {
 		uArg := db.UpdateDislikeParams{
 			Username:  authPayLoad.Username,
@@ -91,7 +89,7 @@ func (server *Server) dislikeReview(ctx *gin.Context) {
 			IsDislike: !dislike.IsDislike,
 		}
 
-		dislike, err = server.store.UpdateDislike(ctx, uArg)
+		_, err := server.store.UpdateDislike(ctx, uArg)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return

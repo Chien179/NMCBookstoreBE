@@ -73,17 +73,15 @@ func (server *Server) likeReview(ctx *gin.Context) {
 				ReviewID: req.ReviewId,
 				IsLike:   true,
 			}
-			like, err := server.store.CreateLike(ctx, arg)
+			_, err := server.store.CreateLike(ctx, arg)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 				return
 			}
-
-			ctx.JSON(http.StatusOK, like)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
 	} else {
 		uArg := db.UpdateLikeParams{
 			Username: authPayLoad.Username,
@@ -91,7 +89,7 @@ func (server *Server) likeReview(ctx *gin.Context) {
 			IsLike:   !like.IsLike,
 		}
 
-		like, err = server.store.UpdateLike(ctx, uArg)
+		_, err := server.store.UpdateLike(ctx, uArg)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
