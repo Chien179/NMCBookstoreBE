@@ -3,7 +3,7 @@ package db
 import "context"
 
 type ReportReviewTxParams struct {
-	UpdateReviewParams
+	ID          int64
 	AfterCreate func(id int64) error
 }
 
@@ -11,7 +11,7 @@ func (store *SQLStore) ReportReviewTx(ctx context.Context, arg ReportReviewTxPar
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
 
-		_, err = q.UpdateReview(ctx, arg.UpdateReviewParams)
+		_, err = q.SoftDeleteReview(ctx, arg.ID)
 		if err != nil {
 			return err
 		}

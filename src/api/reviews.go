@@ -183,34 +183,14 @@ func (server *Server) report(ctx *gin.Context) {
 		return
 	}
 
-	review, err := server.store.GetReview(ctx, req.ID)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
+	arg := db.UpdateReviewParams{
 
-	arg := db.ReportReviewTxParams{
-		UpdateReviewParams: db.UpdateReviewParams{
-			Reported: sql.NullBool{
-				Bool:  true,
-				Valid: true,
-			},
-		},
-		AfterCreate: func(id int64) error {
-			taskPayload := &worker.PayloadSendReportReview{
-				Review: review,
-			}
-
-			opts := []asynq.Option{
-				asynq.MaxRetry(10),
-				asynq.ProcessIn(10 * time.Second),
-				asynq.Queue(worker.QueueCritical),
-			}
-
-			return server.taskDistributor.DistributeTaskSendReportReview(ctx, taskPayload, opts...)
+		Reported: sql.NullBool{
+			Bool:  true,
+			Valid: true,
 		},
 	}
-	err = server.store.ReportReviewTx(ctx, arg)
+	_, err := server.store.UpdateReview(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -236,8 +216,29 @@ func (server *Server) softDeleteReview(ctx *gin.Context) {
 		return
 	}
 
-	_, err := server.store.SoftDeleteReview(ctx, req.ID)
+	review, err := server.store.GetReview(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
+	arg := db.ReportReviewTxParams{
+		ID: req.ID, AfterCreate: func(id int64) error {
+			taskPayload := &worker.PayloadSendReportReview{
+				Review: review,
+			}
+
+			opts := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+
+			return server.taskDistributor.DistributeTaskSendReportReview(ctx, taskPayload, opts...)
+		},
+	}
+
+	err = server.store.ReportReviewTx(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
