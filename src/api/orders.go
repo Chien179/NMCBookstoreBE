@@ -142,7 +142,7 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		SubTotal:  order.SubTotal,
 		Sale:      order.Sale,
 		Status:    order.Status,
-		CreateAt:  order.CreatedAt,
+		CreatedAt: order.CreatedAt,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

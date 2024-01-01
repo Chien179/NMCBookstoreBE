@@ -25,7 +25,7 @@ type OrderReponse struct {
 	SubTotal  float64   `json:"sub_total"`
 	Sale      float64   `json:"sale"`
 	Status    string    `json:"status"`
-	CreateAt  time.Time `json:"create_at"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type DeleteOrderRequest struct {

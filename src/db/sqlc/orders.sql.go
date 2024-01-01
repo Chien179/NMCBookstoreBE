@@ -12,8 +12,8 @@ import (
 )
 
 const createOrder = `-- name: CreateOrder :one
-INSERT INTO orders (username, created_at)
-VALUES ($1, NOW())
+INSERT INTO orders (username)
+VALUES ($1)
 RETURNING id, username, created_at, status, sub_amount, sub_total, sale, note
 `
 
