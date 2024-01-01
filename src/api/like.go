@@ -108,7 +108,7 @@ func (server *Server) likeReview(ctx *gin.Context) {
 
 	likeAmount := 1
 	if !like.IsLike {
-		likeAmount = -1
+		likeAmount = 0
 	} else if err == nil {
 		dislikeArg := db.UpdateDislikeParams{
 			Username:  authPayLoad.Username,

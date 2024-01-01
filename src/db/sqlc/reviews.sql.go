@@ -156,7 +156,7 @@ SELECT t.total_page,
       comments,
       'rating',
       rating,
-      "is_deleted",
+      'is_deleted',
       is_deleted,
       'created_at',
       created_at

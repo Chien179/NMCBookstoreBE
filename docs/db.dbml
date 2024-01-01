@@ -16,9 +16,10 @@ Table users as U {
   image varchar [not null]
   phone_number varchar [not null]
   role varchar [not null]
+  is_deleted boolean [not null, default: false]
   password_changed_at timestamptz [not null, default: '0001-01-01 00:00:00Z']
   is_email_verified boolean [not null, default: false]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
 }
 
 Table verify_emails {
@@ -46,9 +47,9 @@ Table address as A{
   username varchar [ref: > U.username, not null]
   city_id bigserial [ref: > C.id, not null]
   district_id bigserial [ref: > D.id, not null]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
   
-  indexes{
+  indexes  {
     username
     city_id
     district_id
@@ -59,15 +60,15 @@ Table address as A{
 Table cities as C {
   id bigserial [pk]
   name varchar [not null]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
 }
 
 Table districts as D {
   id bigserial [pk]
   city_id bigserial [ref: > C.id, not null]
   name varchar [not null]
-  created_at timestamptz [not null, default:"now()"]
-  indexes{
+  created_at timestamptz [not null, default:'now()']
+  indexes  {
     city_id
   }
 }
@@ -81,25 +82,17 @@ Table books as B {
   author varchar [not null]
   publisher varchar [not null]
   quantity int [not null]
+  is_deleted boolean [not null, default: false]
+  sale float [not null, default: 0]
   rating float [not null, default:0]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
 }
 
 Table genres as G{
   id bigserial [pk]
   name varchar [not null]
-  created_at timestamptz [not null, default:"now()"]
-}
-
-Table subgenres as SG{
-  id bigserial [pk]
-  genres_id bigserial [ref: > G.id, not null]
-  name varchar [not null]
-  created_at timestamptz [not null, default:"now()"]
-  
-  indexes {
-     genres_id
-  }
+  is_deleted boolean [not null, default: false]
+  created_at timestamptz [not null, default:'now()']
 }
 
 Table carts as BC{
@@ -108,9 +101,9 @@ Table carts as BC{
   username varchar [ref: > U.username, not null]
   amount int [not null, default: 1]
   total float [not null, default: 0]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
   
-  indexes{
+  indexes {
     books_id
     username
     (books_id, username)
@@ -121,7 +114,7 @@ Table books_genres as BG {
   id bigserial [pk]
   books_id bigserial [ref: > B.id, not null]
   genres_id bigserial [ref: > G.id, not null]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
   
   indexes {
     books_id
@@ -130,28 +123,16 @@ Table books_genres as BG {
   }
 }
 
-Table books_subgenres as BS {
-  id bigserial [pk]
-  books_id bigserial [ref: > B.id, not null]
-  subgenres_id bigserial [ref: > SG.id, not null]
-  created_at timestamptz [not null, default:"now()"]
-  
-  indexes {
-    books_id
-    subgenres_id
-    (books_id, subgenres_id)
-  }
-}
-
 Table reviews as R {
   id bigserial [pk]
   username varchar [ref: > U.username, not null]
   books_id bigserial [ref: > B.id, not null]
   comments varchar [not null]
+  is_deleted boolean [not null, default: false]
   rating int [not null]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
   
-  indexes{
+  indexes {
     username
     books_id
     (username, books_id)
@@ -164,35 +145,37 @@ Table like as L {
   review_id bigserial [ref: > R.id, not null]
   is_like boolean [not null, default:false]
   
-  indexes{
+  indexes {
     username
     review_id
-    (username, books_id)
+    (username, review_id)
   }
 }
 
-Table dislike as D {
+Table dislike as DL {
   id bigserial [pk]
   username varchar [ref: > U.username, not null]
   review_id bigserial [ref: > R.id, not null]
   is_dislike boolean [not null, default:false]
   
-  indexes{
+  indexes {
     username
     review_id
-    (username, books_id)
+    (username, review_id)
   }
 }
 
 Table orders as O {
   id bigserial [pk]
   username varchar [ref: > U.username, not null]
-  status varchar [not null, default:"unpaid"]
+  status varchar [not null, default:'unpaid']
   sub_amount int [not null, default: 1]
   sub_total float [not null, default:0]
-  created_at timestamptz [not null, default:"now()"]
+  sale float [not null, default: 0]
+  note varchar
+  created_at timestamptz [not null, default:'now()']
   
-  indexes{
+  indexes {
     username
   }
 }
@@ -203,9 +186,9 @@ Table transactions as T {
   books_id bigserial [ref: > B.id, not null]
   amount int [not null, default: 1]
   total float [not null, default: 0]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
   
-  indexes{
+  indexes {
     books_id
     orders_id
     (books_id, orders_id)
@@ -216,9 +199,9 @@ Table wishlists as BW{
   id bigserial [pk]
   books_id bigserial [ref: > B.id, not null]
   username varchar [ref: > U.username, not null]
-  created_at timestamptz [not null, default:"now()"]
+  created_at timestamptz [not null, default:'now()']
   
-  indexes{
+  indexes {
     books_id
     username
     (books_id, username)
@@ -255,10 +238,10 @@ Table payments as P{
   shipping_id bigserial [ref: - S.id, not null]
   price float [not null, default:0]
   subtotal float [not null, default:0]
-  status varchar [not null, default:"failed"]
+  status varchar [not null, default:'failed']
   created_at timestamptz [not null, default:'now()']
 
-  indexes{
+  indexes {
     username
     order_id
     shipping_id

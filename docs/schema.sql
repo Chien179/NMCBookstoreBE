@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-05-30T15:44:11.452Z
+-- Generated at: 2024-01-01T10:56:18.680Z
 
 CREATE TABLE "users" (
   "username" varchar PRIMARY KEY,
@@ -12,6 +12,7 @@ CREATE TABLE "users" (
   "image" varchar NOT NULL,
   "phone_number" varchar NOT NULL,
   "role" varchar NOT NULL,
+  "is_deleted" boolean NOT NULL DEFAULT false,
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "is_email_verified" boolean NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
@@ -67,6 +68,8 @@ CREATE TABLE "books" (
   "author" varchar NOT NULL,
   "publisher" varchar NOT NULL,
   "quantity" int NOT NULL,
+  "is_deleted" boolean NOT NULL DEFAULT false,
+  "sale" float NOT NULL DEFAULT 0,
   "rating" float NOT NULL DEFAULT 0,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
@@ -74,13 +77,7 @@ CREATE TABLE "books" (
 CREATE TABLE "genres" (
   "id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
-);
-
-CREATE TABLE "subgenres" (
-  "id" bigserial PRIMARY KEY,
-  "genres_id" bigserial NOT NULL,
-  "name" varchar NOT NULL,
+  "is_deleted" boolean NOT NULL DEFAULT false,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
@@ -100,20 +97,28 @@ CREATE TABLE "books_genres" (
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
-CREATE TABLE "books_subgenres" (
-  "id" bigserial PRIMARY KEY,
-  "books_id" bigserial NOT NULL,
-  "subgenres_id" bigserial NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
-);
-
 CREATE TABLE "reviews" (
   "id" bigserial PRIMARY KEY,
   "username" varchar NOT NULL,
   "books_id" bigserial NOT NULL,
   "comments" varchar NOT NULL,
+  "is_deleted" boolean NOT NULL DEFAULT false,
   "rating" int NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
+);
+
+CREATE TABLE "like" (
+  "id" bigserial PRIMARY KEY,
+  "username" varchar NOT NULL,
+  "review_id" bigserial NOT NULL,
+  "is_like" boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE "dislike" (
+  "id" bigserial PRIMARY KEY,
+  "username" varchar NOT NULL,
+  "review_id" bigserial NOT NULL,
+  "is_dislike" boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE "orders" (
@@ -122,6 +127,8 @@ CREATE TABLE "orders" (
   "status" varchar NOT NULL DEFAULT 'unpaid',
   "sub_amount" int NOT NULL DEFAULT 1,
   "sub_total" float NOT NULL DEFAULT 0,
+  "sale" float NOT NULL DEFAULT 0,
+  "note" varchar,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
 );
 
@@ -139,20 +146,6 @@ CREATE TABLE "wishlists" (
   "books_id" bigserial NOT NULL,
   "username" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT 'now()'
-);
-
-CREATE TABLE "like"(
-  id bigserial PRIMARY KEY,
-  username varchar NOT NULL,
-  review_id bigserial NOT NULL,
-  is_like boolean NOT NULL DEFAULT false
-);
-
-CREATE TABLE "dislike"(
-  id bigserial PRIMARY KEY,
-  username varchar NOT NULL,
-  review_id bigserial NOT NULL,
-  is_dislike boolean NOT NULL DEFAULT false
 );
 
 CREATE TABLE "sessions" (
@@ -205,8 +198,6 @@ CREATE INDEX ON "address" ("username", "city_id", "district_id");
 
 CREATE INDEX ON "districts" ("city_id");
 
-CREATE INDEX ON "subgenres" ("genres_id");
-
 CREATE INDEX ON "carts" ("books_id");
 
 CREATE INDEX ON "carts" ("username");
@@ -219,19 +210,21 @@ CREATE INDEX ON "books_genres" ("genres_id");
 
 CREATE INDEX ON "books_genres" ("books_id", "genres_id");
 
-CREATE INDEX ON "books_subgenres" ("books_id");
-
-CREATE INDEX ON "books_subgenres" ("subgenres_id");
-
-CREATE INDEX ON "books_subgenres" ("books_id", "subgenres_id");
-
 CREATE INDEX ON "reviews" ("username");
 
 CREATE INDEX ON "reviews" ("books_id");
 
 CREATE INDEX ON "reviews" ("username", "books_id");
 
+CREATE INDEX ON "like" ("username");
+
+CREATE INDEX ON "like" ("review_id");
+
 CREATE INDEX ON "like" ("username", "review_id");
+
+CREATE INDEX ON "dislike" ("username");
+
+CREATE INDEX ON "dislike" ("review_id");
 
 CREATE INDEX ON "dislike" ("username", "review_id");
 
@@ -269,8 +262,6 @@ ALTER TABLE "address" ADD FOREIGN KEY ("district_id") REFERENCES "districts" ("i
 
 ALTER TABLE "districts" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
 
-ALTER TABLE "subgenres" ADD FOREIGN KEY ("genres_id") REFERENCES "genres" ("id");
-
 ALTER TABLE "carts" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
 
 ALTER TABLE "carts" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
@@ -278,10 +269,6 @@ ALTER TABLE "carts" ADD FOREIGN KEY ("username") REFERENCES "users" ("username")
 ALTER TABLE "books_genres" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
 
 ALTER TABLE "books_genres" ADD FOREIGN KEY ("genres_id") REFERENCES "genres" ("id");
-
-ALTER TABLE "books_subgenres" ADD FOREIGN KEY ("books_id") REFERENCES "books" ("id");
-
-ALTER TABLE "books_subgenres" ADD FOREIGN KEY ("subgenres_id") REFERENCES "subgenres" ("id");
 
 ALTER TABLE "reviews" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
@@ -309,6 +296,6 @@ ALTER TABLE "sessions" ADD FOREIGN KEY ("username") REFERENCES "users" ("usernam
 
 ALTER TABLE "payments" ADD FOREIGN KEY ("username") REFERENCES "users" ("username");
 
-ALTER TABLE "payments" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+ALTER TABLE "orders" ADD FOREIGN KEY ("id") REFERENCES "payments" ("order_id");
 
-ALTER TABLE "payments" ADD FOREIGN KEY ("shipping_id") REFERENCES "shippings" ("id");
+ALTER TABLE "shippings" ADD FOREIGN KEY ("id") REFERENCES "payments" ("shipping_id");
