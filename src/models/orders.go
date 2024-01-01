@@ -12,7 +12,7 @@ type CreateOrderRequest struct {
 	ToAddress     string  `json:"to_address" binding:"required"`
 	Note          string  `json:"note"`
 	Email         string  `json:"email" binding:"required"`
-	TotalShipping float64 `json:"total_shipping" binding:"required,min=0,max=100"`
+	TotalShipping float64 `json:"total_shipping" binding:"required,max=100"`
 	Status        string  `json:"status" binding:"required"`
 }
 
