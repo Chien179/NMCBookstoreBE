@@ -194,6 +194,7 @@ func (server *Server) report(ctx *gin.Context) {
 			Bool:  true,
 			Valid: true,
 		},
+		ID: req.ID,
 	}
 	_, err = server.store.UpdateReview(ctx, arg)
 	if err != nil {
