@@ -183,14 +183,19 @@ func (server *Server) report(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.UpdateReviewParams{
+	_, err := server.store.GetReview(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
+	arg := db.UpdateReviewParams{
 		Reported: sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		},
 	}
-	_, err := server.store.UpdateReview(ctx, arg)
+	_, err = server.store.UpdateReview(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -216,14 +221,14 @@ func (server *Server) softDeleteReview(ctx *gin.Context) {
 		return
 	}
 
-	review, err := server.store.GetReview(ctx, req.ID)
+	_, err := server.store.GetReview(ctx, req.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	arg := db.ReportReviewTxParams{
-		ID: req.ID, AfterCreate: func(id int64) error {
+		ID: req.ID, AfterCreate: func(review db.Review) error {
 			taskPayload := &worker.PayloadSendReportReview{
 				Review: review,
 			}

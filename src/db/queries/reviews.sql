@@ -40,7 +40,8 @@ FROM (
     FROM reviews
       INNER JOIN users ON reviews.username = users.username
     WHERE reviews.books_id = $1
-    ORDER BY id
+    ORDER BY rating,
+      created_at DESC
     LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset')
   ) AS t
 GROUP BY t.total_page;
