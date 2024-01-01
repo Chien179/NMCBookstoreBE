@@ -70,13 +70,13 @@ func (server *Server) userAuth(router *gin.Engine) {
 
 	cartRoutes := usersRoutes.Group("/carts").Use(authMiddleware(server.tokenMaker))
 	cartRoutes.POST("/:id", server.addToCart)
-	cartRoutes.DELETE("/", server.deleteBookInCart)
+	cartRoutes.DELETE("/delete", server.deleteBookInCart)
 	cartRoutes.PUT("/:id", server.upatdeAmountCart)
 	cartRoutes.GET("/", server.listBookInCart)
 
 	wishlistRoutes := usersRoutes.Group("/wishlists").Use(authMiddleware(server.tokenMaker))
 	wishlistRoutes.POST("/:id", server.addToWishlist)
-	wishlistRoutes.DELETE("/", server.deleteBookInWishlist)
+	wishlistRoutes.DELETE("/delete", server.deleteBookInWishlist)
 	wishlistRoutes.GET("/", server.listBookInWishlist)
 
 	addressRoutes := usersRoutes.Group("/addresses").Use(authMiddleware(server.tokenMaker))
@@ -84,7 +84,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	addressRoutes.GET("/:id", server.getAddress)
 	addressRoutes.GET("/", server.listAddress)
 	addressRoutes.PUT("/:id", server.updateAddress)
-	addressRoutes.DELETE("/", server.deleteAddress)
+	addressRoutes.DELETE("/delete", server.deleteAddress)
 	addressRoutes.GET("/cities/:id", server.getCity)
 	addressRoutes.GET("/cities", server.listCities)
 	addressRoutes.GET("/districts/:city_id", server.listDistricts)
@@ -101,7 +101,7 @@ func (server *Server) userAuth(router *gin.Engine) {
 	reviewRoutes.DELETE("/list_dislike/:username", server.listDislike)
 
 	orderRoutes := usersRoutes.Group("/orders").Use(authMiddleware(server.tokenMaker))
-	orderRoutes.POST("/", server.createOrder)
+	orderRoutes.POST("/create", server.createOrder)
 	orderRoutes.GET("/", server.listOrder)
 	orderRoutes.GET("/paid", server.listOrderPaid)
 	orderRoutes.GET("/cancelled", server.listOrderCancelled)
