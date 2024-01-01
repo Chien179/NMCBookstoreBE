@@ -147,5 +147,5 @@ func (server *Server) adminAuth(router *gin.Engine) {
 
 	reviewRoutes := adminRoutes.Group("/reviews").Use(authMiddleware(server.tokenMaker))
 	reviewRoutes.GET("/all_reviews", server.listAllReview)
-	reviewRoutes.PUT("/delete", server.softDeleteReview)
+	reviewRoutes.PUT("/delete.:id", server.softDeleteReview)
 }
