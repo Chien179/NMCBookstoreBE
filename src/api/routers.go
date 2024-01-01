@@ -1,7 +1,6 @@
 package api
 
 import (
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,12 +11,6 @@ func (server *Server) setupRouter() {
 	server.publicRouter(router)
 	server.userAuth(router)
 	server.adminAuth(router)
-
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"*"}
-	corsConfig.AllowCredentials = true
-
-	router.Use(cors.New(corsConfig))
 	server.router = router
 }
 
