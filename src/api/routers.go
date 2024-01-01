@@ -14,7 +14,7 @@ func (server *Server) setupRouter() {
 	server.adminAuth(router)
 
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"*"}
+	corsConfig.AllowOrigins = []string{"https://nmcbookstore.id.vn"}
 	corsConfig.AllowCredentials = true
 
 	router.Use(cors.New(corsConfig))
