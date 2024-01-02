@@ -14,7 +14,6 @@ type Config struct {
 	DBSourceTest            string        `mapstructure:"DB_SOURCE_TEST"`
 	ServerAddress           string        `mapstructure:"SERVER_ADDRESS"`
 	GRPCAddress             string        `mapstructure:"GRPC_ADDRESS"`
-	ELASTIC_ADDRESS         string        `mapstructure:"ELASTIC_ADDRESS"`
 	TokenSymmetrictKey      string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	AccessTokenDuration     time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenDuration    time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
@@ -31,7 +30,10 @@ type Config struct {
 	RedisPassword           string        `mapstructure:"REDIS_PASSWORD"`
 	GoogleOauthClientID     string        `mapstructure:"GOOGLE_OAUTH_CLIENT_ID"`
 	GoogleOauthClientSecret string        `mapstructure:"GOOGLE_OAUTH_CLIENT_SECRET"`
-	CLIENT_HOST             string        `mapstructure:"CLIENT_HOST"`
+	ClientHost              string        `mapstructure:"CLIENT_HOST"`
+	ElasticUsername         string        `mapstructure:"ELASTIC_USERNAME"`
+	ElasticAddress          string        `mapstructure:"ELASTIC_ADDRESS"`
+	ElasticPassword         string        `mapstructure:"ELASTIC_PASSWORD"`
 }
 
 // LoadConfig reads configuration from file or enviroment variables.

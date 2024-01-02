@@ -45,7 +45,7 @@ func main() {
 		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12},
 	}
 
-	// runDBMigration(config.MigrationURL, config.DBSource)
+	runDBMigration(config.MigrationURL, config.DBSource)
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 	go runTaskProcessor(config, redisOpt, store)
@@ -77,7 +77,9 @@ func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store d
 
 func connectElasticSearch(config util.Config) (*elasticsearch.Client, error) {
 	cfg := elasticsearch.Config{
-		Addresses: []string{config.ELASTIC_ADDRESS},
+		Addresses: []string{config.ElasticAddress},
+		Username:  config.ElasticUsername,
+		Password:  config.ElasticPassword,
 	}
 	es, err := elasticsearch.NewClient(cfg)
 	log.Info().Msg("start elastic search")
