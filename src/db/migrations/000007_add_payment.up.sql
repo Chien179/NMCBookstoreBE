@@ -5,7 +5,7 @@ CREATE TABLE "payments" (
   "shipping_id" bigserial NOT NULL,
   "subtotal" float NOT NULL DEFAULT 0,
   "status" varchar NOT NULL DEFAULT 'failed',
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "shippings" (

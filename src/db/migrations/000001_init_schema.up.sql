@@ -11,7 +11,7 @@ CREATE TABLE "users" (
   "rank" int NOT NULL DEFAULT 0,
   "is_deleted" boolean NOT NULL DEFAULT false,
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "address" (
   "id" BIGSERIAL PRIMARY KEY,
@@ -19,18 +19,18 @@ CREATE TABLE "address" (
   "username" varchar NOT NULL,
   "city_id" bigserial NOT NULL,
   "district_id" bigserial NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "cities" (
   "id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "districts" (
   "id" bigserial PRIMARY KEY,
   "city_id" bigserial NOT NULL,
   "name" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "books" (
   "id" BIGSERIAL PRIMARY KEY,
@@ -43,38 +43,38 @@ CREATE TABLE "books" (
   "sale" float NOT NULL DEFAULT 0,
   "quantity" int NOT NULL,
   "is_deleted" boolean NOT NULL DEFAULT false,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "genres" (
   "id" BIGSERIAL PRIMARY KEY,
   "name" varchar NOT NULL,
   "is_deleted" boolean NOT NULL DEFAULT false,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "subgenres" (
   "id" BIGSERIAL PRIMARY KEY,
   "genres_id" bigserial NOT NULL,
   "name" varchar NOT NULL,
   "is_deleted" boolean NOT NULL DEFAULT false,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "carts" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "username" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "books_genres" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "genres_id" bigserial NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "books_subgenres" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "subgenres_id" bigserial NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "reviews" (
   "id" BIGSERIAL PRIMARY KEY,
@@ -86,24 +86,24 @@ CREATE TABLE "reviews" (
   "comments" varchar NOT NULL,
   "is_deleted" boolean NOT NULL DEFAULT false,
   "rating" int NOT NULL DEFAULT 0,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "orders" (
   "id" BIGSERIAL PRIMARY KEY,
   "username" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "transactions" (
   "id" BIGSERIAL PRIMARY KEY,
   "orders_id" bigserial NOT NULL,
   "books_id" bigserial NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE TABLE "wishlists" (
   "id" BIGSERIAL PRIMARY KEY,
   "books_id" bigserial NOT NULL,
   "username" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()'
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 CREATE INDEX ON "address" ("username");
 CREATE INDEX ON "address" ("city_id");

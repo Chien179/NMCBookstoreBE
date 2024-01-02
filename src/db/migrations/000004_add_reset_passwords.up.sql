@@ -3,7 +3,7 @@ CREATE TABLE "reset_passwords" (
   "username" varchar NOT NULL,
   "reset_code" varchar NOT NULL,
   "is_used" bool NOT NULL DEFAULT false,
-  "created_at" timestamptz NOT NULL DEFAULT 'now()',
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
   "expired_at" timestamptz NOT NULL DEFAULT (now()  + interval '15 minutes')
 );
 
