@@ -20,6 +20,7 @@ type TaskProcessor interface {
 	ProcessTaskSendVerifyEmail(ctx context.Context, task *asynq.Task) error
 	ProcessTaskSendResetPassword(ctx context.Context, task *asynq.Task) error
 	ProcessTaskSendReportReview(ctx context.Context, task *asynq.Task) error
+	ProcessTaskSendOrderSuccess(ctx context.Context, task *asynq.Task) error
 }
 
 type RedisTaskProcessor struct {
@@ -62,6 +63,7 @@ func (processor *RedisTaskProcessor) Start() error {
 	mux.HandleFunc(TaskSendVerifyEmail, processor.ProcessTaskSendVerifyEmail)
 	mux.HandleFunc(TaskSendResetPassword, processor.ProcessTaskSendResetPassword)
 	mux.HandleFunc(TaskSendReportReview, processor.ProcessTaskSendReportReview)
+	mux.HandleFunc(TaskSendOrderSuccess, processor.ProcessTaskSendOrderSuccess)
 
 	return processor.server.Start(mux)
 }

@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"time"
 
 	db "github.com/Chien179/NMCBookstoreBE/src/db/sqlc"
 	"github.com/Chien179/NMCBookstoreBE/src/models"
 	"github.com/Chien179/NMCBookstoreBE/src/token"
+	"github.com/Chien179/NMCBookstoreBE/src/worker"
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 )
 
 func (server *Server) createOrder(ctx *gin.Context) {
@@ -143,6 +146,22 @@ func (server *Server) createOrder(ctx *gin.Context) {
 		Sale:      order.Sale,
 		Status:    order.Status,
 		CreatedAt: order.CreatedAt,
+	}
+
+	taskPayload := &worker.PayloadSendOrderSuccess{
+		Order: rsp,
+	}
+
+	opts := []asynq.Option{
+		asynq.MaxRetry(10),
+		asynq.ProcessIn(10 * time.Second),
+		asynq.Queue(worker.QueueCritical),
+	}
+
+	err = server.taskDistributor.DistributeTaskSendOrderSuccess(ctx, taskPayload, opts...)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

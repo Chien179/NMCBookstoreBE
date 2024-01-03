@@ -24,6 +24,12 @@ type TaskDistributor interface {
 		payload *PayloadSendReportReview,
 		opts ...asynq.Option,
 	) error
+
+	DistributeTaskSendOrderSuccess(
+		ctx context.Context,
+		payload *PayloadSendOrderSuccess,
+		opts ...asynq.Option,
+	) error
 }
 
 type RedisTaskDistributor struct {
