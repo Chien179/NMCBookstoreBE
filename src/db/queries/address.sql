@@ -4,7 +4,12 @@ FROM address
 WHERE id = $1
 LIMIT 1;
 -- name: ListAddresses :many
-SELECT *
+SELECT address.id AS id,
+  address.address AS address,
+  districts.name AS district,
+  districts.id AS district_id,
+  cities.name AS city,
+  address.created_at AS created_at
 FROM address
   INNER JOIN cities ON cities.id = address.city_id
   INNER JOIN districts ON districts.id = address.district_id
