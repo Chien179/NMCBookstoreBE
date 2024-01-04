@@ -78,8 +78,6 @@ func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store d
 func connectElasticSearch(config util.Config) (*elasticsearch.Client, error) {
 	cfg := elasticsearch.Config{
 		Addresses: []string{config.ElasticAddress},
-		Username:  config.ElasticUsername,
-		Password:  config.ElasticPassword,
 	}
 	es, err := elasticsearch.NewClient(cfg)
 	log.Info().Msg("start elastic search")

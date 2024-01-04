@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const createAddress = `-- name: CreateAddress :one
@@ -79,10 +80,7 @@ func (q *Queries) GetAddress(ctx context.Context, id int64) (Address, error) {
 }
 
 const listAddresses = `-- name: ListAddresses :many
-SELECT address.id AS id,
-  address.address AS address,
-  districts.name AS district,
-  cities.name AS city
+SELECT address.id, address, username, address.city_id, district_id, address.created_at, cities.id, cities.name, cities.created_at, districts.id, districts.city_id, districts.name, districts.created_at
 FROM address
   INNER JOIN cities ON cities.id = address.city_id
   INNER JOIN districts ON districts.id = address.district_id
@@ -91,10 +89,19 @@ ORDER BY address.id
 `
 
 type ListAddressesRow struct {
-	ID       int64  `json:"id"`
-	Address  string `json:"address"`
-	District string `json:"district"`
-	City     string `json:"city"`
+	ID          int64     `json:"id"`
+	Address     string    `json:"address"`
+	Username    string    `json:"username"`
+	CityID      int64     `json:"city_id"`
+	DistrictID  int64     `json:"district_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	ID_2        int64     `json:"id_2"`
+	Name        string    `json:"name"`
+	CreatedAt_2 time.Time `json:"created_at_2"`
+	ID_3        int64     `json:"id_3"`
+	CityID_2    int64     `json:"city_id_2"`
+	Name_2      string    `json:"name_2"`
+	CreatedAt_3 time.Time `json:"created_at_3"`
 }
 
 func (q *Queries) ListAddresses(ctx context.Context, username string) ([]ListAddressesRow, error) {
@@ -109,8 +116,17 @@ func (q *Queries) ListAddresses(ctx context.Context, username string) ([]ListAdd
 		if err := rows.Scan(
 			&i.ID,
 			&i.Address,
-			&i.District,
-			&i.City,
+			&i.Username,
+			&i.CityID,
+			&i.DistrictID,
+			&i.CreatedAt,
+			&i.ID_2,
+			&i.Name,
+			&i.CreatedAt_2,
+			&i.ID_3,
+			&i.CityID_2,
+			&i.Name_2,
+			&i.CreatedAt_3,
 		); err != nil {
 			return nil, err
 		}
