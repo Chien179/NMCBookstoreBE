@@ -58,9 +58,9 @@ func (processor *RedisTaskProcessor) ProcessTaskSendReportReview(ctx context.Con
 		return fmt.Errorf("failed to get user: %w", err)
 	}
 
-	subject := "Reset password for NMC Bookstore account"
+	subject := "Review report"
 	content := fmt.Sprintf(`Hello %s,<br/>
-	Your review "%s" on %s have been reported</br>
+	Your review "%s" on book "%s" have been reported</br>
 	`, user.Username, payload.Review.Comments, book.Name)
 	to := []string{user.Email}
 
