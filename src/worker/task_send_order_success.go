@@ -54,14 +54,14 @@ func (processor *RedisTaskProcessor) ProcessTaskSendOrderSuccess(ctx context.Con
 	}
 
 	subject := "Order Confirmation"
-	content := fmt.Sprintf(`Hello, %s</br>
-	Thank you for your order</br>
+	content := fmt.Sprintf(`Hello, %s<br/>
+	Thank you for your order<br/>
 	</br>
-	Here's the details information:</br>
+	Here's the details information:<br/>
 	</br>
-	Order confirmation: %d</br>
-	Total: %f$</br>
-	Delivery address: %s</br>`, user.Username, payload.Order.ID, payload.Order.SubTotal, payload.Order.ToAddress)
+	Order confirmation: %d<br/>
+	Total: %.2f$</br>
+	Delivery address: %s<br/>`, user.Username, payload.Order.ID, payload.Order.SubTotal, payload.Order.ToAddress)
 	to := []string{user.Email}
 
 	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
