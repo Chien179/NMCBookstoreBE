@@ -60,7 +60,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendOrderSuccess(ctx context.Con
 	Here's the details information:<br/>
 	</br>
 	Order confirmation: %d<br/>
-	Total: %.2f$</br>
+	Total: %.2f$<br/>
 	Delivery address: %s<br/>`, user.Username, payload.Order.ID, payload.Order.SubTotal, payload.Order.ToAddress)
 	to := []string{user.Email}
 
