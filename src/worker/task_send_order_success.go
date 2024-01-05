@@ -56,9 +56,9 @@ func (processor *RedisTaskProcessor) ProcessTaskSendOrderSuccess(ctx context.Con
 	subject := "Order Confirmation"
 	content := fmt.Sprintf(`Hello, %s<br/>
 	Thank you for your order<br/>
-	</br>
+	<br/>
 	Here's the details information:<br/>
-	</br>
+	<br/>
 	Order confirmation: %d<br/>
 	Total: %.2f$<br/>
 	Delivery address: %s<br/>`, user.Username, payload.Order.ID, payload.Order.SubTotal, payload.Order.ToAddress)
